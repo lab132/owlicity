@@ -187,7 +187,7 @@ namespace Owlicity
       }
     }
   }
-
+  
   /// <summary>
   /// This is the main type for your game.
   /// </summary>
@@ -229,9 +229,9 @@ namespace Owlicity
       spriteBatch = new SpriteBatch(GraphicsDevice);
 
       // TODO: use this.Content to load your game content here
-      Texture2D atlas = Content.Load<Texture2D>("test_0");
-      testAnimation = SpriteAnimationData.FromAtlas(atlas, 3, 128, 128);
-      testAnimation.FramesPerSecond = 1.0f;
+      Texture2D atlas = Content.Load<Texture2D>("slurp_spritesheet");
+      testAnimation = SpriteAnimationData.FromAtlas(atlas, 7, 210, 270);
+      testAnimation.SecondsPerFrame = 0.05f;
 
       test = testAnimation.CreateInstance();
       testTransform = new Transform { Position = new Vector3(20, 20, 0) };
