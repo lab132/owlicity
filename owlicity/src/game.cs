@@ -20,7 +20,7 @@ namespace Owlicity
       animOffset = new Transform
       {
         Parent = this,
-         Position = -0.5f * anim.Data.TileDim.ToVector2()
+        Position = -0.5f * anim.Data.TileDim.ToVector2()
       };
     }
     
@@ -31,7 +31,7 @@ namespace Owlicity
 
     public void Draw(SpriteBatch spriteBatch)
     {
-      anim.Draw(spriteBatch, animOffset);
+      anim.Draw(spriteBatch, animOffset.GetWorldTransform());
     }
   }
 
@@ -171,9 +171,9 @@ namespace Owlicity
     {
       GraphicsDevice.Clear(Color.CornflowerBlue);
 
-      spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, cam.ViewMatrix);
-      dummy.Draw(spriteBatch);
+      spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, cam.ViewMatrix);
       testLevel.Draw(gameTime, spriteBatch);
+      dummy.Draw(spriteBatch);
 
       int radius = 2;
       spriteBatch.FillRectangle(new Rectangle { X = -radius, Y = -radius, Width = 2 * radius, Height = 2 * radius }, Color.Lime);

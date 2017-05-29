@@ -26,7 +26,15 @@ namespace Owlicity.src
     public void Update(GameTime gameTime) { }
     public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
-      spriteBatch.Draw(_texture, AbsoulutePosition, Color.White);
+      spriteBatch.Draw(_texture,
+        position: AbsoulutePosition,
+        sourceRectangle: null,
+        color: Color.White,
+        rotation: 0,
+        origin: Vector2.Zero,
+        scale: 1,
+        effects: SpriteEffects.None,
+        layerDepth: 1.0f);
     }
   }
 }
