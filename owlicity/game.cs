@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
@@ -6,12 +6,7 @@ using System.Diagnostics;
 
 namespace Owlicity
 {
- 
 
-
-  
-
-  
   /// <summary>
   /// This is the main type for your game.
   /// </summary>
@@ -23,6 +18,7 @@ namespace Owlicity
     SpriteAnimationData testAnimation;
     SpriteAnimationInstance test;
     Transform testTransform;
+    Camera cam;
 
     public OwlicityGame()
     {
@@ -60,6 +56,9 @@ namespace Owlicity
       test = testAnimation.CreateInstance();
       test.PingPong = true;
       testTransform = new Transform { Position = new Vector3(20, 20, 0) };
+
+      cam = new Camera();
+      cam.LookAt = testTransform;
     }
 
     /// <summary>
@@ -82,6 +81,25 @@ namespace Owlicity
       {
         Exit();
       }
+      if (Keyboard.GetState().IsKeyDown(Keys.Right))
+      {
+        testTransform.Position += new Vector3(1.0f, 0.0f, 0.0f);
+      }
+
+      if (Keyboard.GetState().IsKeyDown(Keys.Left))
+      {
+        testTransform.Position += new Vector3(-1.0f, 0.0f, 0.0f);
+      }
+
+      if (Keyboard.GetState().IsKeyDown(Keys.Up))
+      {
+        testTransform.Position += new Vector3(0.0f, -1.0f, 0.0f);
+      }
+
+      if (Keyboard.GetState().IsKeyDown(Keys.Down))
+      {
+        testTransform.Position += new Vector3(0.0f, 1.0f, 0.0f);
+      }
 
       // TODO: Add your update logic here
       test.Update(gameTime);
@@ -97,7 +115,7 @@ namespace Owlicity
     {
       GraphicsDevice.Clear(Color.CornflowerBlue);
 
-      spriteBatch.Begin();
+      spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, cam.ViewMatrix);
       test.Draw(spriteBatch, testTransform);
       spriteBatch.End();
       // TODO: Add your drawing code here

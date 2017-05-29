@@ -42,13 +42,16 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="camera.cs" />
     <Compile Include="extensions.cs" />
+    <Compile Include="gameObject.cs" />
     <Compile Include="spriteAnimation.cs" />
     <Compile Include="game.cs" />
     <Compile Include="math.cs" />
     <Compile Include="program.cs" />
     <Compile Include="Properties\assembly_info.cs" />
     <Compile Include="sprite.cs" />
+    <Compile Include="world.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
