@@ -46,9 +46,10 @@
     <Compile Include="src\extensions.cs" />
     <Compile Include="src\gameObject.cs" />
     <Compile Include="src\level.cs" />
+    <Compile Include="src\primitives2D.cs" />
     <Compile Include="src\screen.cs" />
     <Compile Include="src\spriteAnimation.cs" />
-    <Compile Include="game.cs" />
+    <Compile Include="src\game.cs" />
     <Compile Include="src\math.cs" />
     <Compile Include="program.cs" />
     <Compile Include="Properties\assembly_info.cs" />
