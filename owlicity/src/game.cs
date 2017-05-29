@@ -7,6 +7,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System;
 
+/*
+  TODO:
+    - Input "abstraction", but only a little bit.
+    - Game object manager
+    - Audio
+*/
+
 namespace Owlicity
 {
   public class Dummy : ITransformable
@@ -95,7 +102,7 @@ namespace Owlicity
 
       cam = new Camera
       {
-        LookAt = dummy,
+        //LookAt = dummy,
         Bounds = GraphicsDevice.Viewport.Bounds.Size.ToVector2()
       };
 
@@ -106,8 +113,9 @@ namespace Owlicity
         for (uint j = 0; j < 7; j++)
         {
           var screen = new Screen();
-          screen.AssetName = $"level01/level01_{i}{j}";
-          testLevel.addScreen(j, i, screen);
+          screen.AssetName = $"level01/level01_{j}{i}";
+          testLevel.addScreen(i, j, screen);
+          screen.LoadContent(Content);
         }
       }
 
@@ -162,6 +170,29 @@ namespace Owlicity
       const float speed = 400.0f;
       dummy.LocalTransform.Position += inputVector.GetClampedTo(1.0f) * (speed * deltaSeconds);
 
+       inputVector = Vector2.Zero;
+      if (Keyboard.GetState().IsKeyDown(Keys.D))
+      {
+        inputVector.X += 1.0f;
+      }
+
+      if (Keyboard.GetState().IsKeyDown(Keys.A))
+      {
+        inputVector.X -= 1.0f;
+      }
+
+      if (Keyboard.GetState().IsKeyDown(Keys.W))
+      {
+        inputVector.Y -= 1.0f;
+      }
+
+      if (Keyboard.GetState().IsKeyDown(Keys.S))
+      {
+        inputVector.Y += 1.0f;
+      }
+
+      cam.LocalTransform.Position += inputVector.GetClampedTo(1.0f) * (speed * deltaSeconds);
+
       dummy.Update(gameTime);
 
       cam.Update(gameTime);
@@ -176,7 +207,6 @@ namespace Owlicity
     protected override void Draw(GameTime gameTime)
     {
       GraphicsDevice.Clear(Color.CornflowerBlue);
-
       spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, cam.ViewMatrix);
 
       testLevel.Draw(gameTime, spriteBatch);
