@@ -7,6 +7,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System;
 
+/*
+  TODO:
+    - Input "abstraction", but only a little bit.
+    - Game object manager
+    - Audio
+*/
+
 namespace Owlicity
 {
   public class Dummy : ITransformable
@@ -200,9 +207,6 @@ namespace Owlicity
     protected override void Draw(GameTime gameTime)
     {
       GraphicsDevice.Clear(Color.CornflowerBlue);
-      spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, cam.ViewMatrix);
-      
-
       spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, cam.ViewMatrix);
 
       testLevel.Draw(gameTime, spriteBatch);
