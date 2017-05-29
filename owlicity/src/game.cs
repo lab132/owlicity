@@ -54,6 +54,8 @@ namespace Owlicity
     {
       graphics = new GraphicsDeviceManager(this);
       Content.RootDirectory = "content";
+      graphics.PreferredBackBufferHeight = 1080;
+      graphics.PreferredBackBufferWidth = 1920;
     }
 
     /// <summary>
@@ -98,19 +100,15 @@ namespace Owlicity
 
       testLevel = new Level(Content);
 
-      Screen testScreen1 = new Screen();
-      testScreen1.AssetName = "dummy_level_1";
-      Screen testScreen2 = new Screen();
-      testScreen2.AssetName = "dummy_level_2";
-      Screen testScreen3 = new Screen();
-      testScreen3.AssetName = "dummy_level_3";
-      Screen testScreen4 = new Screen();
-      testScreen4.AssetName = "dummy_level_4";
-
-      testLevel.addScreen(0, 0, testScreen1);
-      testLevel.addScreen(0, 1, testScreen2);
-      testLevel.addScreen(1, 0, testScreen3);
-      testLevel.addScreen(1, 1, testScreen4);
+      for (uint i=0; i < 4; i++)
+      {
+        for (uint j = 0; j < 7; j++)
+        {
+          var screen = new Screen();
+          screen.AssetName = $"level01/level01_{i}{j}";
+          testLevel.addScreen(j, i, screen);
+        }
+      }
 
       testLevel.CullingCenter = dummy;
     }
@@ -178,9 +176,8 @@ namespace Owlicity
       GraphicsDevice.Clear(Color.CornflowerBlue);
 
       spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, cam.ViewMatrix);
-      testLevel.Draw(gameTime, spriteBatch);
       dummy.Draw(spriteBatch);
-
+      testLevel.Draw(gameTime, spriteBatch);
       int radius = 2;
       spriteBatch.FillRectangle(new Rectangle { X = -radius, Y = -radius, Width = 2 * radius, Height = 2 * radius }, Color.Lime);
       spriteBatch.End();
