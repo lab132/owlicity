@@ -27,8 +27,8 @@ namespace Owlicity
     private List<Screen> _previouslyActiveScreens;
     private Point _activeCenter;
     private ContentManager _contentManager;
-    public int ScreenTileWidth { get; set; } = 1024;
-    public int ScreenTileHeight { get; set; } = 1024;
+    public int ScreenTileWidth { get; set; } = 1920;
+    public int ScreenTileHeight { get; set; } = 1080;
     public ITransformable CullingCenter { get; set; }
 
     public void addScreen(uint posX, uint posY, Screen screen) {
