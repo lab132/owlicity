@@ -65,11 +65,27 @@ namespace Owlicity
     }
   }
 
+  public enum SpriteAnimationPlaybackMode
+  {
+    Forward,
+    Backward,
+  }
+
+  public enum SpriteAnimationPlaybackState
+  {
+    Stopped,
+    Started,
+    Paused,
+  }
+
   class SpriteAnimationInstance
   {
     public SpriteAnimationData Data { get; set; }
     public float CurrentFrameTime { get; set; }
     public int CurrentFrameIndex { get; set; }
+    public SpriteAnimationPlaybackMode PlaybackMode { get; set; }
+    public SpriteAnimationPlaybackState PlaybackState { get; set; }
+    public bool PingPong { get; set; }
 
     private Sprite _currentSprite;
 
@@ -89,22 +105,17 @@ namespace Owlicity
       {
         float deltaSeconds = (float)dt.ElapsedGameTime.TotalSeconds;
         CurrentFrameTime += deltaSeconds;
-        int newFrameIndex = CurrentFrameIndex;
-        while (CurrentFrameTime > Data.SecondsPerFrame)
+        int oldFrameIndex = CurrentFrameIndex;
+        while (CurrentFrameTime >= Data.SecondsPerFrame)
         {
           CurrentFrameTime -= Data.SecondsPerFrame;
-          ++newFrameIndex;
-          if (newFrameIndex >= Data.Frames.Count)
-          {
-            newFrameIndex = 0;
-          }
+          AdvanceFrameIndex();
         }
 
-        if (newFrameIndex != CurrentFrameIndex)
+        if (CurrentFrameIndex != oldFrameIndex)
         {
-          SpriteAnimationFrame frame = Data.Frames[newFrameIndex];
+          SpriteAnimationFrame frame = Data.Frames[CurrentFrameIndex];
           _currentSprite.TextureOffset = frame.Offset;
-          CurrentFrameIndex = newFrameIndex;
         }
       }
     }
@@ -116,6 +127,53 @@ namespace Owlicity
         _currentSprite.Draw(spriteBatch, transform);
       }
     }
-  }
 
+    public void AdvanceFrameIndex()
+    {
+      int newFrameIndex;
+      switch(PlaybackMode)
+      {
+        case SpriteAnimationPlaybackMode.Forward:
+        {
+          newFrameIndex = CurrentFrameIndex + 1;
+          if(newFrameIndex >= Data.Frames.Count)
+          {
+            if(PingPong)
+            {
+              // Note(manu): Just reverse the playback mode.
+              PlaybackMode = SpriteAnimationPlaybackMode.Backward;
+              newFrameIndex = CurrentFrameIndex;
+            }
+            else
+            {
+              newFrameIndex = 0;
+            }
+          }
+        } break;
+
+        case SpriteAnimationPlaybackMode.Backward:
+        {
+          newFrameIndex = CurrentFrameIndex - 1;
+          if(newFrameIndex < 0)
+          {
+            if(PingPong)
+            {
+              // Note(manu): Just reverse the playback mode.
+              PlaybackMode = SpriteAnimationPlaybackMode.Forward;
+              newFrameIndex = CurrentFrameIndex;
+            }
+            else
+            {
+              newFrameIndex = Data.Frames.Count - 1;
+            }
+          }
+        } break;
+
+        default:
+          throw new ArgumentException("Unknown playback mode.");
+      }
+
+      CurrentFrameIndex = newFrameIndex;
+    }
+  }
 }

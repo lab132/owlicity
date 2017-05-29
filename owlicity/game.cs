@@ -58,6 +58,7 @@ namespace Owlicity
       testAnimation.SecondsPerFrame = 0.05f;
 
       test = testAnimation.CreateInstance();
+      test.PingPong = true;
       testTransform = new Transform { Position = new Vector3(20, 20, 0) };
     }
 
