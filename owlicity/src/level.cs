@@ -1,4 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using Owlicity.src;
 using System;
 using System.Collections.Generic;
@@ -11,24 +13,27 @@ namespace Owlicity
   class Level
   {
     private const int SCREEN_DIMENSION = 256;
-    public Level()
+    public Level(ContentManager contentManager)
     {
       _screens = new Screen[SCREEN_DIMENSION, SCREEN_DIMENSION];
       _activeCenter = new Point(0, 0);
       _activeScreens = new List<Screen>();
       _previouslyActiveScreens = new List<Screen>();
+      _contentManager = contentManager;
     }
 
     private Screen[,] _screens;
     private List<Screen> _activeScreens;
     private List<Screen> _previouslyActiveScreens;
     private Point _activeCenter;
+    private ContentManager _contentManager;
     public int ScreenTileWidth { get; set; } = 1024;
     public int ScreenTileHeight { get; set; } = 1024;
     public Transform CullingCenter { get; set; }
 
     public void addScreen(uint posX, uint posY, Screen screen) {
       _screens[posX, posY] = screen;
+      screen.AbsoulutePosition = new Vector2(posX * ScreenTileWidth, posY * ScreenTileHeight);
     }
 
     public void Update(GameTime gameTime)
@@ -40,7 +45,7 @@ namespace Owlicity
 
       foreach(Screen screen in becameActive)
       {
-        screen.LoadContent();
+        screen.LoadContent(_contentManager);
       }
 
       foreach(Screen screen in becameInactive)
@@ -54,11 +59,11 @@ namespace Owlicity
       }
     }
 
-    public void Draw(GameTime gameTime)
+    public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
     {
       foreach (Screen screen in _activeScreens)
       {
-        screen.Draw(gameTime);
+        screen.Draw(gameTime, spriteBatch);
       }
     }
 

@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Primitives2D;
+using Owlicity.src;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -20,6 +21,7 @@ namespace Owlicity
     SpriteAnimationInstance test;
     Transform testTransform;
     Camera cam;
+    Level testLevel;
 
     public OwlicityGame()
     {
@@ -60,6 +62,25 @@ namespace Owlicity
 
       cam = new Camera();
       cam.LookAt = testTransform;
+
+      testLevel = new Level(Content);
+
+      Screen testScreen1 = new Screen();
+      testScreen1.AssetName = "dummy_level_1";
+      Screen testScreen2 = new Screen();
+      testScreen2.AssetName = "dummy_level_2";
+      Screen testScreen3 = new Screen();
+      testScreen3.AssetName = "dummy_level_3";
+      Screen testScreen4 = new Screen();
+      testScreen4.AssetName = "dummy_level_4";
+
+      testLevel.addScreen(0, 0, testScreen1);
+      testLevel.addScreen(0, 1, testScreen2);
+      testLevel.addScreen(1, 0, testScreen3);
+      testLevel.addScreen(1, 1, testScreen4);
+
+      testLevel.CullingCenter = testTransform;
+
     }
 
     /// <summary>
@@ -78,6 +99,7 @@ namespace Owlicity
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
     protected override void Update(GameTime gameTime)
     {
+      testLevel.Update(gameTime);
       if(GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
       {
         Exit();
@@ -117,6 +139,7 @@ namespace Owlicity
       GraphicsDevice.Clear(Color.CornflowerBlue);
 
       spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, cam.ViewMatrix);
+      testLevel.Draw(gameTime, spriteBatch);
       test.Draw(spriteBatch, testTransform);
       spriteBatch.End();
       // TODO: Add your drawing code here
