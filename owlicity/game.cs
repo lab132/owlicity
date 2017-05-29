@@ -49,8 +49,8 @@ namespace Owlicity
       spriteBatch = new SpriteBatch(GraphicsDevice);
 
       // TODO: use this.Content to load your game content here
-      Texture2D atlas = Content.Load<Texture2D>("slurp_spritesheet");
-      testAnimation = SpriteAnimationData.FromAtlas(atlas, 7, 210, 270);
+      Texture2D atlas = Content.Load<Texture2D>("owliver_walk_front_left_spritesheet");
+      testAnimation = SpriteAnimationData.FromAtlas(atlas, 3, 256, 256);
       testAnimation.SecondsPerFrame = 0.05f;
 
       test = testAnimation.CreateInstance();
