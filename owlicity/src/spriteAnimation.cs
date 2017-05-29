@@ -10,13 +10,13 @@ namespace Owlicity
 {
   public struct SpriteAnimationFrame
   {
-    public Vector2 Offset;
+    public Point Offset;
   }
 
   class SpriteAnimationData
   {
     public Texture2D Atlas { get; set; }
-    public Vector2 TileUV { get; set; }
+    public Point TileDim { get; set; }
     public List<SpriteAnimationFrame> Frames { get; set; } = new List<SpriteAnimationFrame>();
     public float FramesPerSecond
     {
@@ -34,8 +34,7 @@ namespace Owlicity
         int numCols = atlas.Width / tileWidth;
         int numRows = atlas.Height / tileHeight;
         anim.Atlas = atlas;
-        Vector2 invAtlasDim = new Vector2(1.0f / atlas.Width, 1.0f / atlas.Height);
-        anim.TileUV = new Vector2(tileWidth, tileHeight) * invAtlasDim;
+        anim.TileDim = new Point(tileWidth, tileHeight);
         int spriteIndex = 0;
         for (int row = 0; row < numRows; row++)
         {
@@ -46,7 +45,10 @@ namespace Owlicity
 
             int x = col * tileWidth;
             int y = row * tileHeight;
-            SpriteAnimationFrame frame = new SpriteAnimationFrame { Offset = new Vector2(x, y) * invAtlasDim };
+            SpriteAnimationFrame frame = new SpriteAnimationFrame
+            {
+              Offset = new Point(x, y)
+            };
             anim.Frames.Add(frame);
           }
         }
@@ -95,7 +97,7 @@ namespace Owlicity
       _currentSprite = new Sprite
       {
         Texture = data.Atlas,
-        TextureUV = data.TileUV,
+        TextureDim = data.TileDim,
       };
     }
 

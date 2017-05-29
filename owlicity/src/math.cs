@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Owlicity
 {
-  struct Angle
+  public struct Angle
   {
     private float _value;
 
@@ -34,14 +34,62 @@ namespace Owlicity
     }
   }
 
-
-
-
-  class Transform
+  public struct RectF
   {
-    public Vector3 Position { get; set; }
-    public Angle Rotation { get; set; }
-    public Vector2 Scale { get; set; } = Vector2.One;
+    public Vector2 Offset;
+    public Vector2 HalfExtents;
+
+    public Vector2 Extents
+    {
+      get { return 2.0f * HalfExtents; }
+      set { HalfExtents = 0.5f * value; }
+    }
   }
 
+  public class Transform : ITransformable
+  {
+    public Transform LocalTransform { get { return this; } }
+
+    public ITransformable Parent;
+
+    public Vector2 Position;
+    public float Depth;
+    public Angle Rotation;
+    public Vector2 Scale = Vector2.One;
+
+    public RectF Bounds;
+
+    public Vector3 Translation
+    {
+      get { return new Vector3(Position, Depth); }
+      set { Position = value.GetXY(); Depth = value.Z; }
+    }
+  }
+
+  public interface ITransformable
+  {
+    Transform LocalTransform { get; }
+  }
+
+  public static class Transformable
+  {
+    public static Transform GetWorldTransform(this ITransformable self)
+    {
+      Transform result = new Transform();
+      Transform transform = self.LocalTransform;
+      while(true)
+      {
+        result.Position += transform.Position;
+        result.Depth += transform.Depth;
+        result.Rotation += transform.Rotation;
+        result.Scale += transform.Scale;
+
+        if(transform.Parent == null)
+          break;
+        transform = transform.Parent.LocalTransform;
+      }
+
+      return result;
+    }
+  }
 }

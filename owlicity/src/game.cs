@@ -56,7 +56,7 @@ namespace Owlicity
 
       test = testAnimation.CreateInstance();
       test.PingPong = true;
-      testTransform = new Transform { Position = new Vector3(20, 20, 0) };
+      testTransform = new Transform { Position = new Vector2(20, 20) };
 
       cam = new Camera();
       cam.LookAt = testTransform;
@@ -82,25 +82,30 @@ namespace Owlicity
       {
         Exit();
       }
+
+      Vector2 inputVector = Vector2.Zero;
       if (Keyboard.GetState().IsKeyDown(Keys.Right))
       {
-        testTransform.Position += new Vector3(1.0f, 0.0f, 0.0f);
+        inputVector.X += 1.0f;
       }
 
       if (Keyboard.GetState().IsKeyDown(Keys.Left))
       {
-        testTransform.Position += new Vector3(-1.0f, 0.0f, 0.0f);
+        inputVector.X -= 1.0f;
       }
 
       if (Keyboard.GetState().IsKeyDown(Keys.Up))
       {
-        testTransform.Position += new Vector3(0.0f, -1.0f, 0.0f);
+        inputVector.Y -= 1.0f;
       }
 
       if (Keyboard.GetState().IsKeyDown(Keys.Down))
       {
-        testTransform.Position += new Vector3(0.0f, 1.0f, 0.0f);
+        inputVector.Y += 1.0f;
       }
+
+      const float speed = 200.0f;
+      testTransform.Position += inputVector.GetClampedTo(1.0f) * (speed * (float)gameTime.ElapsedGameTime.TotalSeconds);
 
       // TODO: Add your update logic here
       test.Update(gameTime);
@@ -116,10 +121,12 @@ namespace Owlicity
     {
       GraphicsDevice.Clear(Color.CornflowerBlue);
 
-      spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, cam.ViewMatrix);
+      spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, cam.ViewMatrix);
       test.Draw(spriteBatch, testTransform);
+
+      int radius = 2;
+      spriteBatch.FillRectangle(new Rectangle { X = -radius, Y = -radius, Width = 2 * radius, Height = 2 * radius }, Color.Lime);
       spriteBatch.End();
-      // TODO: Add your drawing code here
 
       base.Draw(gameTime);
     }

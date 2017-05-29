@@ -9,7 +9,7 @@ namespace Owlicity
 {
   class Camera
   {
-    private Vector3 _position;
+    private Vector2 _position;
     public float CamAcceleration { get; set; } = 1.0f;
     public Transform LookAt { get; set; }
     public float Zoom { get; set; } = 1.0f;
@@ -18,7 +18,7 @@ namespace Owlicity
     {
       get
       {
-        Vector3 direction = (LookAt.Position - _position);
+        Vector2 direction = (LookAt.Position - _position);
 
         if (direction.Length() > CamAcceleration)
         {
@@ -26,13 +26,10 @@ namespace Owlicity
           direction *= CamAcceleration;
         }
         _position += direction;
-        var mat = Matrix.CreateTranslation(_position);
+        var mat = Matrix.CreateTranslation(new Vector3(_position, 0.0f));
         mat.Scale = new Vector3(1/Zoom, 1/Zoom, 1.0f);
         return Matrix.Invert(mat);
       }
     }
-    public Camera() { _position = Vector3.Zero; }
   }
-
-
 }
