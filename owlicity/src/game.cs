@@ -90,8 +90,11 @@ namespace Owlicity
       dummy.anim.PingPong = true;
       dummy.Initialize();
 
-      cam = new Camera();
-      cam.LookAt = dummy;
+      cam = new Camera
+      {
+        LookAt = dummy,
+        Bounds = GraphicsDevice.Viewport.Bounds.Size.ToVector2()
+      };
 
       testLevel = new Level(Content);
 
@@ -155,10 +158,13 @@ namespace Owlicity
         inputVector.Y += 1.0f;
       }
 
-      const float speed = 200.0f;
-      dummy.LocalTransform.Position += inputVector.GetClampedTo(1.0f) * (speed * (float)gameTime.ElapsedGameTime.TotalSeconds);
+      float deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+      const float speed = 400.0f;
+      dummy.LocalTransform.Position += inputVector.GetClampedTo(1.0f) * (speed * deltaSeconds);
 
       dummy.Update(gameTime);
+
+      cam.Update(gameTime);
 
       base.Update(gameTime);
     }
