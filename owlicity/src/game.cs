@@ -109,7 +109,7 @@ namespace Owlicity
       testLevel.addScreen(1, 0, testScreen3);
       testLevel.addScreen(1, 1, testScreen4);
 
-      testLevel.CullingCenter = testTransform;
+      testLevel.CullingCenter = dummy;
     }
 
     /// <summary>
