@@ -20,7 +20,8 @@ namespace Owlicity
       animOffset = new Transform
       {
         Parent = this,
-        Position = -0.5f * anim.Data.TileDim.ToVector2()
+        Position = -0.5f * anim.Data.TileDim.ToVector2(),
+        Depth = 0.5f,
       };
     }
     
@@ -129,6 +130,8 @@ namespace Owlicity
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
     protected override void Update(GameTime gameTime)
     {
+      float deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
       testLevel.Update(gameTime);
       if(GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
       {
@@ -156,7 +159,6 @@ namespace Owlicity
         inputVector.Y += 1.0f;
       }
 
-      float deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
       const float speed = 400.0f;
       dummy.LocalTransform.Position += inputVector.GetClampedTo(1.0f) * (speed * deltaSeconds);
 
@@ -175,11 +177,16 @@ namespace Owlicity
     {
       GraphicsDevice.Clear(Color.CornflowerBlue);
 
-      spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, cam.ViewMatrix);
-      dummy.Draw(spriteBatch);
+      spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, cam.ViewMatrix);
+
       testLevel.Draw(gameTime, spriteBatch);
+
+      dummy.Draw(spriteBatch);
+
+      // Draw the origin of the world.
       int radius = 2;
       spriteBatch.FillRectangle(new Rectangle { X = -radius, Y = -radius, Width = 2 * radius, Height = 2 * radius }, Color.Lime);
+
       spriteBatch.End();
 
       base.Draw(gameTime);
