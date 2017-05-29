@@ -12,6 +12,8 @@ namespace Owlicity
     private Vector3 _position;
     public float CamAcceleration { get; set; } = 1.0f;
     public Transform LookAt { get; set; }
+    public float Zoom { get; set; } = 1.0f;
+
     public Matrix ViewMatrix
     {
       get
@@ -25,6 +27,7 @@ namespace Owlicity
         }
         _position += direction;
         var mat = Matrix.CreateTranslation(_position);
+        mat.Scale = new Vector3(1/Zoom, 1/Zoom, 1.0f);
         return Matrix.Invert(mat);
       }
     }
