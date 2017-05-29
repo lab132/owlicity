@@ -82,7 +82,7 @@ namespace Owlicity
         result.Position += transform.Position;
         result.Depth += transform.Depth;
         result.Rotation += transform.Rotation;
-        result.Scale += transform.Scale;
+        result.Scale *= transform.Scale;
 
         if(transform.Parent == null)
           break;

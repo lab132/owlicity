@@ -4,9 +4,35 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Primitives2D;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System;
 
 namespace Owlicity
 {
+  public class Dummy : ITransformable
+  {
+    public Transform LocalTransform { get; } = new Transform();
+    public SpriteAnimationInstance anim;
+    public Transform animOffset;
+
+    public void Initialize()
+    {
+      animOffset = new Transform
+      {
+        Parent = this,
+         Position = -0.5f * anim.Data.TileDim.ToVector2()
+      };
+    }
+    
+    public void Update(GameTime dt)
+    {
+      anim.Update(dt);
+    }
+
+    public void Draw(SpriteBatch spriteBatch)
+    {
+      anim.Draw(spriteBatch, animOffset);
+    }
+  }
 
   /// <summary>
   /// This is the main type for your game.
@@ -17,9 +43,10 @@ namespace Owlicity
     SpriteBatch spriteBatch;
 
     SpriteAnimationData testAnimation;
-    SpriteAnimationInstance test;
-    Transform testTransform;
+    Dummy dummy;
+
     Camera cam;
+
 
     public OwlicityGame()
     {
@@ -54,12 +81,15 @@ namespace Owlicity
       testAnimation = SpriteAnimationData.FromAtlas(atlas, 3, 256, 256);
       testAnimation.SecondsPerFrame = 0.05f;
 
-      test = testAnimation.CreateInstance();
-      test.PingPong = true;
-      testTransform = new Transform { Position = new Vector2(20, 20) };
+      dummy = new Dummy
+      {
+        anim = testAnimation.CreateInstance(),
+      };
+      dummy.anim.PingPong = true;
+      dummy.Initialize();
 
       cam = new Camera();
-      cam.LookAt = testTransform;
+      cam.LookAt = dummy;
     }
 
     /// <summary>
@@ -105,10 +135,9 @@ namespace Owlicity
       }
 
       const float speed = 200.0f;
-      testTransform.Position += inputVector.GetClampedTo(1.0f) * (speed * (float)gameTime.ElapsedGameTime.TotalSeconds);
+      dummy.LocalTransform.Position += inputVector.GetClampedTo(1.0f) * (speed * (float)gameTime.ElapsedGameTime.TotalSeconds);
 
-      // TODO: Add your update logic here
-      test.Update(gameTime);
+      dummy.Update(gameTime);
 
       base.Update(gameTime);
     }
@@ -122,7 +151,7 @@ namespace Owlicity
       GraphicsDevice.Clear(Color.CornflowerBlue);
 
       spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, cam.ViewMatrix);
-      test.Draw(spriteBatch, testTransform);
+      dummy.Draw(spriteBatch);
 
       int radius = 2;
       spriteBatch.FillRectangle(new Rectangle { X = -radius, Y = -radius, Width = 2 * radius, Height = 2 * radius }, Color.Lime);

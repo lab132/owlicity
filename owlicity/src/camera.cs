@@ -11,14 +11,14 @@ namespace Owlicity
   {
     private Vector2 _position;
     public float CamAcceleration { get; set; } = 1.0f;
-    public Transform LookAt { get; set; }
+    public ITransformable LookAt { get; set; }
     public float Zoom { get; set; } = 1.0f;
 
     public Matrix ViewMatrix
     {
       get
       {
-        Vector2 direction = (LookAt.Position - _position);
+        Vector2 direction = (LookAt.GetWorldTransform().Position - _position);
 
         if (direction.Length() > CamAcceleration)
         {

@@ -13,7 +13,7 @@ namespace Owlicity
     public Point Offset;
   }
 
-  class SpriteAnimationData
+  public class SpriteAnimationData
   {
     public Texture2D Atlas { get; set; }
     public Point TileDim { get; set; }
@@ -80,7 +80,7 @@ namespace Owlicity
     Paused,
   }
 
-  class SpriteAnimationInstance
+  public class SpriteAnimationInstance
   {
     public SpriteAnimationData Data { get; set; }
     public float CurrentFrameTime { get; set; }

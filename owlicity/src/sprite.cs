@@ -34,7 +34,6 @@ namespace Owlicity
         effects: SpriteEffects,
         layerDepth: transform.Depth);
 
-
       spriteBatch.DrawRectangle(transform.Position, textureDim.ToVector2(), Color.Red);
     }
   }
