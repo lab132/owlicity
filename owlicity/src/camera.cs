@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace Owlicity
 {
-  class Camera
+  class Camera : ITransformable
   {
-    private Vector2 _position;
     public Vector2 Bounds { get; set; }
     public ITransformable LookAt { get; set; }
     public float Zoom { get; set; } = 1.0f;
@@ -18,21 +17,23 @@ namespace Owlicity
     {
       get
       {
-        var mat = Matrix.CreateTranslation(new Vector3(_position - 0.5f * Bounds, 0.0f));
+        var mat = Matrix.CreateTranslation(new Vector3(LocalTransform.GetWorldTransform().Position - 0.5f * Bounds, 0.0f));
         mat.Scale = new Vector3(1/Zoom, 1/Zoom, 1.0f);
         return Matrix.Invert(mat);
       }
     }
 
+    public Transform LocalTransform { get; } = new Transform();
+    public Camera() { LookAt = this; }
     public void Update(GameTime dt)
     {
       float deltaSeconds = (float)dt.ElapsedGameTime.TotalSeconds;
       Vector2 focus = LookAt.GetWorldTransform().Position;
-      Vector2 delta = focus - _position;
+      Vector2 delta = focus - LocalTransform.GetWorldTransform().Position;
 
       Vector2 velocity = delta * 5;
 
-      _position += velocity * deltaSeconds;
+      LocalTransform.Position += velocity * deltaSeconds;
     }
   }
 }

@@ -94,7 +94,7 @@ namespace Owlicity
 
       cam = new Camera
       {
-        LookAt = dummy,
+        //LookAt = dummy,
         Bounds = GraphicsDevice.Viewport.Bounds.Size.ToVector2()
       };
 
@@ -105,8 +105,9 @@ namespace Owlicity
         for (uint j = 0; j < 7; j++)
         {
           var screen = new Screen();
-          screen.AssetName = $"level01/level01_{i}{j}";
-          testLevel.addScreen(j, i, screen);
+          screen.AssetName = $"level01/level01_{j}{i}";
+          testLevel.addScreen(i, j, screen);
+          screen.LoadContent(Content);
         }
       }
 
@@ -160,6 +161,29 @@ namespace Owlicity
       const float speed = 400.0f;
       dummy.LocalTransform.Position += inputVector.GetClampedTo(1.0f) * (speed * deltaSeconds);
 
+       inputVector = Vector2.Zero;
+      if (Keyboard.GetState().IsKeyDown(Keys.D))
+      {
+        inputVector.X += 1.0f;
+      }
+
+      if (Keyboard.GetState().IsKeyDown(Keys.A))
+      {
+        inputVector.X -= 1.0f;
+      }
+
+      if (Keyboard.GetState().IsKeyDown(Keys.W))
+      {
+        inputVector.Y -= 1.0f;
+      }
+
+      if (Keyboard.GetState().IsKeyDown(Keys.S))
+      {
+        inputVector.Y += 1.0f;
+      }
+
+      cam.LocalTransform.Position += inputVector.GetClampedTo(1.0f) * (speed * deltaSeconds);
+
       dummy.Update(gameTime);
 
       cam.Update(gameTime);
@@ -176,8 +200,9 @@ namespace Owlicity
       GraphicsDevice.Clear(Color.CornflowerBlue);
 
       spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, cam.ViewMatrix);
-      dummy.Draw(spriteBatch);
+      
       testLevel.Draw(gameTime, spriteBatch);
+      dummy.Draw(spriteBatch);
       int radius = 2;
       spriteBatch.FillRectangle(new Rectangle { X = -radius, Y = -radius, Width = 2 * radius, Height = 2 * radius }, Color.Lime);
       spriteBatch.End();

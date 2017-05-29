@@ -42,17 +42,17 @@ namespace Owlicity
       _activeScreens = getActiveScreens();
       var becameActive = _activeScreens.Where(S => ! _previouslyActiveScreens.Contains(S));
       var becameInactive = _previouslyActiveScreens.Where(S => ! _activeScreens.Contains(S));
-
+      
       foreach(Screen screen in becameActive)
       {
-        screen.LoadContent(_contentManager);
+     //   screen.LoadContent(_contentManager);
       }
 
       foreach(Screen screen in becameInactive)
       {
-        screen.UnloadContent();
+      //  screen.UnloadContent();
       }
-
+      
       foreach (Screen screen in _activeScreens)
       {
         screen.Update(gameTime);
