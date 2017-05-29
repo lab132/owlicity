@@ -203,6 +203,8 @@ namespace Owlicity
       spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, cam.ViewMatrix);
       
 
+      spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, cam.ViewMatrix);
+
       testLevel.Draw(gameTime, spriteBatch);
 
       dummy.Draw(spriteBatch);
