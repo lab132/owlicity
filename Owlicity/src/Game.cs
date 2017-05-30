@@ -6,6 +6,11 @@ using Owlicity.src;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System;
+using VelcroPhysics.Shared;
+using VelcroPhysics.Dynamics;
+using VelcroPhysics.Factories;
+using VelcroPhysics.DebugViews.MonoGame;
+using VelcroPhysics.Extensions.DebugView;
 
 /*
   TODO:
@@ -21,6 +26,7 @@ namespace Owlicity
     public Transform LocalTransform { get; } = new Transform();
     public SpriteAnimationInstance anim;
     public Transform animOffset;
+    public Body body;
 
     public void Initialize()
     {
@@ -30,6 +36,14 @@ namespace Owlicity
         Position = -0.5f * anim.Data.TileDim.ToVector2(),
         Depth = 0.5f,
       };
+
+      body = new Body(OwlicityGame.Instance.World);
+    }
+
+    public void LoadContent()
+    {
+      Vertices collisionVertices = OwlicityGame.Instance.Content.Load<Vertices>("slurp_collision");
+      FixtureFactory.AttachLoopShape(collisionVertices, body);
     }
     
     public void Update(GameTime dt)
@@ -48,6 +62,8 @@ namespace Owlicity
   /// </summary>
   public class OwlicityGame : Game
   {
+    public static OwlicityGame Instance { get; set; }
+
     GraphicsDeviceManager graphics;
     SpriteBatch spriteBatch;
 
@@ -57,9 +73,15 @@ namespace Owlicity
     Camera cam;
     Level testLevel;
 
+    public World World { get; set; }
+    public DebugView PhysicsDebugView { get; set; }
+
 
     public OwlicityGame()
     {
+      Debug.Assert(Instance == null);
+      Instance = this;
+
       graphics = new GraphicsDeviceManager(this);
       Content.RootDirectory = "content";
       graphics.PreferredBackBufferHeight = 1080;
@@ -74,7 +96,17 @@ namespace Owlicity
     /// </summary>
     protected override void Initialize()
     {
-      // TODO: Add your initialization logic here
+      cam = new Camera
+      {
+        //LookAt = dummy,
+        Bounds = GraphicsDevice.Viewport.Bounds.Size.ToVector2()
+      };
+      cam.Initialize();
+
+      World = new World(gravity: Vector2.Zero);
+
+      PhysicsDebugView = new DebugView(World);
+      PhysicsDebugView.Flags = DebugViewFlags.Shape | DebugViewFlags.PolygonPoints | DebugViewFlags.AABB;
 
       base.Initialize();
     }
@@ -88,6 +120,8 @@ namespace Owlicity
       // Create a new SpriteBatch, which can be used to draw textures.
       spriteBatch = new SpriteBatch(GraphicsDevice);
 
+      PhysicsDebugView.LoadContent(GraphicsDevice, Content);
+
       // TODO: use this.Content to load your game content here
       Texture2D atlas = Content.Load<Texture2D>("owliver_walk_front_left_spritesheet");
       testAnimation = SpriteAnimationData.FromAtlas(atlas, 3, 256, 256);
@@ -99,12 +133,7 @@ namespace Owlicity
       };
       dummy.anim.PingPong = true;
       dummy.Initialize();
-
-      cam = new Camera
-      {
-        //LookAt = dummy,
-        Bounds = GraphicsDevice.Viewport.Bounds.Size.ToVector2()
-      };
+      dummy.LoadContent();
 
       testLevel = new Level(Content);
 
@@ -170,6 +199,12 @@ namespace Owlicity
       const float speed = 400.0f;
       dummy.LocalTransform.Position += inputVector.GetClampedTo(1.0f) * (speed * deltaSeconds);
 
+      if(World.BodyList.Count > 0)
+      {
+        var body = World.BodyList[0];
+        body.Position += inputVector.GetClampedTo(1.0f) * (speed * deltaSeconds);
+      }
+
        inputVector = Vector2.Zero;
       if (Keyboard.GetState().IsKeyDown(Keys.D))
       {
@@ -193,6 +228,8 @@ namespace Owlicity
 
       cam.LocalTransform.Position += inputVector.GetClampedTo(1.0f) * (speed * deltaSeconds);
 
+      World.Step(deltaSeconds);
+
       dummy.Update(gameTime);
 
       cam.Update(gameTime);
@@ -207,7 +244,11 @@ namespace Owlicity
     protected override void Draw(GameTime gameTime)
     {
       GraphicsDevice.Clear(Color.CornflowerBlue);
-      spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, cam.ViewMatrix);
+      Matrix viewMatrix = cam.ViewMatrix;
+      Matrix projectionMatrix = cam.ProjectionMatrix;
+
+#if true
+      spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, viewMatrix);
 
       testLevel.Draw(gameTime, spriteBatch);
 
@@ -218,6 +259,9 @@ namespace Owlicity
       spriteBatch.FillRectangle(new Rectangle { X = -radius, Y = -radius, Width = 2 * radius, Height = 2 * radius }, Color.Lime);
 
       spriteBatch.End();
+#endif
+
+      PhysicsDebugView.RenderDebugData(ref projectionMatrix, ref viewMatrix);
 
       base.Draw(gameTime);
     }

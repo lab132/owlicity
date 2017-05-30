@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Owlicity
 {
-  class World
+  class OwlWorld
   {
-    public static World theWorld;
-    public World() { }
-    public World Instance { get {
+    public static OwlWorld theWorld;
+    public OwlWorld() { }
+    public OwlWorld Instance { get {
         if (theWorld == null) {
-          theWorld = new  World();
+          theWorld = new  OwlWorld();
         }
         return theWorld;
       } }

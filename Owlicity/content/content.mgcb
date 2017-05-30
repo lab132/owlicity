@@ -435,3 +435,8 @@
 /processorParam:TextureFormat=Color
 /build:level01/level1_ground_63.png
 
+#begin slurp_collision.png
+/importer:OwlicityCollisionImporter
+/processor:OwlicityCollisionProcessor
+/build:slurp_collision.png
+

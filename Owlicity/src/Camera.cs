@@ -23,8 +23,16 @@ namespace Owlicity
       }
     }
 
+    public Matrix ProjectionMatrix { get; set; }
+
     public Transform LocalTransform { get; } = new Transform();
     public Camera() { LookAt = this; }
+
+    public void Initialize()
+    {
+      ProjectionMatrix = Matrix.CreateOrthographicOffCenter(0, Bounds.X, Bounds.Y, 0, -1, 1);
+    }
+
     public void Update(GameTime dt)
     {
       float deltaSeconds = (float)dt.ElapsedGameTime.TotalSeconds;
@@ -32,7 +40,6 @@ namespace Owlicity
       Vector2 delta = focus - LocalTransform.GetWorldTransform().Position;
 
       Vector2 velocity = delta * 5;
-
       LocalTransform.Position += velocity * deltaSeconds;
     }
   }

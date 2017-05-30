@@ -41,8 +41,9 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\CollisionImporter.cs" />
-    <Compile Include="src\CollisionProcessor.cs" />
+    <Compile Include="src\CollisionTexture.cs" />
+    <Compile Include="src\OwlicityCollisionImporter.cs" />
+    <Compile Include="src\OwlicityCollisionProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

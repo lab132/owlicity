@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owlicity.Content.Pipeline",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owlicity.Common", "Owlicity.Common\Owlicity.Common.csproj", "{D33C2A57-2CC3-4AF4-8B8E-CF530AC5F288}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame", "VelcroPhysics\DebugViews\MonoGame\MonoGame.csproj", "{7A712520-A665-4ED7-A2B0-9C3E9705ECF8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{D33C2A57-2CC3-4AF4-8B8E-CF530AC5F288}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D33C2A57-2CC3-4AF4-8B8E-CF530AC5F288}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D33C2A57-2CC3-4AF4-8B8E-CF530AC5F288}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A712520-A665-4ED7-A2B0-9C3E9705ECF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A712520-A665-4ED7-A2B0-9C3E9705ECF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A712520-A665-4ED7-A2B0-9C3E9705ECF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A712520-A665-4ED7-A2B0-9C3E9705ECF8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
