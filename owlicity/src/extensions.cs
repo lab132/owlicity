@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework.Primitives2D;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Owlicity
 {
@@ -41,6 +43,19 @@ namespace Owlicity
       }
 
       return result;
+    }
+  }
+
+  public static class SpriteBatchExtensions
+  {
+    public static void FillRectangle(this SpriteBatch self, RectF rect, Color color)
+    {
+      self.FillRectangle(rect.ToRectangle(), color);
+    }
+
+    public static void FillRectangle(this SpriteBatch self, RectF rect, Color color, Angle angle)
+    {
+      self.FillRectangle(rect.ToRectangle(), color, angle.Radians);
     }
   }
 }

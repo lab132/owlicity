@@ -36,13 +36,70 @@ namespace Owlicity
 
   public struct RectF
   {
-    public Vector2 Offset;
+    public Vector2 Center;
     public Vector2 HalfExtents;
 
     public Vector2 Extents
     {
       get { return 2.0f * HalfExtents; }
       set { HalfExtents = 0.5f * value; }
+    }
+
+    public Vector2 BottomLeft
+    {
+      get { return Center + new Vector2(-HalfExtents.X, HalfExtents.Y); }
+      set { Center = value + new Vector2(HalfExtents.X, -HalfExtents.Y); }
+    }
+
+    public Vector2 Left
+    {
+      get { return Center + new Vector2(-HalfExtents.X, 0.0f); }
+      set { Center = value + new Vector2(HalfExtents.X, 0.0f); }
+    }
+
+    public Vector2 TopLeft
+    {
+      get { return Center + new Vector2(-HalfExtents.X, -HalfExtents.Y); }
+      set { Center = value + new Vector2(HalfExtents.X, HalfExtents.Y); }
+    }
+
+    public Vector2 Top
+    {
+      get { return Center + new Vector2(0.0f, -HalfExtents.Y); }
+      set { Center = value + new Vector2(0.0f, HalfExtents.Y); }
+    }
+
+    public Vector2 TopRight
+    {
+      get { return Center + new Vector2(HalfExtents.X, -HalfExtents.Y); }
+      set { Center = value + new Vector2(-HalfExtents.X, HalfExtents.Y); }
+    }
+
+    public Vector2 Right
+    {
+      get { return Center + new Vector2(HalfExtents.X, 0.0f); }
+      set { Center = value + new Vector2(-HalfExtents.X, 0.0f); }
+    }
+
+    public Vector2 BottomRight
+    {
+      get { return Center + new Vector2(HalfExtents.X, HalfExtents.Y); }
+      set { Center = value + new Vector2(-HalfExtents.X, -HalfExtents.Y); }
+    }
+
+    public Vector2 Bottom
+    {
+      get { return Center + new Vector2(0.0f, HalfExtents.Y); }
+      set { Center = value + new Vector2(0.0f, -HalfExtents.Y); }
+    }
+
+    public Rectangle ToRectangle()
+    {
+      return new Rectangle
+      {
+        Location = Left.ToPoint(),
+        Size = Extents.ToPoint(),
+      };
     }
   }
 
