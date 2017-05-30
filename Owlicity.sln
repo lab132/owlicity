@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owlicity", "Owlicity\Owlicity.csproj", "{CC52C537-CF8E-4DCE-B644-43EE6C209E11}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VelcroPhysics.MonoGame", "VelcroPhysics\VelcroPhysics\VelcroPhysics.MonoGame.csproj", "{3394F375-947A-4358-AA68-B6CF6743740E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owlicity.Content.Pipeline", "Owlicity.Content.Pipeline\Owlicity.Content.Pipeline.csproj", "{3778161B-E78B-4574-AAA7-7AC853DAE575}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owlicity.Common", "Owlicity.Common\Owlicity.Common.csproj", "{D33C2A57-2CC3-4AF4-8B8E-CF530AC5F288}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CC52C537-CF8E-4DCE-B644-43EE6C209E11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC52C537-CF8E-4DCE-B644-43EE6C209E11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC52C537-CF8E-4DCE-B644-43EE6C209E11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC52C537-CF8E-4DCE-B644-43EE6C209E11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3394F375-947A-4358-AA68-B6CF6743740E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3394F375-947A-4358-AA68-B6CF6743740E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3394F375-947A-4358-AA68-B6CF6743740E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3394F375-947A-4358-AA68-B6CF6743740E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3778161B-E78B-4574-AAA7-7AC853DAE575}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3778161B-E78B-4574-AAA7-7AC853DAE575}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3778161B-E78B-4574-AAA7-7AC853DAE575}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3778161B-E78B-4574-AAA7-7AC853DAE575}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D33C2A57-2CC3-4AF4-8B8E-CF530AC5F288}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D33C2A57-2CC3-4AF4-8B8E-CF530AC5F288}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D33C2A57-2CC3-4AF4-8B8E-CF530AC5F288}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D33C2A57-2CC3-4AF4-8B8E-CF530AC5F288}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
