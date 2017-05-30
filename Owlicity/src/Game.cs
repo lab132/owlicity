@@ -37,18 +37,33 @@ namespace Owlicity
         Depth = 0.5f,
       };
 
-      body = new Body(OwlicityGame.Instance.World);
+      body = new Body(OwlicityGame.Instance.World, bodyType: BodyType.Kinematic);
     }
 
     public void LoadContent()
     {
       Vertices collisionVertices = OwlicityGame.Instance.Content.Load<Vertices>("slurp_collision");
+      collisionVertices.Translate(-collisionVertices.GetAABB().Center);
       FixtureFactory.AttachLoopShape(collisionVertices, body);
     }
-    
+
+    public void ProcessInput(GameTime dt, Vector2 inputVector)
+    {
+      if(inputVector != Vector2.Zero)
+      {
+        float deltaSeconds = (float)dt.ElapsedGameTime.TotalSeconds;
+        const float speed = 400.0f;
+        Vector2 movementVector = inputVector.GetClampedTo(1.0f) * speed;
+
+        LocalTransform.Position += movementVector * deltaSeconds;
+        body.LinearVelocity = movementVector;
+      }
+    }
+
     public void Update(GameTime dt)
     {
       anim.Update(dt);
+      body.LinearVelocity *= 0.85f;
     }
 
     public void Draw(SpriteBatch spriteBatch)
@@ -137,7 +152,7 @@ namespace Owlicity
 
       testLevel = new Level(Content);
 
-      for (uint i=0; i < 4; i++)
+      for (uint i = 0; i < 4; i++)
       {
         for (uint j = 0; j < 7; j++)
         {
@@ -170,7 +185,7 @@ namespace Owlicity
       float deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
       testLevel.Update(gameTime);
-      if(GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+      if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
       {
         Exit();
       }
@@ -196,16 +211,9 @@ namespace Owlicity
         inputVector.Y += 1.0f;
       }
 
-      const float speed = 400.0f;
-      dummy.LocalTransform.Position += inputVector.GetClampedTo(1.0f) * (speed * deltaSeconds);
+      dummy.ProcessInput(gameTime, inputVector);
 
-      if(World.BodyList.Count > 0)
-      {
-        var body = World.BodyList[0];
-        body.Position += inputVector.GetClampedTo(1.0f) * (speed * deltaSeconds);
-      }
-
-       inputVector = Vector2.Zero;
+      inputVector = Vector2.Zero;
       if (Keyboard.GetState().IsKeyDown(Keys.D))
       {
         inputVector.X += 1.0f;
@@ -226,6 +234,7 @@ namespace Owlicity
         inputVector.Y += 1.0f;
       }
 
+      const float speed = 400.0f;
       cam.LocalTransform.Position += inputVector.GetClampedTo(1.0f) * (speed * deltaSeconds);
 
       World.Step(deltaSeconds);

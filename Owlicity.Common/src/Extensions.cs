@@ -34,6 +34,7 @@ namespace Owlicity
       return result;
     }
 
+    // In case maxLength = 1: "normalize if length is greater than one."
     public static Vector2 GetClampedTo(this Vector2 v, float maxLength)
     {
       Vector2 result = v;
