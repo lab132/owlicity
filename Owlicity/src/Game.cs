@@ -113,7 +113,7 @@ namespace Owlicity
         for (uint j = 0; j < 7; j++)
         {
           var screen = new Screen();
-          screen.AssetName = $"level01/level01_{j}{i}";
+          screen.AssetName = $"level01/level1_ground_{j}{i}";
           testLevel.addScreen(i, j, screen);
           screen.LoadContent(Content);
         }
