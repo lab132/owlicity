@@ -13,7 +13,7 @@ namespace Owlicity.Content.Pipeline
   /// This should be part of a Content Pipeline Extension Library project.
   /// </summary>
   [ContentProcessor(DisplayName = "CollisionProcessor - Owlicity")]
-  public class CollisionProcessor : ContentProcessor<Vector2, Vector3>
+  public class OwlicityCollisionProcessor : ContentProcessor<Vector2, Vector3>
   {
     public override Vector3 Process(Vector2 input, ContentProcessorContext context)
     {

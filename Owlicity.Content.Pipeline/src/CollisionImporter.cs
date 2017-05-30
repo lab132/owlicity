@@ -14,8 +14,8 @@ namespace Owlicity.Content.Pipeline
   ///
   /// This should be part of a Content Pipeline Extension Library project.
   /// </summary>
-  [ContentImporter(".png", DisplayName = "Collision Importer - Owlicity", DefaultProcessor = "Owlicity.Content.Pipeline.CollisionProcessor")]
-  public class CollisionImporter : ContentImporter<Vector2>
+  [ContentImporter(".png", DisplayName = "Collision Importer - Owlicity", DefaultProcessor = "OwlicityCollisionProcessor")]
+  public class OwlicityCollisionImporter : ContentImporter<Vector2>
   {
     public override Vector2 Import(string filename, ContentImporterContext context)
     {

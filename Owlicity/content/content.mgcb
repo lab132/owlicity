@@ -10,6 +10,8 @@
 
 #-------------------------------- References --------------------------------#
 
+/reference:..\..\Owlicity.Content.Pipeline\bin\Debug\Owlicity.Common.dll
+/reference:..\..\Owlicity.Content.Pipeline\bin\Debug\Owlicity.Content.Pipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
