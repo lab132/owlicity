@@ -10,7 +10,6 @@
 
 #-------------------------------- References --------------------------------#
 
-/reference:..\..\Owlicity.Content.Pipeline\bin\Debug\Owlicity.Common.dll
 /reference:..\..\Owlicity.Content.Pipeline\bin\Debug\Owlicity.Content.Pipeline.dll
 
 #---------------------------------- Content ---------------------------------#
@@ -444,4 +443,9 @@
 /importer:OwlicityCollisionImporter
 /processor:OwlicityCollisionProcessor
 /build:level01/level1_ground_00_collision.png
+
+#begin level01/level1_ground_00_layout.png
+/importer:OwlicityLevelLayoutImporter
+/processor:OwlicityLayoutProcessor
+/build:level01/level1_ground_00_layout.png
 

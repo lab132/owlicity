@@ -16,7 +16,7 @@ namespace Owlicity.Content.Pipeline
   ///
   /// This should be part of a Content Pipeline Extension Library project.
   /// </summary>
-  [ContentProcessor(DisplayName = "CollisionProcessor - Owlicity")]
+  [ContentProcessor(DisplayName = "Collision Processor - Owlicity")]
   public class OwlicityCollisionProcessor : ContentProcessor<CollisionTexture, Vertices>
   {
     public override Vertices Process(CollisionTexture input, ContentProcessorContext context)

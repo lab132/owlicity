@@ -42,7 +42,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\CollisionTexture.cs" />
+    <Compile Include="src\LayoutInfo.cs" />
     <Compile Include="src\OwlicityCollisionImporter.cs" />
+    <Compile Include="src\OwlicityLayoutImporter.cs" />
+    <Compile Include="src\OwlicityLayoutProcessor.cs" />
     <Compile Include="src\OwlicityCollisionProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
