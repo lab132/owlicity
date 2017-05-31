@@ -42,14 +42,8 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="src\Camera.cs" />
-    <Compile Include="src\GameObject.cs" />
-    <Compile Include="src\Level.cs" />
-    <Compile Include="src\Screen.cs" />
-    <Compile Include="src\Game.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\World.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
@@ -110,17 +104,9 @@
     <None Include="app.manifest" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Owlicity.Common\Owlicity.Common.csproj">
+    <ProjectReference Include="..\Owlicity.Code\Owlicity.Code.csproj">
       <Project>{d33c2a57-2cc3-4af4-8b8e-cf530ac5f288}</Project>
-      <Name>Owlicity.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\VelcroPhysics\DebugViews\MonoGame\MonoGame.csproj">
-      <Project>{7a712520-a665-4ed7-a2b0-9c3e9705ecf8}</Project>
-      <Name>MonoGame</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\VelcroPhysics\VelcroPhysics\VelcroPhysics.MonoGame.csproj">
-      <Project>{3394f375-947a-4358-aa68-b6cf6743740e}</Project>
-      <Name>VelcroPhysics.MonoGame</Name>
+      <Name>Owlicity.Code</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

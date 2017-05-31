@@ -12,7 +12,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VelcroPhysics.MonoGame", "V
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owlicity.Content.Pipeline", "Owlicity.Content.Pipeline\Owlicity.Content.Pipeline.csproj", "{3778161B-E78B-4574-AAA7-7AC853DAE575}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owlicity.Common", "Owlicity.Common\Owlicity.Common.csproj", "{D33C2A57-2CC3-4AF4-8B8E-CF530AC5F288}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owlicity.Code", "Owlicity.Code\Owlicity.Code.csproj", "{D33C2A57-2CC3-4AF4-8B8E-CF530AC5F288}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame", "VelcroPhysics\DebugViews\MonoGame\MonoGame.csproj", "{7A712520-A665-4ED7-A2B0-9C3E9705ECF8}"
 EndProject

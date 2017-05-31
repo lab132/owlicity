@@ -50,9 +50,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Owlicity.Common\Owlicity.Common.csproj">
+    <ProjectReference Include="..\Owlicity.Code\Owlicity.Code.csproj">
       <Project>{d33c2a57-2cc3-4af4-8b8e-cf530ac5f288}</Project>
-      <Name>Owlicity.Common</Name>
+      <Name>Owlicity.Code</Name>
     </ProjectReference>
     <ProjectReference Include="..\VelcroPhysics\VelcroPhysics\VelcroPhysics.MonoGame.csproj">
       <Project>{3394f375-947a-4358-aa68-b6cf6743740e}</Project>
