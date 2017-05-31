@@ -11,6 +11,7 @@ using VelcroPhysics.Dynamics;
 using VelcroPhysics.Factories;
 using VelcroPhysics.DebugViews.MonoGame;
 using VelcroPhysics.Extensions.DebugView;
+using System.Linq;
 
 /*
   TODO:
@@ -158,9 +159,15 @@ namespace Owlicity
         {
           var screen = new Screen();
           screen.AssetName = $"level01/level1_ground_{j}{i}";
-          testLevel.addScreen(i, j, screen);
+          testLevel.AddScreen(i, j, screen);
           screen.LoadContent(Content);
         }
+      }
+
+      {
+        Vertices vertices = Content.Load<Vertices>("level01/level1_ground_00_collision");
+        Body body = new Body(World);
+        FixtureFactory.AttachLoopShape(vertices, body);
       }
 
       testLevel.CullingCenter = dummy;

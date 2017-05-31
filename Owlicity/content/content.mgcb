@@ -440,3 +440,8 @@
 /processor:OwlicityCollisionProcessor
 /build:slurp_collision.png
 
+#begin level01/level1_ground_00_collision.png
+/importer:OwlicityCollisionImporter
+/processor:OwlicityCollisionProcessor
+/build:level01/level1_ground_00_collision.png
+

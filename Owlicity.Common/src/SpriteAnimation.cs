@@ -88,12 +88,19 @@ namespace Owlicity
     public SpriteAnimationPlaybackMode PlaybackMode { get; set; }
     public SpriteAnimationPlaybackState PlaybackState { get; set; }
     public bool PingPong { get; set; }
+    public float FramesPerSecond
+    {
+      get { return 1 / SecondsPerFrame; }
+      set { SecondsPerFrame = 1 / value; }
+    }
+    public float SecondsPerFrame { get; set; } = 1.0f / 24.0f;
 
     private Sprite _currentSprite;
 
     public void Init(SpriteAnimationData data)
     {
       Data = data;
+      SecondsPerFrame = data.SecondsPerFrame;
       _currentSprite = new Sprite
       {
         Texture = data.Atlas,
@@ -108,9 +115,9 @@ namespace Owlicity
         float deltaSeconds = (float)dt.ElapsedGameTime.TotalSeconds;
         CurrentFrameTime += deltaSeconds;
         int oldFrameIndex = CurrentFrameIndex;
-        while (CurrentFrameTime >= Data.SecondsPerFrame)
+        while (CurrentFrameTime >= SecondsPerFrame)
         {
-          CurrentFrameTime -= Data.SecondsPerFrame;
+          CurrentFrameTime -= SecondsPerFrame;
           AdvanceFrameIndex();
         }
 

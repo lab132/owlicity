@@ -31,7 +31,7 @@ namespace Owlicity
     public int ScreenTileHeight { get; set; } = 1080;
     public ITransformable CullingCenter { get; set; }
 
-    public void addScreen(uint posX, uint posY, Screen screen) {
+    public void AddScreen(uint posX, uint posY, Screen screen) {
       _screens[posX, posY] = screen;
       screen.AbsoulutePosition = new Vector2(posX * ScreenTileWidth, posY * ScreenTileHeight);
     }
@@ -39,20 +39,20 @@ namespace Owlicity
     public void Update(GameTime gameTime)
     {
       _previouslyActiveScreens = _activeScreens;
-      _activeScreens = getActiveScreens();
-      var becameActive = _activeScreens.Where(S => ! _previouslyActiveScreens.Contains(S));
-      var becameInactive = _previouslyActiveScreens.Where(S => ! _activeScreens.Contains(S));
+      _activeScreens = GetActiveScreens();
+      var becameActive = _activeScreens.Where(s => ! _previouslyActiveScreens.Contains(s));
+      var becameInactive = _previouslyActiveScreens.Where(s => ! _activeScreens.Contains(s));
       
       foreach(Screen screen in becameActive)
       {
-     //   screen.LoadContent(_contentManager);
+        // screen.LoadContent(_contentManager);
       }
 
       foreach(Screen screen in becameInactive)
       {
-      //  screen.UnloadContent();
+        // screen.UnloadContent();
       }
-      
+
       foreach (Screen screen in _activeScreens)
       {
         screen.Update(gameTime);
@@ -67,7 +67,7 @@ namespace Owlicity
       }
     }
 
-    private List<Screen> getActiveScreens()
+    private List<Screen> GetActiveScreens()
     {
 
       var screenList = new List<Screen>();
@@ -76,19 +76,19 @@ namespace Owlicity
       int tileX = (int) focus.X / ScreenTileWidth;
       int tileY = (int) focus.Y / ScreenTileHeight;
 
-      addToListIfExists(tileX, tileY, ref screenList);
-      addToListIfExists(tileX, tileY + 1, ref screenList);
-      addToListIfExists(tileX, tileY - 1, ref screenList);
-      addToListIfExists(tileX + 1, tileY, ref screenList);
-      addToListIfExists(tileX + 1, tileY + 1, ref screenList);
-      addToListIfExists(tileX + 1, tileY - 1, ref screenList);
-      addToListIfExists(tileX - 1, tileY, ref screenList);
-      addToListIfExists(tileX - 1, tileY + 1, ref screenList);
-      addToListIfExists(tileX - 1, tileY - 1, ref screenList);
+      AddToListIfExists(tileX, tileY, ref screenList);
+      AddToListIfExists(tileX, tileY + 1, ref screenList);
+      AddToListIfExists(tileX, tileY - 1, ref screenList);
+      AddToListIfExists(tileX + 1, tileY, ref screenList);
+      AddToListIfExists(tileX + 1, tileY + 1, ref screenList);
+      AddToListIfExists(tileX + 1, tileY - 1, ref screenList);
+      AddToListIfExists(tileX - 1, tileY, ref screenList);
+      AddToListIfExists(tileX - 1, tileY + 1, ref screenList);
+      AddToListIfExists(tileX - 1, tileY - 1, ref screenList);
       return screenList;
     }
 
-    private void addToListIfExists(int x, int y, ref List<Screen> screenList)
+    private void AddToListIfExists(int x, int y, ref List<Screen> screenList)
     {
       if (x < SCREEN_DIMENSION && x >= 0 && y < SCREEN_DIMENSION && y >= 0)
       {
