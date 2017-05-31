@@ -21,7 +21,6 @@ namespace Owlicity.Content.Pipeline
   {
     public override Vertices Process(CollisionTexture input, ContentProcessorContext context)
     {
-      List<Vector2> result = new List<Vector2>();
       Debug.Assert(input.Bytes.Length % 4 == 0);
       uint[] data = new uint[input.Bytes.Length / 4];
       for (int dataIndex = 0; dataIndex < data.Length; dataIndex++)

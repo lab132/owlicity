@@ -7,6 +7,26 @@ using System.Threading.Tasks;
 
 namespace Owlicity
 {
+  public enum GameObjectType
+  {
+    Owliver,
+
+    // Mobs
+    Slurp,
+
+    // Static elements
+    Tree_Fir,
+    Tree_Orange,
+  }
+
+  public interface IGameObject
+  {
+    void Initialize();
+    void BeginPlay();
+    void Update(float deltaSeconds);
+    void EndPlay();
+  }
+
   abstract class GameObject
   {
     abstract public void Update(GameTime gameTime);

@@ -449,3 +449,6 @@
 /processor:OwlicityLayoutProcessor
 /build:level01/level1_ground_00_layout.png
 
+#begin Font.xnb
+/copy:Font.xnb
+

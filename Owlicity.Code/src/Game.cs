@@ -34,7 +34,7 @@ namespace Owlicity
       animOffset = new Transform
       {
         Parent = this,
-        Position = -0.5f * anim.Data.TileDim.ToVector2(),
+        Position = -0.5f * anim.Data.Config.TileDim.ToVector2(),
         Depth = 0.5f,
       };
 
@@ -83,7 +83,6 @@ namespace Owlicity
     GraphicsDeviceManager graphics;
     SpriteBatch spriteBatch;
 
-    SpriteAnimationData testAnimation;
     Dummy dummy;
 
     Camera cam;
@@ -112,6 +111,8 @@ namespace Owlicity
     /// </summary>
     protected override void Initialize()
     {
+      SpriteAnimationFactory.Initialize(Content);
+
       cam = new Camera
       {
         //LookAt = dummy,
@@ -138,16 +139,10 @@ namespace Owlicity
 
       PhysicsDebugView.LoadContent(GraphicsDevice, Content);
 
-      // TODO: use this.Content to load your game content here
-      Texture2D atlas = Content.Load<Texture2D>("owliver_walk_front_left_spritesheet");
-      testAnimation = SpriteAnimationData.FromAtlas(atlas, 3, 256, 256);
-      testAnimation.SecondsPerFrame = 0.05f;
-
       dummy = new Dummy
       {
-        anim = testAnimation.CreateInstance(),
+        anim = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Owliver_Walk_Left),
       };
-      dummy.anim.PingPong = true;
       dummy.Initialize();
       dummy.LoadContent();
 
