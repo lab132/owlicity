@@ -106,6 +106,7 @@ namespace Owlicity
     SpriteBatch spriteBatch;
 
     Dummy dummy;
+    GameObject go;
 
     Camera cam;
     Level testLevel;
@@ -161,15 +162,7 @@ namespace Owlicity
 
       PhysicsDebugView.LoadContent(GraphicsDevice, Content);
 
-      dummy = new Dummy
-      {
-        anim = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Owliver_Walk_Left),
-      };
-      dummy.Initialize();
-      dummy.LoadContent();
-
       testLevel = new Level(Content);
-
       for (uint i = 0; i < 4; i++)
       {
         for (uint j = 0; j < 7; j++)
@@ -187,7 +180,24 @@ namespace Owlicity
         FixtureFactory.AttachLoopShape(vertices, body);
       }
 
+      //
+      // Dummy
+      //
+      dummy = new Dummy
+      {
+        anim = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Owliver_Walk_Left),
+      };
+      dummy.Initialize();
+      dummy.LoadContent();
       testLevel.CullingCenter = dummy;
+
+      go = new GameObject(testLevel);
+      new SpriteAnimationComponent(go)
+      {
+        AnimationType = SpriteAnimationType.Slurp_Idle,
+      };
+
+      go.AttachWithOffsetTo(dummy, new Vector2(300, 100));
     }
 
     /// <summary>
@@ -208,7 +218,6 @@ namespace Owlicity
     {
       float deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-      testLevel.Update(gameTime);
       if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
       {
         Exit();
@@ -261,10 +270,16 @@ namespace Owlicity
       const float speed = 400.0f;
       cam.Spatial.Transform.p += inputVector.GetClampedTo(1.0f) * (speed * deltaSeconds);
 
+      // Physics simulation
       World.Step(deltaSeconds);
 
+      // GameObject simulation
+      testLevel.Update(deltaSeconds);
+
+      // Bullsh*t.
       dummy.Update(deltaSeconds);
 
+      // Camera simulation.
       cam.Update(deltaSeconds);
 
       base.Update(gameTime);
@@ -276,14 +291,15 @@ namespace Owlicity
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
     protected override void Draw(GameTime gameTime)
     {
+      float deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
       GraphicsDevice.Clear(Color.CornflowerBlue);
       Matrix viewMatrix = cam.ViewMatrix;
       Matrix projectionMatrix = cam.ProjectionMatrix;
 
-#if true
       spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, viewMatrix);
 
-      testLevel.Draw(gameTime, spriteBatch);
+      testLevel.Draw(deltaSeconds, spriteBatch);
 
       dummy.Draw(spriteBatch);
 
@@ -292,7 +308,6 @@ namespace Owlicity
       spriteBatch.FillRectangle(new Rectangle { X = -radius, Y = -radius, Width = 2 * radius, Height = 2 * radius }, Color.Lime);
 
       spriteBatch.End();
-#endif
 
       PhysicsDebugView.RenderDebugData(ref projectionMatrix, ref viewMatrix);
 

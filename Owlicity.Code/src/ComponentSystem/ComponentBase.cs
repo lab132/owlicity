@@ -18,9 +18,10 @@ namespace Owlicity
     public ComponentBase(GameObject owner)
     {
       Owner = owner;
+      Owner.AddComponent(this);
     }
 
-    public virtual void Initialize() { }
+    public virtual void Initialize() { WantsInitialize = false; }
     public virtual void Update(float deltaSeconds) { }
     public virtual void Draw(float deltaSeconds, SpriteBatch batch) { }
   }

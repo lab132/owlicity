@@ -280,8 +280,16 @@ namespace Owlicity
 
           case SpriteAnimationType.Slurp_Idle:
           {
-            throw new NotImplementedException();
+            config = new SpriteAnimationConfig
+            {
+              TileSheetName = "slurp_spritesheet",
+              TileCount = 7,
+              TileDim = new Point(210, 270), // TODO(manu): Are these correct?
+              SecondsPerFrame = 0.05f,
+              PingPong = true,
+            };
           }
+          break;
 
           default:
           {

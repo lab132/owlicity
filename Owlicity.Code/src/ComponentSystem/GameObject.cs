@@ -3,15 +3,32 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Owlicity
 {
-  public class GameObject
+  public class GameObject : ISpatial
   {
-    public List<ComponentBase> Components { get; set; }
+    public List<ComponentBase> Components { get; } = new List<ComponentBase>();
+
+    public SpatialData Spatial
+    {
+      get => Components.OfType<ISpatial>().FirstOrDefault()?.Spatial;
+    }
+
+    public GameObject(Level level)
+    {
+      level.AddGameObject(this);
+    }
+
+    public void AddComponent(ComponentBase newComponent)
+    {
+      Debug.Assert(!Components.Contains(newComponent));
+      Components.Add(newComponent);
+    }
 
     public void Initialize()
     {
@@ -19,6 +36,11 @@ namespace Owlicity
       {
         component.Initialize();
       }
+    }
+
+    public void Deinitialize()
+    {
+      // TODO(manu): Do we need this?
     }
 
     public void Update(float deltaSeconds)
@@ -62,14 +84,14 @@ namespace Owlicity
       _content = content;
     }
 
-    public static GameObject CreateKnown(GameObjectType type)
+    public static GameObject CreateKnown(Level level, GameObjectType type)
     {
-      GameObject result;
+      GameObject result = new GameObject(level);
       switch(type)
       {
         case GameObjectType.Owliver:
         {
-          result = new GameObject();
+          // TODO(manu)
         }
         break;
 

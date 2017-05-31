@@ -13,8 +13,6 @@ namespace Owlicity
 
     public SpatialData Spatial { get; } = new SpatialData();
 
-    public Transform LocalTransform { get; set; } = new Transform();
-
 
     public SpriteAnimationComponent(GameObject owner) : base(owner)
     {
@@ -25,6 +23,7 @@ namespace Owlicity
       base.Initialize();
 
       Animation = SpriteAnimationFactory.CreateAnimationInstance(AnimationType);
+      Spatial.Transform.p -= 0.5f * Animation.Data.Config.TileDim.ToVector2();
     }
 
     public override void Update(float deltaSeconds)

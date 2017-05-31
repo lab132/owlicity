@@ -116,27 +116,64 @@ namespace Owlicity
     public ISpatial Parent;
     public Transform Transform;
     public float Depth;
+
+    public override string ToString()
+    {
+      Vector3 translation = new Vector3(Transform.p, Depth);
+      float degrees = new Angle { Radians = Transform.q.GetAngle() }.Degrees;
+      return $"{translation}|{degrees}°";
+    }
   }
 
   public static class ISpatialExtensions
   {
     public static SpatialData GetWorldSpatialData(this ISpatial self)
     {
-      SpatialData result = new SpatialData();
+      Vector2 position = new Vector2();
+      float depth = 0.0f;
       float angle = 0.0f;
+
       ISpatial parent = self;
       while(parent != null)
       {
         SpatialData spatial = parent.Spatial;
-        result.Transform.p += spatial.Transform.p;
+        position += spatial.Transform.p;
         angle += spatial.Transform.q.GetAngle();
-        result.Depth += spatial.Depth;
+        depth += spatial.Depth;
 
         parent = spatial.Parent;
       }
-      result.Transform.q = new Rot(angle);
+
+      SpatialData result = new SpatialData
+      {
+        Transform = new Transform
+        {
+          p = position,
+          q = new Rot(angle)
+        },
+        Depth = depth,
+      };
 
       return result;
+    }
+
+    public static void AttachTo(this ISpatial self, ISpatial newParent)
+    {
+      self.Spatial.Parent = newParent;
+    }
+
+    public static void AttachWithOffsetTo(this ISpatial self, ISpatial newParent,
+      Vector2? positionOffset = null,
+      float? depthOffset = null,
+      Angle? rotationOffset = null)
+    {
+      SpatialData offset = new SpatialData();
+      if(positionOffset != null) offset.Transform.p = positionOffset.Value;
+      if(depthOffset != null) offset.Depth = depthOffset.Value;
+      if(rotationOffset != null) offset.Transform.q = new Rot(rotationOffset.Value.Radians);
+
+      offset.AttachTo(newParent);
+      self.AttachTo(offset);
     }
   }
 }
