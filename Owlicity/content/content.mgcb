@@ -461,3 +461,6 @@
 /processorParam:TextureFormat=Color
 /build:particle.png
 
+#begin Font.xnb
+/copy:Font.xnb
+

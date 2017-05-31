@@ -12,11 +12,11 @@ namespace Owlicity.src
   {
     private  int _maxNumParticles = 150;
     public float MinTTL { get; set; } = 0.5f;
-    public float MaxTTL { get; set; } = 1.5f;
+    public float MaxTTL { get; set; } = 2.0f;
     public float MaxParticleSpeed { get; set; } = 20.0f;
     public float MaxParticleSpread { get; set; } = 20.0f;
     public Vector2 Gravity { get; set; } = new Vector2(0.0f, -1.5f);
-    private Random _random;
+    private Random _random = new Random();
     private Particle[] _particles;
     private List<Texture2D> _textures;
     private List<Color> _colors;
@@ -25,7 +25,6 @@ namespace Owlicity.src
     public ParticleEmitter(int maxNumParticles, List<Texture2D> textures, List<Color> colors)
     {
       _maxNumParticles = maxNumParticles;
-      _random = new Random();
       _particles = new Particle[_maxNumParticles];
       _textures = textures;
       _colors = colors;
@@ -40,11 +39,11 @@ namespace Owlicity.src
         int idx = _freeParticleSlots.Pop();
         var particle = new Particle
         {
-          Velocity = new Vector2(getRandomSignedFloat(MaxParticleSpeed), getRandomSignedFloat(MaxParticleSpeed)),
-          Position = position + new Vector2(getRandomSignedFloat(MaxParticleSpread), getRandomSignedFloat(MaxParticleSpread)),
-          Color = getRandomChoice(_colors),
-          Texture = getRandomChoice(_textures),
-          TTL = MinTTL + getRandomUnSignedFloat(MaxTTL)
+          Velocity = MaxParticleSpeed * _random.NextBilateralVector2(),
+          Position = position + MaxParticleSpread * _random.NextBilateralVector2(),
+          Color = _random.Choose(_colors),
+          Texture = _random.Choose(_textures),
+          TTL = _random.NextFloatBetween(MinTTL, MaxTTL),
         };
         _particles[idx] = particle;
       }
@@ -82,21 +81,6 @@ namespace Owlicity.src
           spriteBatch.Draw(_particles[i].Texture, _particles[i].Position, _particles[i].Color);
         }
       }
-    }
-
-    private T getRandomChoice<T>(List<T> list)
-    {
-      var idx = _random.Next(list.Count);
-      return list[idx];
-    }
-    private float getRandomSignedFloat(float upperBound)
-    {
-      return (float) (_random.NextDouble()  * 2 - 1 ) * upperBound;
-    }
-
-    private float getRandomUnSignedFloat(float upperBound)
-    {
-      return (float)_random.NextDouble() * upperBound;
     }
   }
 }
