@@ -1,0 +1,16 @@
+
+#----------------------------- Global Properties ----------------------------#
+
+/outputDir:bin/$(Platform)
+/intermediateDir:obj/$(Platform)
+/platform:DesktopGL
+/config:
+/profile:Reach
+/compress:False
+
+#-------------------------------- References --------------------------------#
+
+/reference:..\..\owlicityContentPipeline\bin\Debug\Owlicity.ContentPipeline.dll
+
+#---------------------------------- Content ---------------------------------#
+
