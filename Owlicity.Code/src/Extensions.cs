@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Primitives2D;
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
 
 namespace Owlicity
 {
@@ -57,6 +58,53 @@ namespace Owlicity
     public static void FillRectangle(this SpriteBatch self, RectF rect, Color color, Angle angle)
     {
       self.FillRectangle(rect.ToRectangle(), color, angle.Radians);
+    }
+  }
+
+  public static class RandomExtensions
+  {
+    public static float NextFloat(this Random rand)
+    {
+      return (float)rand.NextDouble();
+    }
+
+    public static float NextBilateralFloat(this Random rand)
+    {
+      return rand.NextFloat() * 2 - 1;
+    }
+
+    public static float NextFloatBetween(this Random rand, float lower, float upper)
+    {
+      float t = rand.NextFloat();
+      float result = ((1 - t) * lower) + (t * upper);
+      return result;
+    }
+
+    public static Vector2 NextVector2(this Random rand)
+    {
+      return new Vector2(rand.NextFloat(), rand.NextFloat());
+    }
+
+    public static Vector2 NextBilateralVector2(this Random rand)
+    {
+      return new Vector2(rand.NextBilateralFloat(), rand.NextBilateralFloat());
+    }
+
+    public static Vector3 NextVector3(this Random rand)
+    {
+      return new Vector3(rand.NextFloat(), rand.NextFloat(), rand.NextFloat());
+    }
+
+    public static Vector3 NextBilateralVector3(this Random rand)
+    {
+      return new Vector3(rand.NextBilateralFloat(), rand.NextBilateralFloat(), rand.NextBilateralFloat());
+    }
+
+    public static T Choose<T>(this Random rand, List<T> list)
+    {
+      Debug.Assert(list.Count > 0);
+      var idx = rand.Next(list.Count);
+      return list[idx];
     }
   }
 }
