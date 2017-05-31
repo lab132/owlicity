@@ -28,6 +28,7 @@ namespace Owlicity
     public SpriteAnimationInstance anim;
     public Transform animOffset;
     public Body body;
+    public ParticleEmitter particleEmitter;
 
     public void Initialize()
     {
@@ -39,6 +40,22 @@ namespace Owlicity
       };
 
       body = new Body(OwlicityGame.Instance.World, bodyType: BodyType.Kinematic);
+
+      var colors = new List<Color>
+      {
+        Color.White,
+        Color.Red,
+        Color.Green,
+      };
+
+      Texture2D particleTexture = OwlicityGame.Instance.Content.Load<Texture2D>("particle");
+
+      var particles = new List<Texture2D>
+      {
+        particleTexture
+      };
+
+      particleEmitter = new ParticleEmitter(150, particles, colors);
     }
 
     public void LoadContent()
@@ -65,11 +82,14 @@ namespace Owlicity
     {
       anim.Update(dt);
       body.LinearVelocity *= 0.85f;
+      particleEmitter.Update(dt);
+      particleEmitter.emitParticles(LocalTransform.Position);
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
       anim.Draw(spriteBatch, animOffset.GetWorldTransform());
+      particleEmitter.Draw(spriteBatch);
     }
   }
 
