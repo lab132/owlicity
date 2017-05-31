@@ -22,20 +22,22 @@ using System.Linq;
 
 namespace Owlicity
 {
-  public class Dummy : ITransformable
+  public class Dummy : ISpatial
   {
-    public Transform LocalTransform { get; } = new Transform();
+    public SpatialData Spatial { get; } = new SpatialData();
+
     public SpriteAnimationInstance anim;
-    public Transform animOffset;
+    public SpatialData animOffset;
     public Body body;
     public ParticleEmitter particleEmitter;
 
     public void Initialize()
     {
-      animOffset = new Transform
+      Vector2 offset = -0.5f * anim.Data.Config.TileDim.ToVector2();
+      animOffset = new SpatialData
       {
         Parent = this,
-        Position = -0.5f * anim.Data.Config.TileDim.ToVector2(),
+        Transform = new Transform { p = offset },
         Depth = 0.5f,
       };
 
@@ -73,22 +75,22 @@ namespace Owlicity
         const float speed = 400.0f;
         Vector2 movementVector = inputVector.GetClampedTo(1.0f) * speed;
 
-        LocalTransform.Position += movementVector * deltaSeconds;
+        Spatial.Transform.p += movementVector * deltaSeconds;
         body.LinearVelocity = movementVector;
       }
     }
 
-    public void Update(GameTime dt)
+    public void Update(float deltaSeconds)
     {
-      anim.Update(dt);
+      anim.Update(deltaSeconds);
       body.LinearVelocity *= 0.85f;
-      particleEmitter.Update(dt);
-      particleEmitter.emitParticles(LocalTransform.Position);
+      particleEmitter.Update(deltaSeconds);
+      particleEmitter.emitParticles(Spatial.Transform.p);
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
-      anim.Draw(spriteBatch, animOffset.GetWorldTransform());
+      anim.Draw(spriteBatch, animOffset.GetWorldSpatialData());
       particleEmitter.Draw(spriteBatch);
     }
   }
@@ -257,13 +259,13 @@ namespace Owlicity
       }
 
       const float speed = 400.0f;
-      cam.LocalTransform.Position += inputVector.GetClampedTo(1.0f) * (speed * deltaSeconds);
+      cam.Spatial.Transform.p += inputVector.GetClampedTo(1.0f) * (speed * deltaSeconds);
 
       World.Step(deltaSeconds);
 
-      dummy.Update(gameTime);
+      dummy.Update(deltaSeconds);
 
-      cam.Update(gameTime);
+      cam.Update(deltaSeconds);
 
       base.Update(gameTime);
     }

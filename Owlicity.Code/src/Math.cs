@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VelcroPhysics.Shared;
 
 namespace Owlicity
 {
@@ -103,48 +104,37 @@ namespace Owlicity
     }
   }
 
-  public class Transform : ITransformable
+  public interface ISpatial
   {
-    public Transform LocalTransform { get { return this; } }
+    SpatialData Spatial { get; }
+  }
 
-    public ITransformable Parent;
+  public class SpatialData : ISpatial
+  {
+    public SpatialData Spatial { get => this; }
 
-    public Vector2 Position;
+    public ISpatial Parent;
+    public Transform Transform;
     public float Depth;
-    public Angle Rotation;
-    public Vector2 Scale = Vector2.One;
-
-    public RectF Bounds;
-
-    public Vector3 Translation
-    {
-      get { return new Vector3(Position, Depth); }
-      set { Position = value.GetXY(); Depth = value.Z; }
-    }
   }
 
-  public interface ITransformable
+  public static class ISpatialExtensions
   {
-    Transform LocalTransform { get; }
-  }
-
-  public static class Transformable
-  {
-    public static Transform GetWorldTransform(this ITransformable self)
+    public static SpatialData GetWorldSpatialData(this ISpatial self)
     {
-      Transform result = new Transform();
-      Transform transform = self.LocalTransform;
-      while(true)
+      SpatialData result = new SpatialData();
+      float angle = 0.0f;
+      ISpatial parent = self;
+      while(parent != null)
       {
-        result.Position += transform.Position;
-        result.Depth += transform.Depth;
-        result.Rotation += transform.Rotation;
-        result.Scale *= transform.Scale;
+        SpatialData spatial = parent.Spatial;
+        result.Transform.p += spatial.Transform.p;
+        angle += spatial.Transform.q.GetAngle();
+        result.Depth += spatial.Depth;
 
-        if(transform.Parent == null)
-          break;
-        transform = transform.Parent.LocalTransform;
+        parent = spatial.Parent;
       }
+      result.Transform.q = new Rot(angle);
 
       return result;
     }

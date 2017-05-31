@@ -49,15 +49,13 @@ namespace Owlicity.src
       }
     }
 
-    public void Update(GameTime gameTime)
+    public void Update(float deltaSeconds)
     {
-      var dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
       for (int i = 0; i < _maxNumParticles; i++)
       {
         if (_particles[i].TTL > 0)
         {
-          _particles[i].TTL -= dt;
+          _particles[i].TTL -= deltaSeconds;
 
           if (_particles[i].TTL <= 0)
           {
@@ -65,8 +63,8 @@ namespace Owlicity.src
           }
           else
           {
-            _particles[i].Velocity -= Gravity * dt;
-            _particles[i].Position += _particles[i].Velocity * dt;
+            _particles[i].Velocity -= Gravity * deltaSeconds;
+            _particles[i].Position += _particles[i].Velocity * deltaSeconds;
           }
         }
       }

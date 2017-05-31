@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VelcroPhysics.Shared;
 
 namespace Owlicity
 {
@@ -17,7 +18,7 @@ namespace Owlicity
     public Color Tint { get; set; } = Color.White;
     public SpriteEffects SpriteEffects { get; set; }
 
-    public void Draw(SpriteBatch spriteBatch, Transform transform)
+    public void Draw(SpriteBatch spriteBatch, SpatialData spatial)
     {
       Point textureDim = TextureDim;
       if(textureDim == Point.Zero)
@@ -25,16 +26,16 @@ namespace Owlicity
 
       spriteBatch.Draw(
         texture: Texture,
-        position: transform.Position,
+        position: spatial.Transform.p,
         sourceRectangle: new Rectangle { Location = TextureOffset, Size = textureDim },
         color: Tint,
-        rotation: transform.Rotation.Radians,
+        rotation: spatial.Transform.q.GetAngle(),
         origin: Vector2.Zero,
-        scale: transform.Scale,
+        scale: Vector2.One,
         effects: SpriteEffects,
-        layerDepth: transform.Depth);
+        layerDepth: spatial.Depth);
 
-      spriteBatch.DrawRectangle(transform.Position, textureDim.ToVector2(), Color.Red);
+      spriteBatch.DrawRectangle(spatial.Transform.p, textureDim.ToVector2(), Color.Red);
     }
   }
 }

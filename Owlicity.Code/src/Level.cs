@@ -29,7 +29,7 @@ namespace Owlicity
     private ContentManager _contentManager;
     public int ScreenTileWidth { get; set; } = 1920;
     public int ScreenTileHeight { get; set; } = 1080;
-    public ITransformable CullingCenter { get; set; }
+    public ISpatial CullingCenter { get; set; }
 
     public void AddScreen(uint posX, uint posY, Screen screen) {
       _screens[posX, posY] = screen;
@@ -72,7 +72,7 @@ namespace Owlicity
 
       var screenList = new List<Screen>();
 
-      Vector2 focus = CullingCenter.GetWorldTransform().Position;
+      Vector2 focus = CullingCenter.Spatial.GetWorldSpatialData().Transform.p;
       int tileX = (int) focus.X / ScreenTileWidth;
       int tileY = (int) focus.Y / ScreenTileHeight;
 

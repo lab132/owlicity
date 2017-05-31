@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VelcroPhysics.Shared;
 
 namespace Owlicity
 {
@@ -81,11 +82,10 @@ namespace Owlicity
       };
     }
 
-    public void Update(GameTime dt)
+    public void Update(float deltaSeconds)
     {
       if (Data.Frames.Count > 0)
       {
-        float deltaSeconds = (float)dt.ElapsedGameTime.TotalSeconds;
         State.CurrentFrameTime += deltaSeconds;
         int oldFrameIndex = State.CurrentFrameIndex;
         while (State.CurrentFrameTime >= State.SecondsPerFrame)
@@ -102,11 +102,11 @@ namespace Owlicity
       }
     }
 
-    public void Draw(SpriteBatch spriteBatch, Transform transform)
+    public void Draw(SpriteBatch spriteBatch, SpatialData spatial)
     {
       if (Data.Frames.Count > 0)
       {
-        _currentSprite.Draw(spriteBatch, transform);
+        _currentSprite.Draw(spriteBatch, spatial);
       }
     }
 
@@ -161,6 +161,8 @@ namespace Owlicity
 
   public enum SpriteAnimationType
   {
+    Unknown,
+
     Owliver_Idle_Left,
     Owliver_Idle_Right,
     Owliver_Walk_Left,
