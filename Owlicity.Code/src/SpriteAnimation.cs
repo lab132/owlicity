@@ -298,12 +298,16 @@ namespace Owlicity
           {
             config = new SpriteAnimationConfig
             {
-              TileSheetName = "owliver_idle_front_right_spritesheet",
               TileCount = 3,
               TileDim = new Point(256, 256),
               SecondsPerFrame = 0.05f,
               PingPong = true,
               Scale = Global.OwliverScale,
+
+              //TileSheetName = "owliver_idle_front_right_spritesheet",
+
+              TileSheetName = "owliver_idle_front_left_spritesheet",
+              SpriteEffects = SpriteEffects.FlipHorizontally,
             };
           }
           break;
