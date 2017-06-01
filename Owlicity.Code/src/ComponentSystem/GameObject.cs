@@ -99,18 +99,25 @@ namespace Owlicity
     // Mobs
     Slurp,
 
-    // Static elements
+    // Static stuff
     Tree_Fir,
+    Tree_Conifer,
+    Tree_Oak,
     Tree_Orange,
+    Bush,
+
+    // Random groups
+    Random_FirTree,
+    Random_OakTree,
   }
 
   public static class GameObjectFactory
   {
-    private static ContentManager _content;
+    private static Random _random;
 
-    public static void Initialize(ContentManager content)
+    public static void Initialize()
     {
-      _content = content;
+      _random = new Random();
     }
 
     public static GameObject CreateKnown(GameObjectType type)
@@ -171,10 +178,42 @@ namespace Owlicity
         throw new NotImplementedException();
 
         case GameObjectType.Tree_Fir:
-        throw new NotImplementedException();
-
+        case GameObjectType.Tree_Conifer:
+        case GameObjectType.Tree_Oak:
         case GameObjectType.Tree_Orange:
-        throw new NotImplementedException();
+        {
+          List<SpriteAnimationType> animTypes = new List<SpriteAnimationType>();
+          switch(type)
+          {
+            case GameObjectType.Tree_Fir: animTypes.Add(SpriteAnimationType.Fir_Idle); break;
+            case GameObjectType.Tree_Conifer: animTypes.Add(SpriteAnimationType.Conifer_Idle); break;
+            case GameObjectType.Tree_Oak: animTypes.Add(SpriteAnimationType.Oak_Idle);  break;
+            case GameObjectType.Tree_Orange: animTypes.Add(SpriteAnimationType.Orange_Idle); break;
+            default:
+            throw new InvalidProgramException();
+          }
+
+          var sa = new SpriteAnimationComponent(go)
+          {
+            AnimationTypes = animTypes,
+          };
+          go.RootComponent = sa;
+        }
+        break;
+
+        case GameObjectType.Random_FirTree:
+        {
+          GameObjectType choice = _random.Choose(GameObjectType.Tree_Fir, GameObjectType.Tree_Conifer);
+          go = CreateKnown(choice);
+        }
+        break;
+
+        case GameObjectType.Random_OakTree:
+        {
+          GameObjectType choice = _random.Choose(GameObjectType.Tree_Oak, GameObjectType.Tree_Orange);
+          go = CreateKnown(choice);
+        }
+        break;
 
         default:
         throw new ArgumentException("Unknown game object type.");

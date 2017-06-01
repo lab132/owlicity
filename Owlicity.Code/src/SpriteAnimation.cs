@@ -188,6 +188,14 @@ namespace Owlicity
     Owliver_Walk_Right,
 
     Slurp_Idle,
+
+    Fir_Idle,
+
+    Conifer_Idle,
+
+    Oak_Idle,
+
+    Orange_Idle,
   }
 
   public struct SpriteAnimationConfig
@@ -204,8 +212,11 @@ namespace Owlicity
     {
       get => new SpriteAnimationConfig
       {
+        TileCount = 3,
+        TileDim = new Point(256, 256),
         Scale = Vector2.One,
         SecondsPerFrame = 0.05f,
+        PingPong = true,
       };
     }
   }
@@ -276,95 +287,63 @@ namespace Owlicity
 
       if(result == null)
       {
-        SpriteAnimationConfig config;
+        SpriteAnimationConfig config = SpriteAnimationConfig.Default;
 
         switch(animType)
         {
           case SpriteAnimationType.Owliver_Idle_Left:
           {
-            config = new SpriteAnimationConfig
-            {
-              TileSheetName = "owliver_idle_front_left_spritesheet",
-              TileCount = 3,
-              TileDim = new Point(256, 256),
-              SecondsPerFrame = 0.05f,
-              PingPong = true,
-              Scale = Global.OwliverScale,
-            };
+            config.TileSheetName = "owliver_idle_front_left_spritesheet";
+            config.Scale = Global.OwliverScale;
           }
           break;
 
           case SpriteAnimationType.Owliver_Idle_Right:
           {
-            config = new SpriteAnimationConfig
-            {
-              TileCount = 3,
-              TileDim = new Point(256, 256),
-              SecondsPerFrame = 0.05f,
-              PingPong = true,
-              Scale = Global.OwliverScale,
-
-              //TileSheetName = "owliver_idle_front_right_spritesheet",
-
-              TileSheetName = "owliver_idle_front_left_spritesheet",
-              SpriteEffects = SpriteEffects.FlipHorizontally,
-            };
+            //config.TileSheetName = "owliver_idle_front_right_spritesheet";
+            config.TileSheetName = "owliver_idle_front_left_spritesheet";
+            config.SpriteEffects = SpriteEffects.FlipHorizontally;
+            config.Scale = Global.OwliverScale;
           }
           break;
 
           case SpriteAnimationType.Owliver_Walk_Left:
           {
-            config = new SpriteAnimationConfig
-            {
-              TileSheetName = "owliver_walk_front_left_spritesheet",
-              TileCount = 3,
-              TileDim = new Point(256, 256),
-              SecondsPerFrame = 0.05f,
-              PingPong = true,
-              Scale = Global.OwliverScale,
-            };
+            config.TileSheetName = "owliver_walk_front_left_spritesheet";
+            config.Scale = Global.OwliverScale;
           }
           break;
 
           case SpriteAnimationType.Owliver_Walk_Right:
           {
-            config = new SpriteAnimationConfig
-            {
-              //TileSheetName = "owliver_walk_front_right_spritesheet",
-              TileCount = 3,
-              TileDim = new Point(256, 256),
-              SecondsPerFrame = 0.05f,
-              PingPong = true,
-              Scale = Global.OwliverScale,
-
-              // TODO(manu): Once we have it, use the right one.
-              TileSheetName = "owliver_walk_front_left_spritesheet",
-              SpriteEffects = SpriteEffects.FlipHorizontally,
-            };
+            //TileSheetName = "owliver_walk_front_right_spritesheet",
+            config.TileSheetName = "owliver_walk_front_left_spritesheet";
+            config.SpriteEffects = SpriteEffects.FlipHorizontally;
+            config.Scale = Global.OwliverScale;
           }
           break;
 
           case SpriteAnimationType.Slurp_Idle:
           {
-            config = new SpriteAnimationConfig
-            {
-              TileSheetName = "slurp_spritesheet",
-              TileCount = 7,
-              TileDim = new Point(210, 270),
-              SecondsPerFrame = 0.05f,
-              PingPong = true,
-            };
+            config.TileSheetName = "slurp_spritesheet";
+            config.TileCount = 7;
+            config.TileDim = new Point(210, 270);
           }
           break;
 
-          default:
-          {
-            throw new ArgumentException("Unknown sprite animation type.");
-          }
+          case SpriteAnimationType.Fir_Idle: config.TileSheetName = "fir_spritesheet"; break;
+          case SpriteAnimationType.Conifer_Idle: config.TileSheetName = "conifer_spritesheet"; break;
+          case SpriteAnimationType.Oak_Idle: config.TileSheetName = "oak_spritesheet"; break;
+          case SpriteAnimationType.Orange_Idle: config.TileSheetName = "orange_spritesheet"; break;
+
+          default: throw new ArgumentException("Unknown sprite animation type.");
         }
 
-        result = CreateAnimation(ref config);
-        _known[(int)animType] = result;
+        if(config.TileSheetName != null)
+        {
+          result = CreateAnimation(ref config);
+          _known[(int)animType] = result;
+        }
       }
 
       return result;

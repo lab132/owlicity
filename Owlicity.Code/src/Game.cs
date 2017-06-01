@@ -96,6 +96,7 @@ namespace Owlicity
     protected override void Initialize()
     {
       SpriteAnimationFactory.Initialize(Content);
+      GameObjectFactory.Initialize();
 
       cam = new Camera
       {
