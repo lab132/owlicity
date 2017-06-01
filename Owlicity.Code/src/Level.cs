@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Owlicity.src;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,6 +10,12 @@ using System.Threading.Tasks;
 
 namespace Owlicity
 {
+  public enum UpdateStage
+  {
+    PrePhysics,
+    PostPhysics,
+  }
+
   public class Level
   {
     private const int SCREEN_DIMENSION = 256;
@@ -23,10 +28,6 @@ namespace Owlicity
     public int ScreenTileHeight { get; set; } = 1080;
     public ISpatial CullingCenter { get; set; }
 
-    public List<GameObject> GameObjects = new List<GameObject>();
-    public List<GameObject> GameObjectsPendingAdd = new List<GameObject>();
-    public List<GameObject> GameObjectsPendingRemove = new List<GameObject>();
-
     public Level(ContentManager contentManager)
     {
       _screens = new Screen[SCREEN_DIMENSION, SCREEN_DIMENSION];
@@ -34,28 +35,6 @@ namespace Owlicity
       _activeScreens = new List<Screen>();
       _previouslyActiveScreens = new List<Screen>();
       _contentManager = contentManager;
-    }
-
-    public void AddGameObject(GameObject go)
-    {
-      Debug.Assert(!GameObjects.Contains(go));
-      Debug.Assert(!GameObjectsPendingAdd.Contains(go));
-
-      if(!GameObjectsPendingRemove.Contains(go))
-      {
-        GameObjectsPendingAdd.Add(go);
-      }
-    }
-
-    public void RemoveGameObject(GameObject go)
-    {
-      Debug.Assert(GameObjects.Contains(go));
-      Debug.Assert(GameObjectsPendingRemove.Contains(go));
-
-      if(!GameObjectsPendingAdd.Remove(go))
-      {
-        GameObjectsPendingRemove.Add(go);
-      }
     }
 
     public void AddScreen(uint posX, uint posY, Screen screen)
@@ -90,27 +69,6 @@ namespace Owlicity
         screen.Update(deltaSeconds);
       }
 
-      //
-      // Game object simulation
-      //
-      GameObjects.AddRange(GameObjectsPendingAdd);
-      foreach(GameObject go in GameObjectsPendingAdd)
-      {
-        go.Initialize();
-      }
-      GameObjectsPendingAdd.Clear();
-
-      foreach(GameObject go in GameObjects)
-      {
-        go.Update(deltaSeconds);
-      }
-
-      GameObjects.RemoveAll(go => GameObjectsPendingRemove.Contains(go));
-      foreach(GameObject go in GameObjectsPendingRemove)
-      {
-        go.Deinitialize();
-      }
-      GameObjectsPendingRemove.Clear();
     }
 
     public void Draw(float deltaSeconds, SpriteBatch batch)
@@ -118,11 +76,6 @@ namespace Owlicity
       foreach (Screen screen in _activeScreens)
       {
         screen.Draw(batch);
-      }
-
-      foreach(GameObject go in GameObjects)
-      {
-        go.Draw(deltaSeconds, batch);
       }
     }
 

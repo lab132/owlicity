@@ -106,5 +106,12 @@ namespace Owlicity
       var idx = rand.Next(list.Count);
       return list[idx];
     }
+
+    public static T Choose<T>(this Random rand, params T[] choices)
+    {
+      Debug.Assert(choices.Length > 0);
+      var idx = rand.Next(choices.Length);
+      return choices[idx];
+    }
   }
 }

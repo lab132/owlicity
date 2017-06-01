@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Owlicity.src
+namespace Owlicity
 {
   public class ParticleEmitter
   {
@@ -18,21 +18,33 @@ namespace Owlicity.src
     public Vector2 Gravity { get; set; } = new Vector2(0.0f, -1.5f);
     private Random _random = new Random();
     private Particle[] _particles;
-    private List<Texture2D> _textures;
-    private List<Color> _colors;
+    private Texture2D[] _textures;
+    private Color[] _colors;
     private Stack<int> _freeParticleSlots;
+
+    public ParticleEmitter(int maxNumParticles, Texture2D texture, params Color[] colors)
+      : this(maxNumParticles, new List<Texture2D> { texture }, new List<Color>(colors))
+    {
+      _maxNumParticles = maxNumParticles;
+      _textures = new[] { texture };
+      _colors = colors;
+    }
 
     public ParticleEmitter(int maxNumParticles, List<Texture2D> textures, List<Color> colors)
     {
       _maxNumParticles = maxNumParticles;
-      _particles = new Particle[_maxNumParticles];
-      _textures = textures;
-      _colors = colors;
-      _freeParticleSlots = new Stack<int>(Enumerable.Range(0, _maxNumParticles));
-
+      _textures = textures.ToArray();
+      _colors = colors.ToArray();
+      Initialize();
     }
 
-    public void emitParticles(Vector2 position)
+    private void Initialize()
+    {
+      _particles = new Particle[_maxNumParticles];
+      _freeParticleSlots = new Stack<int>(Enumerable.Range(0, _maxNumParticles));
+    }
+
+    public void EmitParticles(Vector2 position)
     {
       while (_freeParticleSlots.Count > 0)
       {
@@ -63,7 +75,7 @@ namespace Owlicity.src
           }
           else
           {
-            _particles[i].Velocity -= Gravity * deltaSeconds;
+            _particles[i].Velocity += Gravity * deltaSeconds;
             _particles[i].Position += _particles[i].Velocity * deltaSeconds;
           }
         }

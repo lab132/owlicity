@@ -159,7 +159,10 @@ namespace Owlicity
 
     public static void AttachTo(this ISpatial self, ISpatial newParent)
     {
-      self.Spatial.Parent = newParent;
+      if(newParent != self)
+      {
+        self.Spatial.Parent = newParent;
+      }
     }
 
     public static void AttachWithOffsetTo(this ISpatial self, ISpatial newParent,
@@ -167,13 +170,16 @@ namespace Owlicity
       float? depthOffset = null,
       Angle? rotationOffset = null)
     {
-      SpatialData offset = new SpatialData();
-      if(positionOffset != null) offset.Transform.p = positionOffset.Value;
-      if(depthOffset != null) offset.Depth = depthOffset.Value;
-      if(rotationOffset != null) offset.Transform.q = new Rot(rotationOffset.Value.Radians);
+      if(newParent != self)
+      {
+        SpatialData offset = new SpatialData();
+        if(positionOffset != null) offset.Transform.p = positionOffset.Value;
+        if(depthOffset != null) offset.Depth = depthOffset.Value;
+        if(rotationOffset != null) offset.Transform.q = new Rot(rotationOffset.Value.Radians);
 
-      offset.AttachTo(newParent);
-      self.AttachTo(offset);
+        offset.AttachTo(newParent);
+        self.AttachTo(offset);
+      }
     }
   }
 }

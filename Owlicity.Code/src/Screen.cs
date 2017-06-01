@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Owlicity.src
+namespace Owlicity
 {
   public class Screen
   {

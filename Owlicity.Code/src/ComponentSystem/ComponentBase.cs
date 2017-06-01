@@ -10,10 +10,7 @@ namespace Owlicity
   public abstract class ComponentBase
   {
     public GameObject Owner;
-
-    public bool WantsInitialize = true;
-    public bool WantsUpdate = true;
-    public bool WantsDraw = true;
+    public bool IsInitialized;
 
     public ComponentBase(GameObject owner)
     {
@@ -21,7 +18,8 @@ namespace Owlicity
       Owner.AddComponent(this);
     }
 
-    public virtual void Initialize() { WantsInitialize = false; }
+    public virtual void Initialize() { IsInitialized = false; }
+    public virtual void PrePhysicsUpdate(float deltaSeconds) { }
     public virtual void Update(float deltaSeconds) { }
     public virtual void Draw(float deltaSeconds, SpriteBatch batch) { }
   }

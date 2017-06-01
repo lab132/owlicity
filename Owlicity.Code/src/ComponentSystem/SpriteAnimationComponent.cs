@@ -24,6 +24,7 @@ namespace Owlicity
 
       Animation = SpriteAnimationFactory.CreateAnimationInstance(AnimationType);
       Spatial.Transform.p -= 0.5f * Animation.Data.Config.TileDim.ToVector2();
+      this.AttachTo(Owner);
     }
 
     public override void Update(float deltaSeconds)

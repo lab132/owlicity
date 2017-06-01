@@ -13,7 +13,7 @@ namespace Owlicity
     [STAThread]
     static void Main()
     {
-      using (var game = new OwlicityGame())
+      using (var game = new OwlGame())
       {
         game.Run();
       }

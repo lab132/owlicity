@@ -14,14 +14,35 @@ namespace Owlicity
   {
     public List<ComponentBase> Components { get; } = new List<ComponentBase>();
 
+    SpatialData _cachedSpatial;
     public SpatialData Spatial
     {
-      get => Components.OfType<ISpatial>().FirstOrDefault()?.Spatial;
+      get
+      {
+        if(_cachedSpatial == null)
+        {
+          BodyComponent bc = Components.OfType<BodyComponent>().FirstOrDefault();
+          if(bc != null)
+          {
+            _cachedSpatial = bc.Spatial;
+          }
+          else
+          {
+            ISpatial spatialComponent = Components.OfType<ISpatial>().FirstOrDefault();
+            if(spatialComponent != null)
+            {
+              _cachedSpatial = spatialComponent.Spatial;
+            }
+          }
+        }
+
+        return _cachedSpatial;
+      }
     }
 
-    public GameObject(Level level)
+    public GameObject()
     {
-      level.AddGameObject(this);
+      Global.Game.AddGameObject(this);
     }
 
     public void AddComponent(ComponentBase newComponent)
@@ -32,7 +53,7 @@ namespace Owlicity
 
     public void Initialize()
     {
-      foreach(ComponentBase component in Components.Where(c => c.WantsInitialize))
+      foreach(ComponentBase component in Components.Where(c => !c.IsInitialized))
       {
         component.Initialize();
       }
@@ -43,9 +64,17 @@ namespace Owlicity
       // TODO(manu): Do we need this?
     }
 
+    public void PrePhysicsUpdate(float deltaSeconds)
+    {
+      foreach(ComponentBase component in Components)
+      {
+        component.PrePhysicsUpdate(deltaSeconds);
+      }
+    }
+
     public void Update(float deltaSeconds)
     {
-      foreach(ComponentBase component in Components.Where(c => c.WantsUpdate))
+      foreach(ComponentBase component in Components)
       {
         component.Update(deltaSeconds);
       }
@@ -53,7 +82,7 @@ namespace Owlicity
 
     public void Draw(float deltaSeconds, SpriteBatch batch)
     {
-      foreach(ComponentBase component in Components.Where(c => c.WantsDraw))
+      foreach(ComponentBase component in Components)
       {
         component.Draw(deltaSeconds, batch);
       }
@@ -84,9 +113,9 @@ namespace Owlicity
       _content = content;
     }
 
-    public static GameObject CreateKnown(Level level, GameObjectType type)
+    public static GameObject CreateKnown(GameObjectType type)
     {
-      GameObject result = new GameObject(level);
+      GameObject result = new GameObject();
       switch(type)
       {
         case GameObjectType.Owliver:

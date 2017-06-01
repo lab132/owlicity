@@ -40,7 +40,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Camera.cs" />
+    <Compile Include="src\ComponentSystem\BodyComponent.cs" />
+    <Compile Include="src\ComponentSystem\MovementComponent.cs" />
     <Compile Include="src\ComponentSystem\ComponentBase.cs" />
+    <Compile Include="src\ComponentSystem\ParticleEmitterComponent.cs" />
     <Compile Include="src\ComponentSystem\SpriteAnimationComponent.cs" />
     <Compile Include="src\Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

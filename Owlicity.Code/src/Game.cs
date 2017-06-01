@@ -2,7 +2,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Primitives2D;
-using Owlicity.src;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System;
@@ -41,7 +40,7 @@ namespace Owlicity
         Depth = 0.5f,
       };
 
-      body = new Body(OwlicityGame.Instance.World, bodyType: BodyType.Kinematic);
+      body = new Body(Global.Game.World, bodyType: BodyType.Kinematic);
 
       var colors = new List<Color>
       {
@@ -50,7 +49,7 @@ namespace Owlicity
         Color.Green,
       };
 
-      Texture2D particleTexture = OwlicityGame.Instance.Content.Load<Texture2D>("particle");
+      Texture2D particleTexture = Global.Game.Content.Load<Texture2D>("particle");
 
       var particles = new List<Texture2D>
       {
@@ -62,9 +61,9 @@ namespace Owlicity
 
     public void LoadContent()
     {
-      Vertices collisionVertices = OwlicityGame.Instance.Content.Load<Vertices>("slurp_collision");
-      collisionVertices.Translate(-collisionVertices.GetAABB().Center);
-      FixtureFactory.AttachLoopShape(collisionVertices, body);
+      //Vertices collisionVertices = Global.Game.Content.Load<Vertices>("slurp_collision");
+      //collisionVertices.Translate(-collisionVertices.GetAABB().Center);
+      //FixtureFactory.AttachLoopShape(collisionVertices, body);
     }
 
     public void ProcessInput(GameTime dt, Vector2 inputVector)
@@ -85,7 +84,7 @@ namespace Owlicity
       anim.Update(deltaSeconds);
       body.LinearVelocity *= 0.85f;
       particleEmitter.Update(deltaSeconds);
-      particleEmitter.emitParticles(Spatial.Transform.p);
+      particleEmitter.EmitParticles(Spatial.Transform.p);
     }
 
     public void Draw(SpriteBatch spriteBatch)
@@ -95,35 +94,69 @@ namespace Owlicity
     }
   }
 
+  public static class Global
+  {
+    public static OwlGame Game { get; set; }
+    public static GameObject Owliver { get; set; }
+  }
+
   /// <summary>
   /// This is the main type for your game.
   /// </summary>
-  public class OwlicityGame : Game
+  public class OwlGame : Game
   {
-    public static OwlicityGame Instance { get; set; }
-
     GraphicsDeviceManager graphics;
-    SpriteBatch spriteBatch;
+    SpriteBatch batch;
 
     Dummy dummy;
     GameObject go;
 
     Camera cam;
-    Level testLevel;
+    Level CurrentLevel;
 
     public World World { get; set; }
     public DebugView PhysicsDebugView { get; set; }
 
+    //
+    // Game object stuff
+    //
+    public List<GameObject> GameObjects = new List<GameObject>();
+    public List<GameObject> GameObjectsPendingAdd = new List<GameObject>();
+    public List<GameObject> GameObjectsPendingRemove = new List<GameObject>();
 
-    public OwlicityGame()
+    public void AddGameObject(GameObject go)
     {
-      Debug.Assert(Instance == null);
-      Instance = this;
+      Debug.Assert(!GameObjects.Contains(go));
+      Debug.Assert(!GameObjectsPendingAdd.Contains(go));
+
+      if(!GameObjectsPendingRemove.Contains(go))
+      {
+        GameObjectsPendingAdd.Add(go);
+      }
+    }
+
+    public void RemoveGameObject(GameObject go)
+    {
+      Debug.Assert(GameObjects.Contains(go));
+      Debug.Assert(GameObjectsPendingRemove.Contains(go));
+
+      if(!GameObjectsPendingAdd.Remove(go))
+      {
+        GameObjectsPendingRemove.Add(go);
+      }
+    }
+
+
+    public OwlGame()
+    {
+      Debug.Assert(Global.Game == null);
+      Global.Game = this;
 
       graphics = new GraphicsDeviceManager(this);
-      Content.RootDirectory = "content";
       graphics.PreferredBackBufferHeight = 1080;
       graphics.PreferredBackBufferWidth = 1920;
+
+      Content.RootDirectory = "content";
     }
 
     /// <summary>
@@ -158,18 +191,18 @@ namespace Owlicity
     protected override void LoadContent()
     {
       // Create a new SpriteBatch, which can be used to draw textures.
-      spriteBatch = new SpriteBatch(GraphicsDevice);
+      batch = new SpriteBatch(GraphicsDevice);
 
       PhysicsDebugView.LoadContent(GraphicsDevice, Content);
 
-      testLevel = new Level(Content);
+      CurrentLevel = new Level(Content);
       for (uint i = 0; i < 4; i++)
       {
         for (uint j = 0; j < 7; j++)
         {
           var screen = new Screen();
           screen.AssetName = $"level01/level1_ground_{j}{i}";
-          testLevel.AddScreen(i, j, screen);
+          CurrentLevel.AddScreen(i, j, screen);
           screen.LoadContent(Content);
         }
       }
@@ -189,15 +222,33 @@ namespace Owlicity
       };
       dummy.Initialize();
       dummy.LoadContent();
-      testLevel.CullingCenter = dummy;
+      CurrentLevel.CullingCenter = dummy;
 
-      go = new GameObject(testLevel);
+      go = new GameObject();
+      ISpatial s = new BodyComponent(go)
+      {
+        InitMode = BodyComponentInitMode.FromContent,
+        BodyType = BodyType.Kinematic,
+        ShapeContentName = "slurp_collision",
+      };
+      new MovementComponent(go)
+      {
+        MaxMovementSpeed = 800.0f,
+      };
       new SpriteAnimationComponent(go)
       {
         AnimationType = SpriteAnimationType.Slurp_Idle,
       };
-
-      go.AttachWithOffsetTo(dummy, new Vector2(300, 100));
+      new ParticleEmitterComponent(go)
+      {
+        NumParticlesPerTexture = 100,
+        TextureContentNames = new[] { "particle" },
+        AvailableColors = new[] {
+          Color.White,
+          Color.Red,
+          Color.Green,
+        },
+      };
     }
 
     /// <summary>
@@ -246,6 +297,15 @@ namespace Owlicity
 
       dummy.ProcessInput(gameTime, inputVector);
 
+      foreach(GameObject go in GameObjects)
+      {
+        MovementComponent mvComponent = go.Components.OfType<MovementComponent>().FirstOrDefault();
+        if(mvComponent != null)
+        {
+          mvComponent.InputVector += inputVector;
+        }
+      }
+
       inputVector = Vector2.Zero;
       if (Keyboard.GetState().IsKeyDown(Keys.D))
       {
@@ -270,14 +330,42 @@ namespace Owlicity
       const float speed = 400.0f;
       cam.Spatial.Transform.p += inputVector.GetClampedTo(1.0f) * (speed * deltaSeconds);
 
+      // Add pending game objects.
+      GameObjects.AddRange(GameObjectsPendingAdd);
+      foreach(GameObject go in GameObjectsPendingAdd)
+      {
+        go.Initialize();
+      }
+      GameObjectsPendingAdd.Clear();
+
+      // Execute pre-physics update.
+      foreach(GameObject go in GameObjects)
+      {
+        go.PrePhysicsUpdate(deltaSeconds);
+      }
+
       // Physics simulation
       World.Step(deltaSeconds);
 
       // GameObject simulation
-      testLevel.Update(deltaSeconds);
+      CurrentLevel.Update(deltaSeconds);
 
       // Bullsh*t.
       dummy.Update(deltaSeconds);
+
+      // Post-physics update.
+      foreach(GameObject go in GameObjects)
+      {
+        go.Update(deltaSeconds);
+      }
+
+      // Remove pending game objects.
+      GameObjects.RemoveAll(go => GameObjectsPendingRemove.Contains(go));
+      foreach(GameObject go in GameObjectsPendingRemove)
+      {
+        go.Deinitialize();
+      }
+      GameObjectsPendingRemove.Clear();
 
       // Camera simulation.
       cam.Update(deltaSeconds);
@@ -297,17 +385,22 @@ namespace Owlicity
       Matrix viewMatrix = cam.ViewMatrix;
       Matrix projectionMatrix = cam.ProjectionMatrix;
 
-      spriteBatch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, viewMatrix);
+      batch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, viewMatrix);
 
-      testLevel.Draw(deltaSeconds, spriteBatch);
+      CurrentLevel.Draw(deltaSeconds, batch);
 
-      dummy.Draw(spriteBatch);
+      foreach(GameObject go in GameObjects)
+      {
+        go.Draw(deltaSeconds, batch);
+      }
+
+      dummy.Draw(batch);
 
       // Draw the origin of the world.
       int radius = 2;
-      spriteBatch.FillRectangle(new Rectangle { X = -radius, Y = -radius, Width = 2 * radius, Height = 2 * radius }, Color.Lime);
+      batch.FillRectangle(new Rectangle { X = -radius, Y = -radius, Width = 2 * radius, Height = 2 * radius }, Color.Lime);
 
-      spriteBatch.End();
+      batch.End();
 
       PhysicsDebugView.RenderDebugData(ref projectionMatrix, ref viewMatrix);
 
