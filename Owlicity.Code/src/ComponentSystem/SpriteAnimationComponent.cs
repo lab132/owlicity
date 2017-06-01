@@ -39,6 +39,7 @@ namespace Owlicity
 
     public void setActiveAnimation(SpriteAnimationType type)
     {
+      ActiveAnimation.Stop();
       ActiveAnimation = _sprites[type];
     }
 
