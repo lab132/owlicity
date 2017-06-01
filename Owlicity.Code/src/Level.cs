@@ -18,7 +18,7 @@ namespace Owlicity
 
   public class Level
   {
-    private const int SCREEN_DIMENSION = 256;
+    public const int SCREEN_DIMENSION = 256;
     private Screen[,] _screens;
     private List<Screen> _activeScreens;
     private List<Screen> _previouslyActiveScreens;

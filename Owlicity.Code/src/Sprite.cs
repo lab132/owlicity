@@ -25,6 +25,7 @@ namespace Owlicity
       if(textureDim == Point.Zero)
         textureDim = Texture.Bounds.Size;
 
+      float depth = Global.Game.CalcDepthFromPosition(spatial.Transform.p);
       spriteBatch.Draw(
         texture: Texture,
         position: spatial.Transform.p,
@@ -34,9 +35,18 @@ namespace Owlicity
         origin: Vector2.Zero, // Note(manu): I have no idea what this parameter does.
         scale: Scale,
         effects: SpriteEffects,
-        layerDepth: spatial.Depth);
+        layerDepth: depth);
+
+#if false
+      spriteBatch.DrawString(
+        spriteFont: Global.Game.Content.Load<SpriteFont>("Font"),
+        text: $"depth: {depth}",
+        position: spatial.Transform.p,
+        color: Color.White
+      );
 
       spriteBatch.DrawRectangle(spatial.Transform.p, textureDim.ToVector2() * Scale, Color.Red);
+#endif
     }
   }
 }
