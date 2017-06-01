@@ -470,3 +470,15 @@
 /processorParam:Quality=Best
 /build:snd/FiluAndDina_-_Video_Game_Background_-_Edit.mp3
 
+#begin owliver_idle_front_right_spritesheet.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:owliver_idle_front_right_spritesheet.png
+

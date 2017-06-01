@@ -45,6 +45,8 @@ namespace Owlicity
 
   public struct SpriteAnimationState
   {
+    public SpriteEffects SpriteEffects;
+    public Vector2 Scale;
     public bool PingPong;
     public float SecondsPerFrame;
 
@@ -74,6 +76,8 @@ namespace Owlicity
       {
         SecondsPerFrame = data.Config.SecondsPerFrame,
         PingPong = data.Config.PingPong,
+        Scale = data.Config.Scale,
+        SpriteEffects = data.Config.SpriteEffects,
       };
       _currentSprite = new Sprite
       {
@@ -102,6 +106,8 @@ namespace Owlicity
       {
         SpriteAnimationFrame frame = Data.Frames[State.CurrentFrameIndex];
         _currentSprite.TextureOffset = frame.Offset;
+        _currentSprite.Scale = State.Scale;
+        _currentSprite.SpriteEffects = State.SpriteEffects;
         _currentSprite.Draw(spriteBatch, spatial);
       }
     }
@@ -189,8 +195,19 @@ namespace Owlicity
     public string TileSheetName;
     public int TileCount;
     public Point TileDim;
+    public Vector2 Scale;
+    public SpriteEffects SpriteEffects;
     public float SecondsPerFrame;
     public bool PingPong;
+
+    public static SpriteAnimationConfig Default
+    {
+      get => new SpriteAnimationConfig
+      {
+        Scale = Vector2.One,
+        SecondsPerFrame = 0.05f,
+      };
+    }
   }
 
   public static class SpriteAnimationFactory
@@ -265,13 +282,31 @@ namespace Owlicity
         {
           case SpriteAnimationType.Owliver_Idle_Left:
           {
-            throw new NotImplementedException();
+            config = new SpriteAnimationConfig
+            {
+              TileSheetName = "owliver_idle_front_left_spritesheet",
+              TileCount = 3,
+              TileDim = new Point(256, 256),
+              SecondsPerFrame = 0.05f,
+              PingPong = true,
+              Scale = Global.OwliverScale,
+            };
           }
+          break;
 
           case SpriteAnimationType.Owliver_Idle_Right:
           {
-            throw new NotImplementedException();
+            config = new SpriteAnimationConfig
+            {
+              TileSheetName = "owliver_idle_front_right_spritesheet",
+              TileCount = 3,
+              TileDim = new Point(256, 256),
+              SecondsPerFrame = 0.05f,
+              PingPong = true,
+              Scale = Global.OwliverScale,
+            };
           }
+          break;
 
           case SpriteAnimationType.Owliver_Walk_Left:
           {
@@ -282,14 +317,28 @@ namespace Owlicity
               TileDim = new Point(256, 256),
               SecondsPerFrame = 0.05f,
               PingPong = true,
+              Scale = Global.OwliverScale,
             };
           }
           break;
 
           case SpriteAnimationType.Owliver_Walk_Right:
           {
-            throw new NotImplementedException();
+            config = new SpriteAnimationConfig
+            {
+              //TileSheetName = "owliver_walk_front_right_spritesheet",
+              TileCount = 3,
+              TileDim = new Point(256, 256),
+              SecondsPerFrame = 0.05f,
+              PingPong = true,
+              Scale = Global.OwliverScale,
+
+              // TODO(manu): Once we have it, use the right one.
+              TileSheetName = "owliver_walk_front_left_spritesheet",
+              SpriteEffects = SpriteEffects.FlipHorizontally,
+            };
           }
+          break;
 
           case SpriteAnimationType.Slurp_Idle:
           {

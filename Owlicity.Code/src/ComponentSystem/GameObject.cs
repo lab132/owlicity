@@ -79,6 +79,14 @@ namespace Owlicity
         component.Draw(deltaSeconds, batch);
       }
     }
+
+    public void DebugDraw(float deltaSeconds, SpriteBatch batch)
+    {
+      foreach(ComponentBase component in Components.Where(c => c.IsDebugDrawingEnabled))
+      {
+        component.DebugDraw(deltaSeconds, batch);
+      }
+    }
   }
 
   public enum GameObjectType
@@ -114,7 +122,7 @@ namespace Owlicity
         {
           Vector2 hotspot = new Vector2(127, 238) * Global.OwliverScale;
           Vector2 tileDim = new Vector2(256, 256) * Global.OwliverScale;
-          Vector2 colDim = new Vector2(110, 170) * Global.OwliverScale;
+          Vector2 colDim = new Vector2(120, 180) * Global.OwliverScale;
 
           var bc = new BodyComponent(go)
           {
@@ -124,16 +132,29 @@ namespace Owlicity
           FixtureFactory.AttachEllipse(
             xRadius: 0.5f * colDim.X,
             yRadius: 0.5f * colDim.Y,
-            edges: 7,
+            edges: 8, // Note(manu): 8 is already the maximum...
             density: 0,
             body: bc.Body,
             userData: bc);
           go.RootComponent = bc;
 
-          var mv = new MovementComponent(go)
+          var oc = new OwliverComponent(go)
           {
           };
-          mv.ControlledBodyComponent = bc;
+          oc.ControlledBodyComponent = bc;
+
+          var sa = new SpriteAnimationComponent(go)
+          {
+            AnimationTypes = new List<SpriteAnimationType>
+            {
+               SpriteAnimationType.Owliver_Idle_Left,
+               SpriteAnimationType.Owliver_Idle_Right,
+               SpriteAnimationType.Owliver_Walk_Left,
+               SpriteAnimationType.Owliver_Walk_Right,
+            },
+          };
+          sa.Spatial.Transform.p += new Vector2(0, -10);
+          sa.AttachTo(bc);
         }
         break;
 

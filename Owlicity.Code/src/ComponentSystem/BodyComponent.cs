@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework.Graphics;
 using VelcroPhysics.Dynamics;
 using VelcroPhysics.Factories;
 using VelcroPhysics.Shared;
+using Microsoft.Xna.Framework.Primitives2D;
+using Microsoft.Xna.Framework;
 
 namespace Owlicity
 {
@@ -67,6 +70,15 @@ namespace Owlicity
       {
         Body.GetTransform(out Spatial.Transform);
       }
+    }
+
+    public override void DebugDraw(float deltaSeconds, SpriteBatch batch)
+    {
+      base.DebugDraw(deltaSeconds, batch);
+
+      Vector2 start = this.GetWorldSpatialData().Transform.p;
+      Vector2 end = start + Body.LinearVelocity;
+      batch.DrawLine(start, end, Color.LimeGreen);
     }
   }
 }
