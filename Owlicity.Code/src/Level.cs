@@ -28,6 +28,10 @@ namespace Owlicity
     public int ScreenTileHeight { get; set; } = 1080;
     public ISpatial CullingCenter { get; set; }
 
+    public string ContentNameFormat_Ground;
+    public string ContentNameFormat_Layout;
+    public string ContentNameFormat_Collision;
+
     public Level(ContentManager contentManager)
     {
       _screens = new Screen[SCREEN_DIMENSION, SCREEN_DIMENSION];
@@ -37,14 +41,31 @@ namespace Owlicity
       _contentManager = contentManager;
     }
 
-    public void AddScreen(uint posX, uint posY, Screen screen)
+    public void CreateScreen(int posX, int posY)
     {
-      _screens[posX, posY] = screen;
-      screen.AbsoulutePosition = new Vector2(posX * ScreenTileWidth, posY * ScreenTileHeight);
+      Screen screen = new Screen
+      {
+        WorldPosition = new Vector2(posX * ScreenTileWidth, posY * ScreenTileHeight),
+        GridPosition = new Point(posX, posY),
+      };
+      _screens[posY, posX] = screen;
     }
 
-    public void Initialize()
+    public void LoadContent()
     {
+#if true
+      for(int y = 0; y < SCREEN_DIMENSION; y++)
+      {
+        for(int x = 0; x < SCREEN_DIMENSION; x++)
+        {
+          Screen screen = _screens[y, x];
+          if(screen != null)
+          {
+            screen.LoadContent(this);
+          }
+        }
+      }
+#endif
     }
 
     public void Update(float deltaSeconds)
@@ -63,12 +84,6 @@ namespace Owlicity
       {
         // screen.UnloadContent();
       }
-
-      foreach (Screen screen in _activeScreens)
-      {
-        screen.Update(deltaSeconds);
-      }
-
     }
 
     public void Draw(float deltaSeconds, SpriteBatch batch)
@@ -81,7 +96,6 @@ namespace Owlicity
 
     private List<Screen> GetActiveScreens()
     {
-
       var screenList = new List<Screen>();
 
       Vector2 focus = CullingCenter.Spatial.GetWorldSpatialData().Transform.p;
@@ -104,7 +118,7 @@ namespace Owlicity
     {
       if (x < SCREEN_DIMENSION && x >= 0 && y < SCREEN_DIMENSION && y >= 0)
       {
-        var entry = _screens[x,y];
+        var entry = _screens[y, x];
         if (entry != null)
         {
           screenList.Add(entry);

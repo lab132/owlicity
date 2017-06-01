@@ -16,25 +16,21 @@ namespace Owlicity.Content.Pipeline
     }
   }
 
-  public enum LevelObjectType
-  {
-    [ColorMapping(0, 255, 0)] Tree_Orange,
-    [ColorMapping(200, 200, 0)] Tree_Fir,
-  }
-
-  public class LevelLayout
+  public class LoadedLevelLayout
   {
     public ContentIdentity identity;
     public BitmapContent map;
 
-    public static IDictionary<Color, LevelObjectType> ColorToType
+    public static IDictionary<Color, GameObjectType> ColorToType
     {
       get
       {
-        return new Dictionary<Color, LevelObjectType>
+        return new Dictionary<Color, GameObjectType>
         {
-          { new Color(  0, 255,   0), LevelObjectType.Tree_Fir },
-          { new Color(200, 200,   0), LevelObjectType.Tree_Orange }
+          { new Color(255,   0,   0), GameObjectType.Random_FirTree },
+          { new Color(  0,   0, 255), GameObjectType.Random_OakTree },
+          { new Color(255,   0, 255), GameObjectType.Random_FirTreeAlternative },
+          { new Color(255, 255,   0), GameObjectType.Bush },
         };
       }
     }

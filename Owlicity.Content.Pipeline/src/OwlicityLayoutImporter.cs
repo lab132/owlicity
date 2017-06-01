@@ -10,16 +10,16 @@ namespace Owlicity.Content.Pipeline
   /// This should be part of a Content Pipeline Extension Library project.
   /// </summary>
   [ContentImporter(".png", DisplayName = "Layout Importer - Owlicity", DefaultProcessor = "OwlicityLayoutProcessor")]
-  public class OwlicityLevelLayoutImporter : ContentImporter<LevelLayout>
+  public class OwlicityLevelLayoutImporter : ContentImporter<LoadedLevelLayout>
   {
-    public override LevelLayout Import(string filename, ContentImporterContext context)
+    public override LoadedLevelLayout Import(string filename, ContentImporterContext context)
     {
       var otherImporter = new TextureImporter();
       TextureContent content = otherImporter.Import(filename, context);
       BitmapContent bitmap = content.Faces[0][0];
       byte[] bytes = bitmap.GetPixelData();
 
-      return new LevelLayout
+      return new LoadedLevelLayout
       {
         map = bitmap
       };

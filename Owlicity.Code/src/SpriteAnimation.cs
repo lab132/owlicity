@@ -196,6 +196,8 @@ namespace Owlicity
     Oak_Idle,
 
     Orange_Idle,
+
+    Bush_Idle,
   }
 
   public struct SpriteAnimationConfig
@@ -335,6 +337,7 @@ namespace Owlicity
           case SpriteAnimationType.Conifer_Idle: config.TileSheetName = "conifer_spritesheet"; break;
           case SpriteAnimationType.Oak_Idle: config.TileSheetName = "oak_spritesheet"; break;
           case SpriteAnimationType.Orange_Idle: config.TileSheetName = "orange_spritesheet"; break;
+          case SpriteAnimationType.Bush_Idle: config.TileSheetName = "bush_spritesheet"; break;
 
           default: throw new ArgumentException("Unknown sprite animation type.");
         }

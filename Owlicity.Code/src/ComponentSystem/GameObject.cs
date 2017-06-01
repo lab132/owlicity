@@ -108,6 +108,7 @@ namespace Owlicity
 
     // Random groups
     Random_FirTree,
+    Random_FirTreeAlternative,
     Random_OakTree,
   }
 
@@ -181,6 +182,7 @@ namespace Owlicity
         case GameObjectType.Tree_Conifer:
         case GameObjectType.Tree_Oak:
         case GameObjectType.Tree_Orange:
+        case GameObjectType.Bush:
         {
           List<SpriteAnimationType> animTypes = new List<SpriteAnimationType>();
           switch(type)
@@ -189,6 +191,7 @@ namespace Owlicity
             case GameObjectType.Tree_Conifer: animTypes.Add(SpriteAnimationType.Conifer_Idle); break;
             case GameObjectType.Tree_Oak: animTypes.Add(SpriteAnimationType.Oak_Idle);  break;
             case GameObjectType.Tree_Orange: animTypes.Add(SpriteAnimationType.Orange_Idle); break;
+            case GameObjectType.Bush: animTypes.Add(SpriteAnimationType.Bush_Idle); break;
             default:
             throw new InvalidProgramException();
           }
@@ -205,6 +208,14 @@ namespace Owlicity
         {
           GameObjectType choice = _random.Choose(GameObjectType.Tree_Fir, GameObjectType.Tree_Conifer);
           go = CreateKnown(choice);
+        }
+        break;
+
+        case GameObjectType.Random_FirTreeAlternative:
+        {
+          GameObjectType choice = _random.Choose(GameObjectType.Tree_Fir, GameObjectType.Tree_Conifer);
+          go = CreateKnown(choice);
+          go.Spatial.Transform.p += new Vector2(0, -30);
         }
         break;
 

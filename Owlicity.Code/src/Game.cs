@@ -126,22 +126,19 @@ namespace Owlicity
 
       PhysicsDebugView.LoadContent(GraphicsDevice, Content);
 
-      CurrentLevel = new Level(Content);
-      for(uint i = 0; i < 4; i++)
+      CurrentLevel = new Level(Content)
       {
-        for(uint j = 0; j < 7; j++)
-        {
-          var screen = new Screen();
-          screen.AssetName = $"level01/level1_ground_{j}{i}";
-          CurrentLevel.AddScreen(i, j, screen);
-          screen.LoadContent(Content);
-        }
-      }
+        ContentNameFormat_Ground = "level01/level1_ground_{0}{1}",
+        ContentNameFormat_Collision = "level01/static_collision/static_collision_{0}{1}",
+        ContentNameFormat_Layout = "level01/layout/layout_{0}{1}",
+      };
 
+      for(int x = 0; x < 4; x++)
       {
-        Vertices vertices = Content.Load<Vertices>("level01/level1_ground_00_collision");
-        Body body = new Body(World);
-        FixtureFactory.AttachLoopShape(vertices, body);
+        for(int y = 0; y < 7; y++)
+        {
+          CurrentLevel.CreateScreen(x, y);
+        }
       }
 
 #if false
@@ -190,6 +187,17 @@ namespace Owlicity
         Global.Owliver = go;
       }
 
+      {
+        List<ScreenLayoutInfo> infos = Content.Load<List<ScreenLayoutInfo>>("level01/layout/layout_00");
+        foreach(ScreenLayoutInfo info in infos)
+        {
+          var go = GameObjectFactory.CreateKnown(info.ObjectType);
+          go.Spatial.Transform.p += info.Offset;
+          AddGameObject(go);
+        }
+      }
+
+      CurrentLevel.LoadContent();
       CurrentLevel.CullingCenter = Global.Owliver;
 
       var BackgroundMusic = Content.Load<Song>("snd/FiluAndDina_-_Video_Game_Background_-_Edit");
