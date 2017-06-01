@@ -38,9 +38,9 @@ namespace Owlicity
 
   public enum SpriteAnimationPlaybackState
   {
-    Stopped,
-    Started,
+    Playing,
     Paused,
+    Stopped,
   }
 
   public struct SpriteAnimationState
@@ -84,7 +84,7 @@ namespace Owlicity
 
     public void Update(float deltaSeconds)
     {
-      if (Data.Frames.Count > 0)
+      if (Data.Frames.Count > 0 && State.PlaybackState == SpriteAnimationPlaybackState.Playing)
       {
         State.CurrentFrameTime += deltaSeconds;
         int oldFrameIndex = State.CurrentFrameIndex;
@@ -93,12 +93,6 @@ namespace Owlicity
           State.CurrentFrameTime -= State.SecondsPerFrame;
           AdvanceFrameIndex();
         }
-
-        if (State.CurrentFrameIndex != oldFrameIndex)
-        {
-          SpriteAnimationFrame frame = Data.Frames[State.CurrentFrameIndex];
-          _currentSprite.TextureOffset = frame.Offset;
-        }
       }
     }
 
@@ -106,6 +100,8 @@ namespace Owlicity
     {
       if (Data.Frames.Count > 0)
       {
+        SpriteAnimationFrame frame = Data.Frames[State.CurrentFrameIndex];
+        _currentSprite.TextureOffset = frame.Offset;
         _currentSprite.Draw(spriteBatch, spatial);
       }
     }
@@ -156,6 +152,23 @@ namespace Owlicity
       }
 
       State.CurrentFrameIndex = newFrameIndex;
+    }
+
+    public void Play()
+    {
+      State.PlaybackState = SpriteAnimationPlaybackState.Playing;
+    }
+
+    public void Pause()
+    {
+      State.PlaybackState = SpriteAnimationPlaybackState.Paused;
+    }
+
+    public void Stop()
+    {
+      State.CurrentFrameTime = 0.0f;
+      State.CurrentFrameIndex = 0;
+      State.PlaybackState = SpriteAnimationPlaybackState.Stopped;
     }
   }
 
@@ -284,7 +297,7 @@ namespace Owlicity
             {
               TileSheetName = "slurp_spritesheet",
               TileCount = 7,
-              TileDim = new Point(210, 270), // TODO(manu): Are these correct?
+              TileDim = new Point(210, 270),
               SecondsPerFrame = 0.05f,
               PingPong = true,
             };
