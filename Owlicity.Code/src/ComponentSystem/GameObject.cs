@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VelcroPhysics.Dynamics;
+using VelcroPhysics.Factories;
 
 namespace Owlicity
 {
@@ -105,12 +107,33 @@ namespace Owlicity
 
     public static GameObject CreateKnown(GameObjectType type)
     {
-      GameObject result = new GameObject();
+      GameObject go = new GameObject();
       switch(type)
       {
         case GameObjectType.Owliver:
         {
-          // TODO(manu)
+          Vector2 hotspot = new Vector2(127, 238) * Global.OwliverScale;
+          Vector2 tileDim = new Vector2(256, 256) * Global.OwliverScale;
+          Vector2 colDim = new Vector2(110, 170) * Global.OwliverScale;
+
+          var bc = new BodyComponent(go)
+          {
+            InitMode = BodyComponentInitMode.Manual,
+          };
+          bc.Body = new Body(Global.Game.World, bodyType: BodyType.Kinematic, userdata: bc);
+          FixtureFactory.AttachEllipse(
+            xRadius: 0.5f * colDim.X,
+            yRadius: 0.5f * colDim.Y,
+            edges: 7,
+            density: 0,
+            body: bc.Body,
+            userData: bc);
+          go.RootComponent = bc;
+
+          var mv = new MovementComponent(go)
+          {
+          };
+          mv.ControlledBodyComponent = bc;
         }
         break;
 
@@ -127,7 +150,7 @@ namespace Owlicity
         throw new ArgumentException("Unknown game object type.");
       }
 
-      return result;
+      return go;
     }
   }
 }

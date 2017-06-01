@@ -94,12 +94,6 @@ namespace Owlicity
     }
   }
 
-  public static class Global
-  {
-    public static OwlGame Game { get; set; }
-    public static GameObject Owliver { get; set; }
-  }
-
   /// <summary>
   /// This is the main type for your game.
   /// </summary>
@@ -260,6 +254,11 @@ namespace Owlicity
 
         AddGameObject(go);
       }
+
+      {
+        var o = GameObjectFactory.CreateKnown(GameObjectType.Owliver);
+        AddGameObject(o);
+      }
     }
 
     /// <summary>
@@ -304,6 +303,21 @@ namespace Owlicity
       if (Keyboard.GetState().IsKeyDown(Keys.Down))
       {
         inputVector.Y += 1.0f;
+      }
+
+      if(Keyboard.GetState().IsKeyDown(Keys.D1))
+      {
+        dummy.anim.Play();
+      }
+
+      if(Keyboard.GetState().IsKeyDown(Keys.D2))
+      {
+        dummy.anim.Pause();
+      }
+
+      if(Keyboard.GetState().IsKeyDown(Keys.D3))
+      {
+        dummy.anim.Stop();
       }
 
       dummy.ProcessInput(gameTime, inputVector);
