@@ -11,6 +11,7 @@ using VelcroPhysics.Factories;
 using VelcroPhysics.DebugViews.MonoGame;
 using VelcroPhysics.Extensions.DebugView;
 using System.Linq;
+using Microsoft.Xna.Framework.Media;
 
 /*
   TODO:
@@ -107,6 +108,8 @@ namespace Owlicity
 
     Camera cam;
     Level CurrentLevel;
+
+    Song BackgroundMusic;
 
     public World World { get; set; }
     public DebugView PhysicsDebugView { get; set; }
@@ -259,6 +262,10 @@ namespace Owlicity
         var o = GameObjectFactory.CreateKnown(GameObjectType.Owliver);
         AddGameObject(o);
       }
+	  
+	  var BackgroundMusic = Content.Load<Song>("snd/FiluAndDina_-_Video_Game_Background_-_Edit");
+      MediaPlayer.IsRepeating = true;
+      MediaPlayer.Play(BackgroundMusic);
     }
 
     /// <summary>

@@ -464,3 +464,9 @@
 #begin Font.xnb
 /copy:Font.xnb
 
+#begin snd/FiluAndDina_-_Video_Game_Background_-_Edit.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:snd/FiluAndDina_-_Video_Game_Background_-_Edit.mp3
+
