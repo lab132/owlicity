@@ -14,35 +14,25 @@ namespace Owlicity
   {
     public List<ComponentBase> Components { get; } = new List<ComponentBase>();
 
-    SpatialData _cachedSpatial;
+    public SpatialComponent RootComponent;
+
+    private SpatialData _spatial = new SpatialData();
     public SpatialData Spatial
     {
       get
       {
-        if(_cachedSpatial == null)
+        SpatialData result;
+        if(RootComponent != null)
         {
-          BodyComponent bc = Components.OfType<BodyComponent>().FirstOrDefault();
-          if(bc != null)
-          {
-            _cachedSpatial = bc.Spatial;
-          }
-          else
-          {
-            ISpatial spatialComponent = Components.OfType<ISpatial>().FirstOrDefault();
-            if(spatialComponent != null)
-            {
-              _cachedSpatial = spatialComponent.Spatial;
-            }
-          }
+          result = RootComponent.Spatial;
+        }
+        else
+        {
+          result = _spatial;
         }
 
-        return _cachedSpatial;
+        return result;
       }
-    }
-
-    public GameObject()
-    {
-      Global.Game.AddGameObject(this);
     }
 
     public void AddComponent(ComponentBase newComponent)
@@ -53,7 +43,7 @@ namespace Owlicity
 
     public void Initialize()
     {
-      foreach(ComponentBase component in Components.Where(c => !c.IsInitialized))
+      foreach(ComponentBase component in Components.Where(c => c.IsInitializationEnabled))
       {
         component.Initialize();
       }
@@ -66,7 +56,7 @@ namespace Owlicity
 
     public void PrePhysicsUpdate(float deltaSeconds)
     {
-      foreach(ComponentBase component in Components)
+      foreach(ComponentBase component in Components.Where(c => c.IsPrePhysicsUpdateEnabled))
       {
         component.PrePhysicsUpdate(deltaSeconds);
       }
@@ -74,7 +64,7 @@ namespace Owlicity
 
     public void Update(float deltaSeconds)
     {
-      foreach(ComponentBase component in Components)
+      foreach(ComponentBase component in Components.Where(c => c.IsUpdateEnabled))
       {
         component.Update(deltaSeconds);
       }
@@ -82,7 +72,7 @@ namespace Owlicity
 
     public void Draw(float deltaSeconds, SpriteBatch batch)
     {
-      foreach(ComponentBase component in Components)
+      foreach(ComponentBase component in Components.Where(c => c.IsDrawingEnabled))
       {
         component.Draw(deltaSeconds, batch);
       }

@@ -224,31 +224,39 @@ namespace Owlicity
       dummy.LoadContent();
       CurrentLevel.CullingCenter = dummy;
 
-      go = new GameObject();
-      ISpatial s = new BodyComponent(go)
       {
-        InitMode = BodyComponentInitMode.FromContent,
-        BodyType = BodyType.Kinematic,
-        ShapeContentName = "slurp_collision",
-      };
-      new MovementComponent(go)
-      {
-        MaxMovementSpeed = 800.0f,
-      };
-      new SpriteAnimationComponent(go)
-      {
-        AnimationType = SpriteAnimationType.Slurp_Idle,
-      };
-      new ParticleEmitterComponent(go)
-      {
-        NumParticlesPerTexture = 100,
-        TextureContentNames = new[] { "particle" },
-        AvailableColors = new[] {
-          Color.White,
-          Color.Red,
-          Color.Green,
-        },
-      };
+        go = new GameObject();
+        var bc = new BodyComponent(go)
+        {
+          InitMode = BodyComponentInitMode.FromContent,
+          BodyType = BodyType.Kinematic,
+          ShapeContentName = "slurp_collision",
+        };
+        go.RootComponent = bc;
+
+        var mv = new MovementComponent(go)
+        {
+          MaxMovementSpeed = 800.0f,
+        };
+        mv.ControlledBodyComponent = bc;
+
+        var sa = new SpriteAnimationComponent(go)
+        {
+          AnimationType = SpriteAnimationType.Slurp_Idle,
+        };
+        sa.AttachTo(bc);
+
+        var pe = new ParticleEmitterComponent(go)
+        {
+          NumParticlesPerTexture = 100,
+          TextureContentNames = new[] { "particle" },
+          AvailableColors = new[] { Color.White, Color.Red, Color.Green, },
+        };
+        //pe.Spatial.Transform.p += sa.
+        pe.AttachTo(bc);
+
+        AddGameObject(go);
+      }
     }
 
     /// <summary>
@@ -386,7 +394,6 @@ namespace Owlicity
       Matrix projectionMatrix = cam.ProjectionMatrix;
 
       batch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, viewMatrix);
-
       CurrentLevel.Draw(deltaSeconds, batch);
 
       foreach(GameObject go in GameObjects)

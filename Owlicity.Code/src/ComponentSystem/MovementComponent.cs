@@ -21,10 +21,7 @@ namespace Owlicity
     //
     public Vector2 InputVector;
 
-    public BodyComponent ControlledBodyComponent
-    {
-      get => Owner.Components.OfType<BodyComponent>().FirstOrDefault();
-    }
+    public BodyComponent ControlledBodyComponent { get; set; }
 
     public Body ControlledBody
     {

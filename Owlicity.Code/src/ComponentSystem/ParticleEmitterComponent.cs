@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework;
 
 namespace Owlicity
 {
-  public class ParticleEmitterComponent : ComponentBase, ISpatial
+  public class ParticleEmitterComponent : SpatialComponent
   {
     //
     // Init data
@@ -20,8 +20,8 @@ namespace Owlicity
     //
     // Runtime data
     //
-    public SpatialData Spatial { get; } = new SpatialData();
-    public List<ParticleEmitter> Emitters = new List<ParticleEmitter>();
+    public ParticleEmitter Emitter;
+    public bool IsEmittingEnabled = true;
 
     public ParticleEmitterComponent(GameObject owner) : base(owner)
     {
@@ -31,36 +31,33 @@ namespace Owlicity
     {
       base.Initialize();
 
+      List<Texture2D> textures = new List<Texture2D>(TextureContentNames.Length);
       foreach(string textureName in TextureContentNames)
       {
         Texture2D texture = Global.Game.Content.Load<Texture2D>(textureName);
-        ParticleEmitter emitter = new ParticleEmitter(NumParticlesPerTexture, texture, AvailableColors);
-        Emitters.Add(emitter);
+        textures.Add(texture);
       }
 
-      this.AttachTo(Owner);
+      Emitter = new ParticleEmitter(NumParticlesPerTexture, textures, AvailableColors.ToList());
     }
 
     public override void Update(float deltaSeconds)
     {
       base.Update(deltaSeconds);
 
-      Vector2 spawnPosition = this.GetWorldSpatialData().Transform.p;
-      foreach(ParticleEmitter emitter in Emitters)
+      if(IsEmittingEnabled)
       {
-        emitter.EmitParticles(spawnPosition);
-        emitter.Update(deltaSeconds);
+        Vector2 spawnPosition = this.GetWorldSpatialData().Transform.p;
+        Emitter.EmitParticles(spawnPosition);
       }
+      Emitter.Update(deltaSeconds);
     }
 
     public override void Draw(float deltaSeconds, SpriteBatch batch)
     {
       base.Draw(deltaSeconds, batch);
 
-      foreach(ParticleEmitter emitter in Emitters)
-      {
-        emitter.Draw(batch);
-      }
+      Emitter.Draw(batch);
     }
   }
 }

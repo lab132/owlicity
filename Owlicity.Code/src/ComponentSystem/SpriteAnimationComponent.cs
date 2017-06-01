@@ -5,13 +5,17 @@ using VelcroPhysics.Shared;
 
 namespace Owlicity
 {
-  public class SpriteAnimationComponent : ComponentBase, ISpatial
+  public class SpriteAnimationComponent : SpatialComponent
   {
+    //
+    // Input data
+    //
     public SpriteAnimationType AnimationType { get; set; }
 
+    //
+    // Runtime data
+    //
     public SpriteAnimationInstance Animation { get; set; }
-
-    public SpatialData Spatial { get; } = new SpatialData();
 
 
     public SpriteAnimationComponent(GameObject owner) : base(owner)
@@ -24,7 +28,6 @@ namespace Owlicity
 
       Animation = SpriteAnimationFactory.CreateAnimationInstance(AnimationType);
       Spatial.Transform.p -= 0.5f * Animation.Data.Config.TileDim.ToVector2();
-      this.AttachTo(Owner);
     }
 
     public override void Update(float deltaSeconds)
@@ -38,7 +41,7 @@ namespace Owlicity
     {
       base.Draw(deltaSeconds, batch);
 
-      SpatialData worldSpatial = Spatial.GetWorldSpatialData();
+      SpatialData worldSpatial = this.GetWorldSpatialData();
       Animation.Draw(batch, worldSpatial);
     }
   }

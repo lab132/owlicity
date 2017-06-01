@@ -15,7 +15,7 @@ namespace Owlicity
     FromContent,
   }
 
-  public class BodyComponent : ComponentBase, ISpatial
+  public class BodyComponent : SpatialComponent
   {
     //
     // Init data
@@ -29,8 +29,6 @@ namespace Owlicity
     //
     public Body Body;
     public Fixture Fixture;
-
-    public SpatialData Spatial { get; } = new SpatialData();
 
     public BodyComponent(GameObject owner) : base(owner)
     {
