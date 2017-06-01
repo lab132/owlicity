@@ -242,7 +242,10 @@ namespace Owlicity
 
         var sa = new SpriteAnimationComponent(go)
         {
-          AnimationType = SpriteAnimationType.Slurp_Idle,
+          AnimationTypes = new List<SpriteAnimationType>
+          {
+            SpriteAnimationType.Slurp_Idle
+          }
         };
         sa.AttachTo(bc);
 
