@@ -15,6 +15,7 @@ namespace Owlicity
     public Texture2D Texture { get; set; }
     public Point TextureOffset { get; set; }
     public Point TextureDim { get; set; }
+    public Vector2 Scale { get; set; } = Vector2.One;
     public Color Tint { get; set; } = Color.White;
     public SpriteEffects SpriteEffects { get; set; }
 
@@ -30,12 +31,12 @@ namespace Owlicity
         sourceRectangle: new Rectangle { Location = TextureOffset, Size = textureDim },
         color: Tint,
         rotation: spatial.Transform.q.GetAngle(),
-        origin: Vector2.Zero,
-        scale: Vector2.One,
+        origin: Vector2.Zero, // Note(manu): I have no idea what this parameter does.
+        scale: Scale,
         effects: SpriteEffects,
         layerDepth: spatial.Depth);
 
-      spriteBatch.DrawRectangle(spatial.Transform.p, textureDim.ToVector2(), Color.Red);
+      spriteBatch.DrawRectangle(spatial.Transform.p, textureDim.ToVector2() * Scale, Color.Red);
     }
   }
 }

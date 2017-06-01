@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using VelcroPhysics;
 using VelcroPhysics.Shared;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 namespace Owlicity
 {
@@ -16,31 +17,41 @@ namespace Owlicity
     //
     // Runtime data
     //
-    public SpriteAnimationInstance ActiveAnimation { get; private set; }
+    public SpriteAnimationType ActiveAnimationType { get; private set; }
 
-    private Dictionary<SpriteAnimationType, SpriteAnimationInstance> _sprites{get; set;}
+    public SpriteAnimationInstance ActiveAnimation { get { return _animInstances[ActiveAnimationType]; } }
+
+    private Dictionary<SpriteAnimationType, SpriteAnimationInstance> _animInstances =
+      new Dictionary<SpriteAnimationType, SpriteAnimationInstance>();
 
     public SpriteAnimationComponent(GameObject owner) : base(owner)
     {
-      _sprites = new Dictionary<SpriteAnimationType, SpriteAnimationInstance>();
     }
 
     public override void Initialize()
     {
       base.Initialize();
-      foreach (SpriteAnimationType type in AnimationTypes) {
-        var animation = SpriteAnimationFactory.CreateAnimationInstance(type);
-        _sprites.Add(type, animation);
-        ActiveAnimation = animation;
+
+      ActiveAnimationType = AnimationTypes[0];
+
+      foreach(SpriteAnimationType type in AnimationTypes)
+      {
+        SpriteAnimationInstance animation = SpriteAnimationFactory.CreateAnimationInstance(type);
+        _animInstances.Add(type, animation);
       }
-      
-      Spatial.Transform.p -= 0.5f * ActiveAnimation.Data.Config.TileDim.ToVector2();
+
+      Vector2 dim = ActiveAnimation.Data.Config.TileDim.ToVector2() * ActiveAnimation.Data.Config.Scale;
+      Spatial.Transform.p -= 0.5f * dim;
     }
 
-    public void setActiveAnimation(SpriteAnimationType type)
+    public void ChangeActiveAnimation(SpriteAnimationType newAnimationType)
     {
-      ActiveAnimation.Stop();
-      ActiveAnimation = _sprites[type];
+      if(newAnimationType != ActiveAnimationType)
+      {
+        ActiveAnimation.Stop();
+        ActiveAnimationType = newAnimationType;
+        ActiveAnimation.Play();
+      }
     }
 
     public override void Update(float deltaSeconds)

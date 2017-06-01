@@ -14,6 +14,7 @@ namespace Owlicity
     public bool IsPrePhysicsUpdateEnabled = true;
     public bool IsUpdateEnabled = true;
     public bool IsDrawingEnabled = true;
+    public bool IsDebugDrawingEnabled = true;
 
     public ComponentBase(GameObject owner)
     {
@@ -25,6 +26,7 @@ namespace Owlicity
     public virtual void PrePhysicsUpdate(float deltaSeconds) { }
     public virtual void Update(float deltaSeconds) { }
     public virtual void Draw(float deltaSeconds, SpriteBatch batch) { }
+    public virtual void DebugDraw(float deltaSeconds, SpriteBatch batch) { }
   }
 
   public abstract class SpatialComponent : ComponentBase, ISpatial

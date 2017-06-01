@@ -104,7 +104,6 @@ namespace Owlicity
     SpriteBatch batch;
 
     Dummy dummy;
-    GameObject go;
 
     Camera cam;
     Level CurrentLevel;
@@ -153,6 +152,13 @@ namespace Owlicity
       graphics.PreferredBackBufferHeight = 1080;
       graphics.PreferredBackBufferWidth = 1920;
 
+      if(Environment.UserName == "manu")
+      {
+        // Note(manu): Because I have a really tiny screen...
+        graphics.PreferredBackBufferHeight = (int)(0.5f * 1080);
+        graphics.PreferredBackBufferWidth = (int)(0.5f * 1920);
+      }
+
       Content.RootDirectory = "content";
     }
 
@@ -176,7 +182,9 @@ namespace Owlicity
       World = new World(gravity: Vector2.Zero);
 
       PhysicsDebugView = new DebugView(World);
-      PhysicsDebugView.Flags = DebugViewFlags.Shape | DebugViewFlags.PolygonPoints | DebugViewFlags.AABB;
+      PhysicsDebugView.Flags = DebugViewFlags.Shape |
+                               DebugViewFlags.PolygonPoints |
+                               DebugViewFlags.AABB;
 
       base.Initialize();
     }
@@ -193,9 +201,9 @@ namespace Owlicity
       PhysicsDebugView.LoadContent(GraphicsDevice, Content);
 
       CurrentLevel = new Level(Content);
-      for (uint i = 0; i < 4; i++)
+      for(uint i = 0; i < 4; i++)
       {
-        for (uint j = 0; j < 7; j++)
+        for(uint j = 0; j < 7; j++)
         {
           var screen = new Screen();
           screen.AssetName = $"level01/level1_ground_{j}{i}";
@@ -221,8 +229,9 @@ namespace Owlicity
       dummy.LoadContent();
       CurrentLevel.CullingCenter = dummy;
 
+      if(false)
       {
-        go = new GameObject();
+        var go = new GameObject();
         var bc = new BodyComponent(go)
         {
           InitMode = BodyComponentInitMode.FromContent,
@@ -259,11 +268,11 @@ namespace Owlicity
       }
 
       {
-        var o = GameObjectFactory.CreateKnown(GameObjectType.Owliver);
-        AddGameObject(o);
+        var go = GameObjectFactory.CreateKnown(GameObjectType.Owliver);
+        AddGameObject(go);
       }
-	  
-	  var BackgroundMusic = Content.Load<Song>("snd/FiluAndDina_-_Video_Game_Background_-_Edit");
+
+      var BackgroundMusic = Content.Load<Song>("snd/FiluAndDina_-_Video_Game_Background_-_Edit");
       MediaPlayer.IsRepeating = true;
       MediaPlayer.Play(BackgroundMusic);
     }
@@ -286,28 +295,28 @@ namespace Owlicity
     {
       float deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-      if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+      if(GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
       {
         Exit();
       }
 
       Vector2 inputVector = Vector2.Zero;
-      if (Keyboard.GetState().IsKeyDown(Keys.Right))
+      if(Keyboard.GetState().IsKeyDown(Keys.Right))
       {
         inputVector.X += 1.0f;
       }
 
-      if (Keyboard.GetState().IsKeyDown(Keys.Left))
+      if(Keyboard.GetState().IsKeyDown(Keys.Left))
       {
         inputVector.X -= 1.0f;
       }
 
-      if (Keyboard.GetState().IsKeyDown(Keys.Up))
+      if(Keyboard.GetState().IsKeyDown(Keys.Up))
       {
         inputVector.Y -= 1.0f;
       }
 
-      if (Keyboard.GetState().IsKeyDown(Keys.Down))
+      if(Keyboard.GetState().IsKeyDown(Keys.Down))
       {
         inputVector.Y += 1.0f;
       }
@@ -339,22 +348,22 @@ namespace Owlicity
       }
 
       inputVector = Vector2.Zero;
-      if (Keyboard.GetState().IsKeyDown(Keys.D))
+      if(Keyboard.GetState().IsKeyDown(Keys.D))
       {
         inputVector.X += 1.0f;
       }
 
-      if (Keyboard.GetState().IsKeyDown(Keys.A))
+      if(Keyboard.GetState().IsKeyDown(Keys.A))
       {
         inputVector.X -= 1.0f;
       }
 
-      if (Keyboard.GetState().IsKeyDown(Keys.W))
+      if(Keyboard.GetState().IsKeyDown(Keys.W))
       {
         inputVector.Y -= 1.0f;
       }
 
-      if (Keyboard.GetState().IsKeyDown(Keys.S))
+      if(Keyboard.GetState().IsKeyDown(Keys.S))
       {
         inputVector.Y += 1.0f;
       }
@@ -425,12 +434,19 @@ namespace Owlicity
         go.Draw(deltaSeconds, batch);
       }
 
-      dummy.Draw(batch);
+      //dummy.Draw(batch);
 
       // Draw the origin of the world.
       int radius = 2;
       batch.FillRectangle(new Rectangle { X = -radius, Y = -radius, Width = 2 * radius, Height = 2 * radius }, Color.Lime);
 
+      batch.End();
+
+      batch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, viewMatrix);
+      foreach(GameObject go in GameObjects)
+      {
+        go.DebugDraw(deltaSeconds, batch);
+      }
       batch.End();
 
       PhysicsDebugView.RenderDebugData(ref projectionMatrix, ref viewMatrix);
