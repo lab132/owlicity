@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using VelcroPhysics;
 using VelcroPhysics.Shared;
+using System.Collections.Generic;
 
 namespace Owlicity
 {
@@ -10,31 +11,42 @@ namespace Owlicity
     //
     // Input data
     //
-    public SpriteAnimationType AnimationType { get; set; }
+    public List<SpriteAnimationType> AnimationTypes { get; set; }
 
     //
     // Runtime data
     //
-    public SpriteAnimationInstance Animation { get; set; }
+    public SpriteAnimationInstance ActiveAnimation { get; private set; }
 
+    private Dictionary<SpriteAnimationType, SpriteAnimationInstance> _sprites{get; set;}
 
     public SpriteAnimationComponent(GameObject owner) : base(owner)
     {
+      _sprites = new Dictionary<SpriteAnimationType, SpriteAnimationInstance>();
     }
 
     public override void Initialize()
     {
       base.Initialize();
+      foreach (SpriteAnimationType type in AnimationTypes) {
+        var animation = SpriteAnimationFactory.CreateAnimationInstance(type);
+        _sprites.Add(type, animation);
+        ActiveAnimation = animation;
+      }
+      
+      Spatial.Transform.p -= 0.5f * ActiveAnimation.Data.Config.TileDim.ToVector2();
+    }
 
-      Animation = SpriteAnimationFactory.CreateAnimationInstance(AnimationType);
-      Spatial.Transform.p -= 0.5f * Animation.Data.Config.TileDim.ToVector2();
+    public void setActiveAnimation(SpriteAnimationType type)
+    {
+      ActiveAnimation = _sprites[type];
     }
 
     public override void Update(float deltaSeconds)
     {
       base.Update(deltaSeconds);
 
-      Animation.Update(deltaSeconds);
+      ActiveAnimation.Update(deltaSeconds);
     }
 
     public override void Draw(float deltaSeconds, SpriteBatch batch)
@@ -42,7 +54,7 @@ namespace Owlicity
       base.Draw(deltaSeconds, batch);
 
       SpatialData worldSpatial = this.GetWorldSpatialData();
-      Animation.Draw(batch, worldSpatial);
+      ActiveAnimation.Draw(batch, worldSpatial);
     }
   }
 }
