@@ -31,7 +31,7 @@ namespace Owlicity
     SpriteBatch batch;
 
     Camera cam;
-    Level CurrentLevel;
+    public Level CurrentLevel;
 
     Song BackgroundMusic;
 
@@ -67,6 +67,15 @@ namespace Owlicity
       }
     }
 
+    public float CalcDepthFromPosition(Vector2 worldPosition)
+    {
+      // Note(manu): 0 means front, 1 means back.
+      float maxY = Level.SCREEN_DIMENSION * CurrentLevel.ScreenTileHeight;
+      float y = MathHelper.Clamp(worldPosition.Y, 0, maxY);
+      float alpha = y / maxY;
+      float depth = MathHelper.Lerp(1.0f, 0.0f, alpha);
+      return depth;
+    }
 
     public OwlGame()
     {
