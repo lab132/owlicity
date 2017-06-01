@@ -73,7 +73,7 @@ namespace Owlicity
       float maxY = Level.SCREEN_DIMENSION * CurrentLevel.ScreenTileHeight;
       float y = MathHelper.Clamp(worldPosition.Y, 0, maxY);
       float alpha = y / maxY;
-      float depth = MathHelper.Lerp(1.0f, 0.0f, alpha);
+      float depth = MathHelper.Lerp(0.99f, 0.0f, alpha);
       return depth;
     }
 

@@ -60,6 +60,7 @@ namespace Owlicity
     public int CurrentFrameIndex;
     public SpriteAnimationPlaybackMode PlaybackMode;
     public SpriteAnimationPlaybackState PlaybackState;
+    public float? FixedDepth;
   }
 
   public class SpriteAnimationInstance
@@ -78,6 +79,7 @@ namespace Owlicity
         PingPong = data.Config.PingPong,
         Scale = data.Config.Scale,
         SpriteEffects = data.Config.SpriteEffects,
+        FixedDepth = data.Config.FixedDepth,
       };
       _currentSprite = new Sprite
       {
@@ -207,6 +209,7 @@ namespace Owlicity
     public Point TileDim;
     public Vector2 Scale;
     public SpriteEffects SpriteEffects;
+    public float? FixedDepth;
     public float SecondsPerFrame;
     public bool PingPong;
 

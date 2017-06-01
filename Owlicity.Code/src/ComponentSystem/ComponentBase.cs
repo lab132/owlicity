@@ -17,6 +17,7 @@ namespace Owlicity
     public bool IsDebugDrawingEnabled = true;
 
     public Action OnInitialize;
+    public Action OnPostInitialize;
 
     public ComponentBase(GameObject owner)
     {
@@ -26,8 +27,13 @@ namespace Owlicity
 
     public virtual void Initialize()
     {
-      IsInitializationEnabled = false;
       OnInitialize?.Invoke();
+    }
+
+    public virtual void PostInitialize()
+    {
+      IsInitializationEnabled = false;
+      OnPostInitialize?.Invoke();
     }
 
     public virtual void PrePhysicsUpdate(float deltaSeconds) { }

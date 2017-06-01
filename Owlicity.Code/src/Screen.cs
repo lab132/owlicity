@@ -21,17 +21,14 @@ namespace Owlicity
   {
     public Point GridPosition;
     public Vector2 WorldPosition;
-    public Texture2D GroundTexture;
     private GameObject _screenGameObject;
     private List<GameObject> _decorationObjects = new List<GameObject>();
 
     public void LoadContent(Level level)
     {
       string groundTextureName = string.Format(level.ContentNameFormat_Ground, GridPosition.Y, GridPosition.X);
-      string collisionVerticesName = string.Format(level.ContentNameFormat_Collision, GridPosition.Y, GridPosition.X);
-      string layoutName = string.Format(level.ContentNameFormat_Layout, GridPosition.Y, GridPosition.X);
-
-      GroundTexture = Global.Game.Content.Load<Texture2D>(groundTextureName);
+      string collisionContentName = string.Format(level.ContentNameFormat_Collision, GridPosition.Y, GridPosition.X);
+      string layoutContentName = string.Format(level.ContentNameFormat_Layout, GridPosition.Y, GridPosition.X);
 
       //
       // Screen game object
@@ -41,22 +38,41 @@ namespace Owlicity
         var bc = new BodyComponent(go)
         {
           InitMode = BodyComponentInitMode.FromContent,
-          ShapeContentName = collisionVerticesName,
+          ShapeContentName = collisionContentName,
         };
+        bc.Spatial.Transform.p += WorldPosition;
         go.RootComponent = bc;
-        go.Spatial.Transform.p += WorldPosition;
-        Global.Game.AddGameObject(go);
+
+        var sc = new SpriteComponent(go)
+        {
+           SpriteContentName = groundTextureName,
+        };
+        sc.Sprite.FixedDepth = 1.0f;
+        sc.AttachTo(bc);
 
         _screenGameObject = go;
+        Global.Game.AddGameObject(_screenGameObject);
       }
 
-      List<ScreenLayoutInfo> layoutInfos = Global.Game.Content.Load<List<ScreenLayoutInfo>>(layoutName);
+      List<ScreenLayoutInfo> layoutInfos = Global.Game.Content.Load<List<ScreenLayoutInfo>>(layoutContentName);
       foreach(ScreenLayoutInfo layout in layoutInfos)
       {
         var deco = GameObjectFactory.CreateKnown(layout.ObjectType);
+        SpriteAnimationComponent sa = deco.Components.OfType<SpriteAnimationComponent>().First();
+        sa.OnPostInitialize += delegate ()
+        {
+          sa.ActiveAnimation.Data.Config.FixedDepth = Global.Game.CalcDepthFromPosition(deco.GetWorldSpatialData().Transform.p);
+          int startFrame = level.Random.Next(3);
+          for(int frameIndex = 0; frameIndex < startFrame; frameIndex++)
+          {
+            sa.ActiveAnimation.AdvanceFrameIndex();
+          }
+        };
         deco.Spatial.Transform.p += layout.Offset;
         deco.AttachTo(_screenGameObject);
+
         Global.Game.AddGameObject(deco);
+
         _decorationObjects.Add(deco);
       }
     }
@@ -74,6 +90,7 @@ namespace Owlicity
 
     public void Draw(SpriteBatch batch)
     {
+#if false
       Debug.Assert(GroundTexture != null);
 
       SpatialData spatial = _screenGameObject.GetWorldSpatialData();
@@ -87,6 +104,7 @@ namespace Owlicity
         scale: 1,
         effects: SpriteEffects.None,
         layerDepth: 1.0f);
+#endif
     }
   }
 }

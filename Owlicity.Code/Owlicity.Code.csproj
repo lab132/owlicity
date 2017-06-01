@@ -46,6 +46,7 @@
     <Compile Include="src\ComponentSystem\OwliverComponent.cs" />
     <Compile Include="src\ComponentSystem\ParticleEmitterComponent.cs" />
     <Compile Include="src\ComponentSystem\SpriteAnimationComponent.cs" />
+    <Compile Include="src\ComponentSystem\SpriteComponent.cs" />
     <Compile Include="src\Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Game.cs" />

@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿#define DETECT_CLOSE_PIXELS
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
 using System;
 using System.Collections.Generic;
@@ -57,6 +59,23 @@ namespace Owlicity.Content.Pipeline
           }
         }
       }
+
+#if DETECT_CLOSE_PIXELS
+      for(int infoIndex = 0; infoIndex < result.Count; infoIndex++)
+      {
+        for(int otherIndex = infoIndex + 1; otherIndex < result.Count; otherIndex++)
+        {
+          Vector2 a = result[infoIndex].Offset;
+          Vector2 b = result[otherIndex].Offset;
+
+          float distance = Vector2.Distance(a, b);
+          if(distance <= 2)
+          {
+            context.Logger.LogWarning(null, input.identity, $"Pixels are too close together: {a} <-> {b} | distance: {distance}");
+          }
+        }
+      }
+#endif
 
       return result;
     }

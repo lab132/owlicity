@@ -45,9 +45,15 @@ namespace Owlicity
 
     public void Initialize()
     {
-      foreach(ComponentBase component in Components.Where(c => c.IsInitializationEnabled))
+      ComponentBase[] toInit = Components.Where(c => c.IsInitializationEnabled).ToArray();
+      foreach(ComponentBase component in toInit)
       {
         component.Initialize();
+      }
+
+      foreach(ComponentBase component in toInit)
+      {
+        component.PostInitialize();
       }
     }
 

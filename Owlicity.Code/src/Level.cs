@@ -32,6 +32,8 @@ namespace Owlicity
     public string ContentNameFormat_Layout;
     public string ContentNameFormat_Collision;
 
+    public Random Random = new Random();
+
     public Level(ContentManager contentManager)
     {
       _screens = new Screen[SCREEN_DIMENSION, SCREEN_DIMENSION];
