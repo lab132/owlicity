@@ -16,13 +16,20 @@ namespace Owlicity
     public bool IsDrawingEnabled = true;
     public bool IsDebugDrawingEnabled = true;
 
+    public Action OnInitialize;
+
     public ComponentBase(GameObject owner)
     {
       Owner = owner;
       Owner.AddComponent(this);
     }
 
-    public virtual void Initialize() { IsInitializationEnabled = false; }
+    public virtual void Initialize()
+    {
+      IsInitializationEnabled = false;
+      OnInitialize?.Invoke();
+    }
+
     public virtual void PrePhysicsUpdate(float deltaSeconds) { }
     public virtual void Update(float deltaSeconds) { }
     public virtual void Draw(float deltaSeconds, SpriteBatch batch) { }

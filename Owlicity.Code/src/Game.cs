@@ -22,79 +22,6 @@ using Microsoft.Xna.Framework.Media;
 
 namespace Owlicity
 {
-  public class Dummy : ISpatial
-  {
-    public SpatialData Spatial { get; } = new SpatialData();
-
-    public SpriteAnimationInstance anim;
-    public SpatialData animOffset;
-    public Body body;
-    public ParticleEmitter particleEmitter;
-
-    public void Initialize()
-    {
-      Vector2 offset = -0.5f * anim.Data.Config.TileDim.ToVector2();
-      animOffset = new SpatialData
-      {
-        Parent = this,
-        Transform = new Transform { p = offset },
-        Depth = 0.5f,
-      };
-
-      body = new Body(Global.Game.World, bodyType: BodyType.Kinematic);
-
-      var colors = new List<Color>
-      {
-        Color.White,
-        Color.Red,
-        Color.Green,
-      };
-
-      Texture2D particleTexture = Global.Game.Content.Load<Texture2D>("particle");
-
-      var particles = new List<Texture2D>
-      {
-        particleTexture
-      };
-
-      particleEmitter = new ParticleEmitter(150, particles, colors);
-    }
-
-    public void LoadContent()
-    {
-      //Vertices collisionVertices = Global.Game.Content.Load<Vertices>("slurp_collision");
-      //collisionVertices.Translate(-collisionVertices.GetAABB().Center);
-      //FixtureFactory.AttachLoopShape(collisionVertices, body);
-    }
-
-    public void ProcessInput(GameTime dt, Vector2 inputVector)
-    {
-      if(inputVector != Vector2.Zero)
-      {
-        float deltaSeconds = (float)dt.ElapsedGameTime.TotalSeconds;
-        const float speed = 400.0f;
-        Vector2 movementVector = inputVector.GetClampedTo(1.0f) * speed;
-
-        Spatial.Transform.p += movementVector * deltaSeconds;
-        body.LinearVelocity = movementVector;
-      }
-    }
-
-    public void Update(float deltaSeconds)
-    {
-      anim.Update(deltaSeconds);
-      body.LinearVelocity *= 0.85f;
-      particleEmitter.Update(deltaSeconds);
-      particleEmitter.EmitParticles(Spatial.Transform.p);
-    }
-
-    public void Draw(SpriteBatch spriteBatch)
-    {
-      anim.Draw(spriteBatch, animOffset.GetWorldSpatialData());
-      particleEmitter.Draw(spriteBatch);
-    }
-  }
-
   /// <summary>
   /// This is the main type for your game.
   /// </summary>
@@ -102,8 +29,6 @@ namespace Owlicity
   {
     GraphicsDeviceManager graphics;
     SpriteBatch batch;
-
-    Dummy dummy;
 
     Camera cam;
     Level CurrentLevel;
@@ -218,18 +143,7 @@ namespace Owlicity
         FixtureFactory.AttachLoopShape(vertices, body);
       }
 
-      //
-      // Dummy
-      //
-      dummy = new Dummy
-      {
-        anim = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Owliver_Walk_Left),
-      };
-      dummy.Initialize();
-      dummy.LoadContent();
-      CurrentLevel.CullingCenter = dummy;
-
-      if(false)
+#if false
       {
         var go = new GameObject();
         var bc = new BodyComponent(go)
@@ -266,11 +180,16 @@ namespace Owlicity
 
         AddGameObject(go);
       }
+#endif
 
       {
         var go = GameObjectFactory.CreateKnown(GameObjectType.Owliver);
+        go.Spatial.Transform.p += new Vector2(450, 600);
         AddGameObject(go);
+        Global.Owliver = go;
       }
+
+      CurrentLevel.CullingCenter = Global.Owliver;
 
       var BackgroundMusic = Content.Load<Song>("snd/FiluAndDina_-_Video_Game_Background_-_Edit");
       MediaPlayer.IsRepeating = true;
@@ -321,31 +240,7 @@ namespace Owlicity
         inputVector.Y += 1.0f;
       }
 
-      if(Keyboard.GetState().IsKeyDown(Keys.D1))
-      {
-        dummy.anim.Play();
-      }
-
-      if(Keyboard.GetState().IsKeyDown(Keys.D2))
-      {
-        dummy.anim.Pause();
-      }
-
-      if(Keyboard.GetState().IsKeyDown(Keys.D3))
-      {
-        dummy.anim.Stop();
-      }
-
-      dummy.ProcessInput(gameTime, inputVector);
-
-      foreach(GameObject go in GameObjects)
-      {
-        MovementComponent mvComponent = go.Components.OfType<MovementComponent>().FirstOrDefault();
-        if(mvComponent != null)
-        {
-          mvComponent.InputVector += inputVector;
-        }
-      }
+      Global.Owliver.Components.OfType<MovementComponent>().First().InputVector += inputVector;
 
       inputVector = Vector2.Zero;
       if(Keyboard.GetState().IsKeyDown(Keys.D))
@@ -390,9 +285,6 @@ namespace Owlicity
 
       // GameObject simulation
       CurrentLevel.Update(deltaSeconds);
-
-      // Bullsh*t.
-      dummy.Update(deltaSeconds);
 
       // Post-physics update.
       foreach(GameObject go in GameObjects)

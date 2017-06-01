@@ -40,6 +40,7 @@ namespace Owlicity
     public override void Initialize()
     {
       base.Initialize();
+
       switch(InitMode)
       {
         case BodyComponentInitMode.Manual:

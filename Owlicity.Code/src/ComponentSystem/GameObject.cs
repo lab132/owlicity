@@ -128,15 +128,24 @@ namespace Owlicity
           {
             InitMode = BodyComponentInitMode.Manual,
           };
-          bc.Body = new Body(Global.Game.World, bodyType: BodyType.Kinematic, userdata: bc);
-          FixtureFactory.AttachEllipse(
-            xRadius: 0.5f * colDim.X,
-            yRadius: 0.5f * colDim.Y,
-            edges: 8, // Note(manu): 8 is already the maximum...
-            density: 0,
-            body: bc.Body,
-            userData: bc);
-          go.RootComponent = bc;
+          bc.OnInitialize += delegate()
+          {
+            SpatialData s = go.GetWorldSpatialData();
+            bc.Body = new Body(
+              world: Global.Game.World,
+              position: s.Transform.p,
+              rotation: s.Transform.q.GetAngle(),
+              bodyType: BodyType.Kinematic,
+              userdata: bc);
+            FixtureFactory.AttachEllipse(
+              xRadius: 0.5f * colDim.X,
+              yRadius: 0.5f * colDim.Y,
+              edges: 8, // Note(manu): 8 is already the maximum...
+              density: 0,
+              body: bc.Body,
+              userData: bc);
+            go.RootComponent = bc;
+          };
 
           var oc = new OwliverComponent(go)
           {
