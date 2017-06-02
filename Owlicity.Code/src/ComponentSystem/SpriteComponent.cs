@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Owlicity
 {
-  public class SpriteComponent : SpatialComponent
+  public class SpriteComponent : DrawComponent
   {
     //
     // Init data
@@ -39,8 +39,8 @@ namespace Owlicity
 
       if(Sprite != null)
       {
-        SpatialData worldSpatial = this.GetWorldSpatialData();
-        Sprite.Draw(batch, worldSpatial);
+        SpatialData worldSpatial = Hotspot.GetWorldSpatialData();
+        Sprite.Draw(batch, worldSpatial, RenderDepth);
       }
     }
   }

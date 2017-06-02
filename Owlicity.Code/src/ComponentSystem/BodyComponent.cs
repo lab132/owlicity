@@ -58,7 +58,7 @@ namespace Owlicity
             bodyType: BodyType,
             userdata: this);
           Vertices vertices = Global.Game.Content.Load<Vertices>(ShapeContentName);
-          Fixture = FixtureFactory.AttachLoopShape(vertices, Body);
+          Fixture = FixtureFactory.AttachLoopShape(vertices, Body, this);
         }
         break;
       }

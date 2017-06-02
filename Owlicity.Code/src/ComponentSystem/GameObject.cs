@@ -37,6 +37,9 @@ namespace Owlicity
       }
     }
 
+    public GameLayer Layer = GameLayer.Default;
+    public bool IsStationary;
+
     public void AddComponent(ComponentBase newComponent)
     {
       Debug.Assert(!Components.Contains(newComponent));
@@ -106,15 +109,18 @@ namespace Owlicity
     Slurp,
 
     // Static stuff
+    BackgroundScreen,
     Tree_Fir,
+    Tree_FirAlt, // is "upside down"
     Tree_Conifer,
+    Tree_ConiferAlt, // is "upside down"
     Tree_Oak,
     Tree_Orange,
     Bush,
 
     // Random groups
     Random_FirTree,
-    Random_FirTreeAlternative,
+    Random_FirTreeAlt,
     Random_OakTree,
   }
 
@@ -134,10 +140,6 @@ namespace Owlicity
       {
         case GameObjectType.Owliver:
         {
-          Vector2 hotspot = new Vector2(127, 238) * Global.OwliverScale;
-          Vector2 tileDim = new Vector2(256, 256) * Global.OwliverScale;
-          Vector2 colDim = new Vector2(120, 180) * Global.OwliverScale;
-
           var bc = new BodyComponent(go)
           {
             InitMode = BodyComponentInitMode.Manual,
@@ -151,12 +153,19 @@ namespace Owlicity
               rotation: s.Transform.q.GetAngle(),
               bodyType: BodyType.Kinematic,
               userdata: bc);
-            FixtureFactory.AttachEllipse(
-              xRadius: 0.5f * colDim.X,
-              yRadius: 0.5f * colDim.Y,
-              edges: 8, // Note(manu): 8 is already the maximum...
-              density: 0,
+            float radius = 50 * Global.OwliverScale.X;
+            float density = 10; // ??
+            FixtureFactory.AttachCircle(
+              radius: radius,
+              density: density,
               body: bc.Body,
+              offset: new Vector2(0, 10) * Global.OwliverScale,
+              userData: bc);
+            FixtureFactory.AttachCircle(
+              radius: radius,
+              density: density,
+              body: bc.Body,
+              offset: new Vector2(0, 60) * Global.OwliverScale,
               userData: bc);
             go.RootComponent = bc;
           };
@@ -184,29 +193,59 @@ namespace Owlicity
         case GameObjectType.Slurp:
         throw new NotImplementedException();
 
+        case GameObjectType.BackgroundScreen:
+        {
+          go.Layer = GameLayer.Background;
+          go.IsStationary = true;
+
+          var bc = new BodyComponent(go)
+          {
+            InitMode = BodyComponentInitMode.FromContent,
+            BodyType = BodyType.Static,
+          };
+          go.RootComponent = bc;
+
+          var sc = new SpriteComponent(go)
+          {
+            RenderDepth = 1.0f,
+          };
+          sc.AttachTo(bc);
+        }
+        break;
+
         case GameObjectType.Tree_Fir:
+        case GameObjectType.Tree_FirAlt:
         case GameObjectType.Tree_Conifer:
+        case GameObjectType.Tree_ConiferAlt:
         case GameObjectType.Tree_Oak:
         case GameObjectType.Tree_Orange:
         case GameObjectType.Bush:
         {
+          go.IsStationary = true;
+
           List<SpriteAnimationType> animTypes = new List<SpriteAnimationType>();
           switch(type)
           {
             case GameObjectType.Tree_Fir: animTypes.Add(SpriteAnimationType.Fir_Idle); break;
+            case GameObjectType.Tree_FirAlt: animTypes.Add(SpriteAnimationType.FirAlt_Idle); go.Layer = GameLayer.CloseToTheScreen; break;
             case GameObjectType.Tree_Conifer: animTypes.Add(SpriteAnimationType.Conifer_Idle); break;
+            case GameObjectType.Tree_ConiferAlt: animTypes.Add(SpriteAnimationType.ConiferAlt_Idle); go.Layer = GameLayer.CloseToTheScreen; break;
             case GameObjectType.Tree_Oak: animTypes.Add(SpriteAnimationType.Oak_Idle);  break;
             case GameObjectType.Tree_Orange: animTypes.Add(SpriteAnimationType.Orange_Idle); break;
             case GameObjectType.Bush: animTypes.Add(SpriteAnimationType.Bush_Idle); break;
-            default:
-            throw new InvalidProgramException();
+
+            default: throw new InvalidProgramException();
           }
 
           var sa = new SpriteAnimationComponent(go)
           {
             AnimationTypes = animTypes,
           };
-          go.RootComponent = sa;
+          sa.OnPostInitialize += () =>
+          {
+            sa.RenderDepth = Global.Game.CalcDepth(sa.GetWorldSpatialData(), go.Layer);
+          };
+          sa.AttachTo(go);
         }
         break;
 
@@ -217,11 +256,10 @@ namespace Owlicity
         }
         break;
 
-        case GameObjectType.Random_FirTreeAlternative:
+        case GameObjectType.Random_FirTreeAlt:
         {
-          GameObjectType choice = _random.Choose(GameObjectType.Tree_Fir, GameObjectType.Tree_Conifer);
+          GameObjectType choice = _random.Choose(GameObjectType.Tree_FirAlt, GameObjectType.Tree_ConiferAlt);
           go = CreateKnown(choice);
-          go.Spatial.Transform.p += new Vector2(0, -30);
         }
         break;
 

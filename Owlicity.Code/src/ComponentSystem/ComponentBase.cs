@@ -42,12 +42,39 @@ namespace Owlicity
     public virtual void DebugDraw(float deltaSeconds, SpriteBatch batch) { }
   }
 
-  public abstract class SpatialComponent : ComponentBase, ISpatial
+  public class SpatialComponent : ComponentBase, ISpatial
   {
     public SpatialData Spatial { get; set; } = new SpatialData();
 
     public SpatialComponent(GameObject owner) : base(owner)
     {
+    }
+  }
+
+  public abstract class DrawComponent : SpatialComponent
+  {
+    public float RenderDepth;
+    public SpatialData Hotspot = new SpatialData();
+
+    public DrawComponent(GameObject owner) : base(owner)
+    {
+    }
+
+    public override void Initialize()
+    {
+      base.Initialize();
+
+      Hotspot.AttachTo(this);
+    }
+
+    public override void Update(float deltaSeconds)
+    {
+      base.Update(deltaSeconds);
+
+      if(!Owner.IsStationary)
+      {
+        RenderDepth = Global.Game.CalcDepth(this.GetWorldSpatialData(), Owner.Layer);
+      }
     }
   }
 }

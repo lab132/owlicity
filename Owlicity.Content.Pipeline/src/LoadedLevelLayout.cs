@@ -29,7 +29,7 @@ namespace Owlicity.Content.Pipeline
         {
           { new Color(255,   0,   0), GameObjectType.Random_FirTree },
           { new Color(  0,   0, 255), GameObjectType.Random_OakTree },
-          { new Color(255,   0, 255), GameObjectType.Random_FirTreeAlternative },
+          { new Color(255,   0, 255), GameObjectType.Random_FirTreeAlt },
           { new Color(255, 255,   0), GameObjectType.Bush },
         };
       }

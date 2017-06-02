@@ -22,6 +22,15 @@ using Microsoft.Xna.Framework.Media;
 
 namespace Owlicity
 {
+  public enum GameLayer
+  {
+    SomewhereInTheMiddle,
+    CloseToTheScreen,
+    Background,
+
+    Default = SomewhereInTheMiddle,
+  }
+
   /// <summary>
   /// This is the main type for your game.
   /// </summary>
@@ -67,13 +76,31 @@ namespace Owlicity
       }
     }
 
-    public float CalcDepthFromPosition(Vector2 worldPosition)
+    public float CalcDepth(SpatialData spatial, GameLayer layer)
     {
       // Note(manu): 0 means front, 1 means back.
       float maxY = Level.SCREEN_DIMENSION * CurrentLevel.ScreenTileHeight;
-      float y = MathHelper.Clamp(worldPosition.Y, 0, maxY);
+      float y = MathHelper.Clamp(spatial.Transform.p.Y, 0, maxY);
       float alpha = y / maxY;
-      float depth = MathHelper.Lerp(0.99f, 0.0f, alpha);
+
+      float depth;
+      switch(layer)
+      {
+        case GameLayer.CloseToTheScreen:
+        depth = MathHelper.Lerp(0.0999f, 0.0f, alpha);
+        break;
+
+        case GameLayer.SomewhereInTheMiddle:
+        depth = MathHelper.Lerp(0.9f, 0.1f, alpha);
+        break;
+
+        case GameLayer.Background:
+        depth = 1.0f;
+        break;
+
+        default: throw new ArgumentException("layer");
+      }
+
       return depth;
     }
 
@@ -194,16 +221,8 @@ namespace Owlicity
         go.Spatial.Transform.p += new Vector2(450, 600);
         AddGameObject(go);
         Global.Owliver = go;
-      }
 
-      {
-        List<ScreenLayoutInfo> infos = Content.Load<List<ScreenLayoutInfo>>("level01/layout/layout_00");
-        foreach(ScreenLayoutInfo info in infos)
-        {
-          var go = GameObjectFactory.CreateKnown(info.ObjectType);
-          go.Spatial.Transform.p += info.Offset;
-          AddGameObject(go);
-        }
+        cam.Spatial.Transform.p = go.Spatial.Transform.p;
       }
 
       CurrentLevel.LoadContent();
@@ -223,6 +242,9 @@ namespace Owlicity
       // TODO: Unload any non ContentManager content here
     }
 
+    float _secondsPerSimStep = 1.0f / 60.0f;
+    float _excessSimTime;
+
     /// <summary>
     /// Allows the game to run logic such as updating the world,
     /// checking for collisions, gathering input, and playing audio.
@@ -236,6 +258,15 @@ namespace Owlicity
       {
         Exit();
       }
+
+      if(Keyboard.GetState().IsKeyDown(Keys.D1))
+        deltaSeconds *= 2;
+
+      if(Keyboard.GetState().IsKeyDown(Keys.D2))
+        deltaSeconds *= 4;
+
+      if(Keyboard.GetState().IsKeyDown(Keys.D3))
+        deltaSeconds *= 8;
 
       Vector2 inputVector = Vector2.Zero;
       if(Keyboard.GetState().IsKeyDown(Keys.Right))
@@ -299,9 +330,14 @@ namespace Owlicity
       }
 
       // Physics simulation
-      World.Step(deltaSeconds);
+      float simTime = _excessSimTime + deltaSeconds;
+      while(simTime > _secondsPerSimStep)
+      {
+        World.Step(_secondsPerSimStep);
+        simTime -= _secondsPerSimStep;
+      }
+      _excessSimTime = simTime;
 
-      // GameObject simulation
       CurrentLevel.Update(deltaSeconds);
 
       // Post-physics update.

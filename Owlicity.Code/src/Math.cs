@@ -116,22 +116,24 @@ namespace Owlicity
 
     public ISpatial Parent;
     public Transform Transform;
-    public float Depth;
 
     public override string ToString()
     {
-      Vector3 translation = new Vector3(Transform.p, Depth);
       float degrees = new Angle { Radians = Transform.q.GetAngle() }.Degrees;
-      return $"{translation}|{degrees}°";
+      return $"{Transform.p}|{degrees}°";
     }
   }
 
   public static class ISpatialExtensions
   {
+    /// <summary>
+    /// Gets the world position and rotation for this spatial object.
+    /// RenderDepth is not inherited.
+    /// The result will have no parent.
+    /// </summary>
     public static SpatialData GetWorldSpatialData(this ISpatial self)
     {
       Vector2 position = new Vector2();
-      float depth = 0.0f;
       float angle = 0.0f;
 
       ISpatial parent = self;
@@ -140,7 +142,6 @@ namespace Owlicity
         SpatialData spatial = parent.Spatial;
         position += spatial.Transform.p;
         angle += spatial.Transform.q.GetAngle();
-        depth += spatial.Depth;
 
         Debug.Assert(spatial.Parent != parent);
         parent = spatial.Parent;
@@ -153,7 +154,6 @@ namespace Owlicity
           p = position,
           q = new Rot(angle)
         },
-        Depth = depth,
       };
 
       return result;
@@ -168,16 +168,13 @@ namespace Owlicity
     }
 
     public static void AttachWithOffsetTo(this ISpatial self, ISpatial newParent,
-      Vector2? positionOffset = null,
-      float? depthOffset = null,
-      Angle? rotationOffset = null)
+      Vector2 positionOffset, Angle rotationOffset)
     {
       if(newParent != self)
       {
         SpatialData offset = new SpatialData();
-        if(positionOffset != null) offset.Transform.p = positionOffset.Value;
-        if(depthOffset != null) offset.Depth = depthOffset.Value;
-        if(rotationOffset != null) offset.Transform.q = new Rot(rotationOffset.Value.Radians);
+        offset.Transform.p = positionOffset;
+        offset.Transform.q = new Rot(rotationOffset.Radians);
 
         offset.AttachTo(newParent);
         self.AttachTo(offset);
