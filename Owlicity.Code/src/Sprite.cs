@@ -36,7 +36,7 @@ namespace Owlicity
         effects: SpriteEffects,
         layerDepth: depth);
 
-#if true
+#if false
       spriteBatch.DrawString(
         spriteFont: Global.Game.Content.Load<SpriteFont>("Font"),
         text: $"depth: {depth}",
