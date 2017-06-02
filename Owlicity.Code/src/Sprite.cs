@@ -18,23 +18,12 @@ namespace Owlicity
     public Vector2 Scale { get; set; } = Vector2.One;
     public Color Tint { get; set; } = Color.White;
     public SpriteEffects SpriteEffects { get; set; }
-    public float? FixedDepth { get; set; }
 
-    public void Draw(SpriteBatch spriteBatch, SpatialData spatial)
+    public void Draw(SpriteBatch spriteBatch, SpatialData spatial, float depth)
     {
       Point textureDim = TextureDim;
       if(textureDim == Point.Zero)
         textureDim = Texture.Bounds.Size;
-
-      float depth;
-      if(FixedDepth != null)
-      {
-        depth = FixedDepth.Value;
-      }
-      else
-      {
-        depth = Global.Game.CalcDepthFromPosition(spatial.Transform.p);
-      }
 
       spriteBatch.Draw(
         texture: Texture,

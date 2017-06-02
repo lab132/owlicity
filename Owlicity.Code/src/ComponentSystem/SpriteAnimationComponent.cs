@@ -4,10 +4,12 @@ using VelcroPhysics;
 using VelcroPhysics.Shared;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using System.Diagnostics;
+using Microsoft.Xna.Framework.Primitives2D;
 
 namespace Owlicity
 {
-  public class SpriteAnimationComponent : SpatialComponent
+  public class SpriteAnimationComponent : DrawComponent
   {
     //
     // Input data
@@ -18,7 +20,6 @@ namespace Owlicity
     // Runtime data
     //
     public SpriteAnimationType ActiveAnimationType { get; private set; }
-
     public SpriteAnimationInstance ActiveAnimation { get { return _animInstances[ActiveAnimationType]; } }
 
     private Dictionary<SpriteAnimationType, SpriteAnimationInstance> _animInstances =
@@ -32,24 +33,30 @@ namespace Owlicity
     {
       base.Initialize();
 
-      ActiveAnimationType = AnimationTypes[0];
-
       foreach(SpriteAnimationType type in AnimationTypes)
       {
         SpriteAnimationInstance animation = SpriteAnimationFactory.CreateAnimationInstance(type);
         _animInstances.Add(type, animation);
       }
 
-      Vector2 dim = ActiveAnimation.Data.Config.TileDim.ToVector2() * ActiveAnimation.Data.Config.Scale;
-      Spatial.Transform.p -= 0.5f * dim;
+      Hotspot.AttachTo(this);
+      ChangeActiveAnimation(AnimationTypes[0]);
     }
 
     public void ChangeActiveAnimation(SpriteAnimationType newAnimationType)
     {
+      Debug.Assert(newAnimationType != SpriteAnimationType.Unknown);
+
       if(newAnimationType != ActiveAnimationType)
       {
-        ActiveAnimation.Stop();
+        if(ActiveAnimationType != SpriteAnimationType.Unknown)
+        {
+          ActiveAnimation.Stop();
+        }
+
         ActiveAnimationType = newAnimationType;
+        Hotspot.Transform.p = -(ActiveAnimation.State.Hotspot * ActiveAnimation.State.Scale);
+
         ActiveAnimation.Play();
       }
     }
@@ -65,8 +72,15 @@ namespace Owlicity
     {
       base.Draw(deltaSeconds, batch);
 
-      SpatialData worldSpatial = this.GetWorldSpatialData();
-      ActiveAnimation.Draw(batch, worldSpatial);
+      SpatialData worldSpatial = Hotspot.GetWorldSpatialData();
+      ActiveAnimation.Draw(batch, worldSpatial, RenderDepth);
+    }
+
+    public override void DebugDraw(float deltaSeconds, SpriteBatch batch)
+    {
+      base.DebugDraw(deltaSeconds, batch);
+
+      batch.DrawCircle(this.GetWorldSpatialData().Transform.p, 10, 9, new Color(0xdd, 0x99, 0x44));
     }
   }
 }

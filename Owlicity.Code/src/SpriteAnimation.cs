@@ -60,7 +60,7 @@ namespace Owlicity
     public int CurrentFrameIndex;
     public SpriteAnimationPlaybackMode PlaybackMode;
     public SpriteAnimationPlaybackState PlaybackState;
-    public float? FixedDepth;
+    public Vector2 Hotspot;
   }
 
   public class SpriteAnimationInstance
@@ -79,7 +79,7 @@ namespace Owlicity
         PingPong = data.Config.PingPong,
         Scale = data.Config.Scale,
         SpriteEffects = data.Config.SpriteEffects,
-        FixedDepth = data.Config.FixedDepth,
+        Hotspot = data.Config.Hotspot,
       };
       _currentSprite = new Sprite
       {
@@ -102,7 +102,7 @@ namespace Owlicity
       }
     }
 
-    public void Draw(SpriteBatch spriteBatch, SpatialData spatial)
+    public void Draw(SpriteBatch spriteBatch, SpatialData spatial, float depth)
     {
       if (Data.Frames.Count > 0)
       {
@@ -110,7 +110,7 @@ namespace Owlicity
         _currentSprite.TextureOffset = frame.Offset;
         _currentSprite.Scale = State.Scale;
         _currentSprite.SpriteEffects = State.SpriteEffects;
-        _currentSprite.Draw(spriteBatch, spatial);
+        _currentSprite.Draw(spriteBatch, spatial, depth);
       }
     }
 
@@ -192,8 +192,10 @@ namespace Owlicity
     Slurp_Idle,
 
     Fir_Idle,
+    FirAlt_Idle,
 
     Conifer_Idle,
+    ConiferAlt_Idle,
 
     Oak_Idle,
 
@@ -209,9 +211,9 @@ namespace Owlicity
     public Point TileDim;
     public Vector2 Scale;
     public SpriteEffects SpriteEffects;
-    public float? FixedDepth;
     public float SecondsPerFrame;
     public bool PingPong;
+    public Vector2 Hotspot;
 
     public static SpriteAnimationConfig Default
     {
@@ -222,6 +224,7 @@ namespace Owlicity
         Scale = Vector2.One,
         SecondsPerFrame = 0.05f,
         PingPong = true,
+        Hotspot = new Vector2(128.0f, 128.0f),
       };
     }
   }
@@ -300,6 +303,7 @@ namespace Owlicity
           {
             config.TileSheetName = "owliver_idle_front_left_spritesheet";
             config.Scale = Global.OwliverScale;
+            config.Hotspot = new Vector2(121, 90);
           }
           break;
 
@@ -309,6 +313,7 @@ namespace Owlicity
             config.TileSheetName = "owliver_idle_front_left_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
+            config.Hotspot = new Vector2(121, 90);
           }
           break;
 
@@ -316,6 +321,7 @@ namespace Owlicity
           {
             config.TileSheetName = "owliver_walk_front_left_spritesheet";
             config.Scale = Global.OwliverScale;
+            config.Hotspot = new Vector2(121, 90);
           }
           break;
 
@@ -325,6 +331,7 @@ namespace Owlicity
             config.TileSheetName = "owliver_walk_front_left_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
+            config.Hotspot = new Vector2(121, 90);
           }
           break;
 
@@ -333,14 +340,59 @@ namespace Owlicity
             config.TileSheetName = "slurp_spritesheet";
             config.TileCount = 7;
             config.TileDim = new Point(210, 270);
+            config.Hotspot = 0.5f * config.TileDim.ToVector2();
           }
           break;
 
-          case SpriteAnimationType.Fir_Idle: config.TileSheetName = "fir_spritesheet"; break;
-          case SpriteAnimationType.Conifer_Idle: config.TileSheetName = "conifer_spritesheet"; break;
-          case SpriteAnimationType.Oak_Idle: config.TileSheetName = "oak_spritesheet"; break;
-          case SpriteAnimationType.Orange_Idle: config.TileSheetName = "orange_spritesheet"; break;
-          case SpriteAnimationType.Bush_Idle: config.TileSheetName = "bush_spritesheet"; break;
+          case SpriteAnimationType.Fir_Idle:
+          {
+            config.TileSheetName = "fir_spritesheet";
+            config.Hotspot = new Vector2(136, 235);
+          }
+          break;
+
+          case SpriteAnimationType.FirAlt_Idle:
+          {
+            config.TileSheetName = "fir_spritesheet";
+            config.Hotspot = new Vector2(128, 17);
+          }
+          break;
+
+          case SpriteAnimationType.Conifer_Idle:
+          {
+            config.TileSheetName = "conifer_spritesheet";
+            config.Hotspot = new Vector2(134, 233);
+          }
+          break;
+
+          case SpriteAnimationType.ConiferAlt_Idle:
+          {
+            config.TileSheetName = "conifer_spritesheet";
+            config.Hotspot = new Vector2(135, 18);
+          }
+          break;
+
+          case SpriteAnimationType.Oak_Idle:
+          {
+            config.TileSheetName = "oak_spritesheet";
+            config.Hotspot = new Vector2(126, 224);
+          }
+          break;
+
+          case SpriteAnimationType.Orange_Idle:
+          {
+            config.TileSheetName = "orange_spritesheet";
+            config.Hotspot = new Vector2(127, 227);
+          }
+          break;
+
+          case SpriteAnimationType.Bush_Idle:
+          {
+            config.TileSheetName = "bush_spritesheet";
+            config.Hotspot = new Vector2(130, 212);
+          }
+          break;
+
 
           default: throw new ArgumentException("Unknown sprite animation type.");
         }

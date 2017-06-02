@@ -34,21 +34,14 @@ namespace Owlicity
       // Screen game object
       //
       {
-        var go = new GameObject();
-        var bc = new BodyComponent(go)
-        {
-          InitMode = BodyComponentInitMode.FromContent,
-          ShapeContentName = collisionContentName,
-        };
-        bc.Spatial.Transform.p += WorldPosition;
-        go.RootComponent = bc;
+        var go = GameObjectFactory.CreateKnown(GameObjectType.BackgroundScreen);
+        go.Spatial.Transform.p += WorldPosition;
 
-        var sc = new SpriteComponent(go)
-        {
-           SpriteContentName = groundTextureName,
-        };
-        sc.Sprite.FixedDepth = 1.0f;
-        sc.AttachTo(bc);
+        var bc = go.Components.OfType<BodyComponent>().Single();
+        bc.ShapeContentName = collisionContentName;
+
+        var sc = go.Components.OfType<SpriteComponent>().Single();
+        sc.SpriteContentName = groundTextureName;
 
         _screenGameObject = go;
         Global.Game.AddGameObject(_screenGameObject);
@@ -58,10 +51,9 @@ namespace Owlicity
       foreach(ScreenLayoutInfo layout in layoutInfos)
       {
         var deco = GameObjectFactory.CreateKnown(layout.ObjectType);
-        SpriteAnimationComponent sa = deco.Components.OfType<SpriteAnimationComponent>().First();
+        SpriteAnimationComponent sa = deco.Components.OfType<SpriteAnimationComponent>().Single();
         sa.OnPostInitialize += delegate ()
         {
-          sa.ActiveAnimation.Data.Config.FixedDepth = Global.Game.CalcDepthFromPosition(deco.GetWorldSpatialData().Transform.p);
           int startFrame = level.Random.Next(3);
           for(int frameIndex = 0; frameIndex < startFrame; frameIndex++)
           {
