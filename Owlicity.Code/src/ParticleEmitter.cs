@@ -98,7 +98,16 @@ namespace Owlicity
       {
         if (_particles[i].TTL > 0)
         {
-          spriteBatch.Draw(texture: _particles[i].Texture, position: _particles[i].Position, color: _particles[i].Color, rotation: _particles[i].Rotation, scale: new Vector2(0.5f), effects: SpriteEffects.None, layerDepth: 0.0f);
+          spriteBatch.Draw(
+            texture: _particles[i].Texture,
+            position: _particles[i].Position,
+            sourceRectangle: null,
+            color: _particles[i].Color,
+            rotation: _particles[i].Rotation,
+            origin: Vector2.Zero, // Note(manu): I still have no idea what this parameter does.
+            scale: Vector2.One,
+            effects: SpriteEffects.None,
+            layerDepth: 0.0f); // TODO(manu): Proper depth for particles.
         }
       }
     }
