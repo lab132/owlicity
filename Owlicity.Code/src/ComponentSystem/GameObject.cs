@@ -151,8 +151,10 @@ namespace Owlicity
               world: Global.Game.World,
               position: s.Transform.p,
               rotation: s.Transform.q.GetAngle(),
-              bodyType: BodyType.Kinematic,
+              bodyType: BodyType.Dynamic,
               userdata: bc);
+            bc.Body.FixedRotation = true;
+
             float radius = 50 * Global.OwliverScale.X;
             float density = 10; // ??
             FixtureFactory.AttachCircle(
@@ -167,6 +169,7 @@ namespace Owlicity
               body: bc.Body,
               offset: new Vector2(0, 60) * Global.OwliverScale,
               userData: bc);
+
             go.RootComponent = bc;
           };
 
