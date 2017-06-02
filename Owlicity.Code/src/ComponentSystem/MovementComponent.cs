@@ -19,8 +19,6 @@ namespace Owlicity
     //
     // Runtime data
     //
-    public Vector2 InputVector;
-
     public BodyComponent ControlledBodyComponent { get; set; }
 
     public Body ControlledBody

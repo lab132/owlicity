@@ -11,19 +11,19 @@ namespace Owlicity
   public class EnemyComponent : ComponentBase
   {
     public GameObjectType EnemyType { get; set; }
-    public EnemyComponent(GameObjectType enemyType, GameObject owner) : base(owner)
+
+    public EnemyComponent(GameObject owner) : base(owner)
     {
-      EnemyType = enemyType;
     }
 
     public override void Initialize()
     {
       base.Initialize();
 
-      var bc = Owner.Components.OfType<BodyComponent>().Single();
-      var pec = Owner.Components.OfType<ParticleEmitterComponent>().Single();
+      var bc = Owner.GetComponent<BodyComponent>();
+      var pec = Owner.GetComponent<ParticleEmitterComponent>();
 
-      var owliverBC = Global.Owliver.Components.OfType<BodyComponent>().Single();
+      var owliverBC = Global.Owliver.GetComponent<BodyComponent>();
       bc.OnPostInitialize += delegate ()
       {
         bc.Body.OnCollision += delegate (Fixture fixtureA, Fixture fixtureB, Contact contact)
@@ -50,7 +50,7 @@ namespace Owlicity
             var enemyPos = Owner.GetWorldSpatialData().Transform.p;
 
             var movementVec = (owliverPosition - enemyPos).GetNormalized() * movementSpeed;
-            mov.InputVector = movementVec;
+            mov.Input.MovementVector += movementVec;
           }
           break;
         default:

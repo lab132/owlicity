@@ -255,100 +255,99 @@ namespace Owlicity
 
         case GameObjectType.Slurp:
         {
-            var bc = new BodyComponent(go)
-            {
-              InitMode = BodyComponentInitMode.Manual,
-              ShapeContentName = "slurp_collision",
-              BodyType = BodyType.Static
-            };
+          var bc = new BodyComponent(go)
+          {
+            InitMode = BodyComponentInitMode.Manual,
+            ShapeContentName = "slurp_collision",
+            BodyType = BodyType.Static
+          };
 
-            bc.OnInitialize += delegate ()
-            {
-              SpatialData s = go.GetWorldSpatialData();
-              bc.Body = new Body(
-                world: Global.Game.World,
-                position: s.Transform.p,
-                rotation: s.Transform.q.GetAngle(),
-                bodyType: BodyType.Dynamic,
-                userdata: bc);
-              bc.Body.FixedRotation = true;
+          bc.OnInitialize += delegate ()
+          {
+            SpatialData s = go.GetWorldSpatialData();
+            bc.Body = new Body(
+              world: Global.Game.World,
+              position: s.Transform.p,
+              rotation: s.Transform.q.GetAngle(),
+              bodyType: BodyType.Dynamic,
+              userdata: bc);
+            bc.Body.FixedRotation = true;
 
-              float radius = 80 * Global.SlurpScale.X;
-              float density = 10; // ??
+            float radius = 80 * Global.SlurpScale.X;
+            float density = 10; // ??
               FixtureFactory.AttachCircle(
-                radius: radius,
-                density: density,
-                body: bc.Body,
-                offset: new Vector2(0, -25) * Global.SlurpScale,
-                userData: bc);
-              FixtureFactory.AttachCircle(
-                radius: radius,
-                density: density,
-                body: bc.Body,
-                offset: new Vector2(0, 100) * Global.SlurpScale,
-                userData: bc);
-            };
+              radius: radius,
+              density: density,
+              body: bc.Body,
+              offset: new Vector2(0, -25) * Global.SlurpScale,
+              userData: bc);
+            FixtureFactory.AttachCircle(
+              radius: radius,
+              density: density,
+              body: bc.Body,
+              offset: new Vector2(0, 100) * Global.SlurpScale,
+              userData: bc);
+          };
 
-              go.RootComponent = bc;
+          go.RootComponent = bc;
 
-            var sa = new SpriteAnimationComponent(go)
-            {
-              AnimationTypes = new List<SpriteAnimationType>
+          var sa = new SpriteAnimationComponent(go)
+          {
+            AnimationTypes = new List<SpriteAnimationType>
               {
                 SpriteAnimationType.Slurp_Idle,
               }
-            };
+          };
+          sa.AttachTo(bc);
 
-            sa.AttachTo(bc);
+          var mc = new MovementComponent(go)
+          {
+            ControlledBodyComponent = bc,
+          };
 
-            var mc = new MovementComponent(go)
+          var pc = new ParticleEmitterComponent(go)
+          {
+            NumParticles = 512,
+            TextureContentNames = new[]
             {
-              ControlledBodyComponent = bc,
-            };
+              "confetti/confetti_01",
+              "confetti/confetti_02",
+              "confetti/confetti_03",
+              "confetti/confetti_04",
+              "confetti/confetti_05",
+              "confetti/confetti_06",
+              "confetti/confetti_07",
+            },
 
-            var pc = new ParticleEmitterComponent(go)
+            AvailableColors = new[]
             {
-              NumParticles = 512,
-              TextureContentNames = new[]
-              {
-                "confetti/confetti_01",
-                "confetti/confetti_02",
-                "confetti/confetti_03",
-                "confetti/confetti_04",
-                "confetti/confetti_05",
-                "confetti/confetti_06",
-                "confetti/confetti_07",
-              },
+              new Color(0x73, 0x4c, 0x87), // purple
+              new Color(0xa3, 0x3b, 0x41), // red
+              new Color(0xda, 0x67, 0x77), // red2
+              new Color(0x41, 0x6d, 0x9c), // blue
+              new Color(0x7a, 0xaa, 0xdd), // blue2
+              new Color(0x5f, 0x72, 0x2d), // green
+              new Color(0x9f, 0xb5, 0x63), // green2
+              new Color(0xda, 0xa7, 0x44), // yellow
+              new Color(0xf4, 0xd3, 0x92), // yellow2
+            },
 
-              AvailableColors = new[]
-              {
-                  new Color(0x73, 0x4c, 0x87), // purple
-                  new Color(0xa3, 0x3b, 0x41), // red
-                  new Color(0xda, 0x67, 0x77), // red2
-                  new Color(0x41, 0x6d, 0x9c), // blue
-                  new Color(0x7a, 0xaa, 0xdd), // blue2
-                  new Color(0x5f, 0x72, 0x2d), // green
-                  new Color(0x9f, 0xb5, 0x63), // green2
-                  new Color(0xda, 0xa7, 0x44), // yellow
-                  new Color(0xf4, 0xd3, 0x92), // yellow2
-              },
+            IsEmittingEnabled = false,
+          };
 
-              IsEmittingEnabled =false,
+          pc.OnPostInitialize += delegate ()
+          {
+            pc.Emitter.MaxParticleSpread = 0;
+            pc.Emitter.MaxParticleSpeed = 100;
+          };
+          pc.AttachTo(bc);
 
-            };
-
-            pc.OnPostInitialize += delegate ()
-            {
-              pc.Emitter.MaxParticleSpread = 0;
-              pc.Emitter.MaxParticleSpeed = 100;
-            };
-            pc.AttachTo(bc);
-
-            var ec = new EnemyComponent(type, go);
-           
-
+          var ec = new EnemyComponent(go)
+          {
+            EnemyType = type,
+          };
         }
-        break; 
+        break;
         throw new NotImplementedException();
 
         case GameObjectType.BackgroundScreen:
@@ -392,7 +391,7 @@ namespace Owlicity
             case GameObjectType.Tree_FirAlt: animTypes.Add(SpriteAnimationType.FirAlt_Idle); go.Layer = GameLayer.CloseToTheScreen; break;
             case GameObjectType.Tree_Conifer: animTypes.Add(SpriteAnimationType.Conifer_Idle); break;
             case GameObjectType.Tree_ConiferAlt: animTypes.Add(SpriteAnimationType.ConiferAlt_Idle); go.Layer = GameLayer.CloseToTheScreen; break;
-            case GameObjectType.Tree_Oak: animTypes.Add(SpriteAnimationType.Oak_Idle);  break;
+            case GameObjectType.Tree_Oak: animTypes.Add(SpriteAnimationType.Oak_Idle); break;
             case GameObjectType.Tree_Orange: animTypes.Add(SpriteAnimationType.Orange_Idle); break;
             case GameObjectType.Bush: animTypes.Add(SpriteAnimationType.Bush_Idle); break;
 
