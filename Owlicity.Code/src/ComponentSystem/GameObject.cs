@@ -1,12 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
+﻿// #define CAMERA_BODY
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VelcroPhysics.Dynamics;
 using VelcroPhysics.Factories;
 
@@ -44,6 +43,18 @@ namespace Owlicity
     {
       Debug.Assert(!Components.Contains(newComponent));
       Components.Add(newComponent);
+    }
+
+    public T GetComponent<T>()
+      where T : ComponentBase
+    {
+      return Components.OfType<T>().FirstOrDefault();
+    }
+
+    public IEnumerable<T> GetComponents<T>()
+      where T : ComponentBase
+    {
+      return Components.OfType<T>();
     }
 
     public void Initialize()
@@ -102,6 +113,9 @@ namespace Owlicity
   {
     Unknown,
 
+    // Misc
+    Camera,
+
     // Characters
     Owliver,
 
@@ -138,13 +152,57 @@ namespace Owlicity
       GameObject go = new GameObject();
       switch(type)
       {
+        case GameObjectType.Camera:
+        {
+          var cc = new CameraComponent(go)
+          {
+          };
+
+#if CAMERA_BODY
+          var bc = new BodyComponent(go)
+          {
+            InitMode = BodyComponentInitMode.Manual,
+          };
+          bc.OnInitialize += () =>
+          {
+            SpatialData initSpatial = go.GetWorldSpatialData();
+            bc.Body = BodyFactory.CreateRectangle(
+              world: Global.Game.World,
+              width: cc.Bounds.X,
+              height: cc.Bounds.Y,
+              density: 10.0f, // ??
+              position: initSpatial.Transform.p,
+              rotation: initSpatial.Transform.q.GetAngle(),
+              bodyType: BodyType.Kinematic, // TODO(manu): Make this dynamic.
+              userData: bc);
+            bc.Body.FixedRotation = true;
+            bc.Body.CollisionCategories = Category.None;
+            bc.Body.CollidesWith = Global.LevelCollisionCategory;
+          };
+          go.RootComponent = bc;
+
+          cc.CameraBodyComponent = bc;
+          cc.AttachTo(bc);
+#else
+          cc.AttachTo(go);
+#endif
+
+          var mc = new MovementComponent(go)
+          {
+          };
+#if CAMERA_BODY
+          mc.ControlledBodyComponent = bc;
+#endif
+        }
+        break;
+
         case GameObjectType.Owliver:
         {
           var bc = new BodyComponent(go)
           {
             InitMode = BodyComponentInitMode.Manual,
           };
-          bc.OnInitialize += delegate()
+          bc.OnInitialize += () =>
           {
             SpatialData s = go.GetWorldSpatialData();
             bc.Body = new Body(
@@ -154,6 +212,8 @@ namespace Owlicity
               bodyType: BodyType.Dynamic,
               userdata: bc);
             bc.Body.FixedRotation = true;
+            bc.Body.CollisionCategories = Global.OwliverCollisionCategory;
+            bc.Body.CollidesWith = Global.LevelCollisionCategory | Global.EnemyCollisionCategory;
 
             float radius = 50 * Global.OwliverScale.X;
             float density = 10; // ??
@@ -300,6 +360,10 @@ namespace Owlicity
           {
             InitMode = BodyComponentInitMode.FromContent,
             BodyType = BodyType.Static,
+          };
+          bc.OnPostInitialize += () =>
+          {
+            bc.Body.CollisionCategories = Global.LevelCollisionCategory;
           };
           go.RootComponent = bc;
 

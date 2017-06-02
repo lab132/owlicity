@@ -31,6 +31,134 @@ namespace Owlicity
     Default = SomewhereInTheMiddle,
   }
 
+  public struct GameInput
+  {
+    // Has a length of <= 1.0f
+    public Vector2 MovementVector;
+
+    public bool WantsInteraction;
+    public bool WantsAttack;
+    public bool WantsPause;
+  }
+
+  public class InputHandler
+  {
+    private KeyboardState _prevKeyboard;
+    private GamePadState[] _prevGamepad = new GamePadState[3];
+    private MouseState _prevMouse;
+
+    public void Update(float deltaSeconds,
+      out GameInput characterInput, out GameInput companionInput, out GameInput debugInput)
+    {
+      KeyboardState newKeyboard = Keyboard.GetState();
+      GamePadState[] newGamepad = new[]
+      {
+        GamePad.GetState(0),
+        GamePad.GetState(1),
+        GamePad.GetState(2),
+      };
+      MouseState newMouse = Mouse.GetState();
+
+      Vector2 mouseDelta = Vector2.Zero;
+      Vector2 timelessMouseDelta = Vector2.Zero;
+      if(deltaSeconds > 0)
+      {
+        mouseDelta = (newMouse.Position - _prevMouse.Position).ToVector2();
+        timelessMouseDelta = mouseDelta / deltaSeconds;
+      }
+
+      //
+      // Character input
+      //
+      {
+        characterInput = new GameInput();
+
+        // Mouse
+        Vector2 mouseMovement = Vector2.Zero;
+
+        // Keyboard
+        Vector2 keyboardMovement = new Vector2();
+        if(newKeyboard.IsKeyDown(Keys.Left)) keyboardMovement.X -= 1.0f;
+        if(newKeyboard.IsKeyDown(Keys.Right)) keyboardMovement.X += 1.0f;
+        if(newKeyboard.IsKeyDown(Keys.Up)) keyboardMovement.Y -= 1.0f;
+        if(newKeyboard.IsKeyDown(Keys.Down)) keyboardMovement.Y += 1.0f;
+        if(newKeyboard.IsKeyDown(Keys.Space) && _prevKeyboard.IsKeyUp(Keys.Space)) characterInput.WantsAttack = true;
+        if(newKeyboard.IsKeyDown(Keys.Enter) && _prevKeyboard.IsKeyUp(Keys.Enter)) characterInput.WantsInteraction = true;
+        if(newKeyboard.IsKeyDown(Keys.Escape) && _prevKeyboard.IsKeyUp(Keys.Escape)) characterInput.WantsPause = true;
+
+        // Gamepad
+        if(newGamepad[0].IsButtonDown(Buttons.Y) && _prevGamepad[0].IsButtonUp(Buttons.Y)) characterInput.WantsAttack = true;
+        if(newGamepad[0].IsButtonDown(Buttons.A) && _prevGamepad[0].IsButtonUp(Buttons.A)) characterInput.WantsInteraction = true;
+        if(newGamepad[0].IsButtonDown(Buttons.Start) && _prevGamepad[0].IsButtonUp(Buttons.Start)) characterInput.WantsInteraction = true;
+
+        Vector2 gamepadMovement = new Vector2(
+          newGamepad[0].ThumbSticks.Left.X,
+          -newGamepad[0].ThumbSticks.Left.Y);
+
+        // Finalize
+        characterInput.MovementVector = (keyboardMovement + gamepadMovement).GetClampedTo(1.0f) + mouseMovement;
+      }
+
+      //
+      // Companion input
+      //
+      {
+        companionInput = new GameInput();
+
+        // Mouse
+        Vector2 mouseMovement = Vector2.Zero;
+
+        // Keyboard
+        Vector2 keyboardMovement = new Vector2();
+
+        // Gamepad
+        if(newGamepad[1].IsButtonDown(Buttons.Y) && _prevGamepad[1].IsButtonUp(Buttons.Y)) companionInput.WantsAttack = true;
+        if(newGamepad[1].IsButtonDown(Buttons.A) && _prevGamepad[1].IsButtonUp(Buttons.A)) companionInput.WantsInteraction = true;
+        if(newGamepad[1].IsButtonDown(Buttons.Start) && _prevGamepad[1].IsButtonUp(Buttons.Start)) companionInput.WantsInteraction = true;
+
+        Vector2 gamepadMovement = new Vector2(
+          newGamepad[1].ThumbSticks.Left.X,
+          -newGamepad[1].ThumbSticks.Left.Y);
+
+        // Finalize
+        companionInput.MovementVector = (keyboardMovement + gamepadMovement).GetClampedTo(1.0f) + mouseMovement;
+      }
+
+      //
+      // Debug input
+      //
+      {
+        debugInput = new GameInput();
+
+        // Mouse
+        Vector2 mouseMovement = timelessMouseDelta;
+
+        // Keyboard
+        Vector2 keyboardMovement = new Vector2();
+        if(newKeyboard.IsKeyDown(Keys.A)) keyboardMovement.X -= 1.0f;
+        if(newKeyboard.IsKeyDown(Keys.D)) keyboardMovement.X += 1.0f;
+        if(newKeyboard.IsKeyDown(Keys.W)) keyboardMovement.Y -= 1.0f;
+        if(newKeyboard.IsKeyDown(Keys.S)) keyboardMovement.Y += 1.0f;
+
+        // Gamepad
+        if(newGamepad[2].IsButtonDown(Buttons.Y) && _prevGamepad[2].IsButtonUp(Buttons.Y)) debugInput.WantsAttack = true;
+        if(newGamepad[2].IsButtonDown(Buttons.A) && _prevGamepad[2].IsButtonUp(Buttons.A)) debugInput.WantsInteraction = true;
+        if(newGamepad[2].IsButtonDown(Buttons.Start) && _prevGamepad[2].IsButtonUp(Buttons.Start)) debugInput.WantsInteraction = true;
+
+        Vector2 gamepadMovement = new Vector2(
+          newGamepad[0].ThumbSticks.Right.X,
+          -newGamepad[0].ThumbSticks.Right.Y);
+
+        // Finalize
+        debugInput.MovementVector = (keyboardMovement + gamepadMovement).GetClampedTo(1.0f) + mouseMovement;
+      }
+
+      _prevKeyboard = newKeyboard;
+      _prevGamepad = newGamepad;
+      _prevMouse = newMouse;
+    }
+  }
+
   /// <summary>
   /// This is the main type for your game.
   /// </summary>
@@ -39,13 +167,12 @@ namespace Owlicity
     GraphicsDeviceManager graphics;
     SpriteBatch batch;
 
-    Camera cam;
+    public GameObject ActiveCamera;
     public Level CurrentLevel;
-
-    Song BackgroundMusic;
 
     public World World { get; set; }
     public DebugView PhysicsDebugView { get; set; }
+    public InputHandler Input = new InputHandler();
 
     //
     // Game object stuff
@@ -113,12 +240,14 @@ namespace Owlicity
       graphics.PreferredBackBufferHeight = 1080;
       graphics.PreferredBackBufferWidth = 1920;
 
+#if DEBUG
       if(Environment.UserName == "manu")
       {
         // Note(manu): Because I have a really tiny screen...
         graphics.PreferredBackBufferHeight = (int)(0.5f * 1080);
         graphics.PreferredBackBufferWidth = (int)(0.5f * 1920);
       }
+#endif
 
       Content.RootDirectory = "content";
     }
@@ -133,13 +262,6 @@ namespace Owlicity
     {
       SpriteAnimationFactory.Initialize(Content);
       GameObjectFactory.Initialize();
-
-      cam = new Camera
-      {
-        //LookAt = dummy,
-        Bounds = GraphicsDevice.Viewport.Bounds.Size.ToVector2()
-      };
-      cam.Initialize();
 
       World = new World(gravity: Vector2.Zero);
 
@@ -221,14 +343,20 @@ namespace Owlicity
         go.Spatial.Transform.p += new Vector2(450, 600);
         AddGameObject(go);
         Global.Owliver = go;
-
-        cam.Spatial.Transform.p = go.Spatial.Transform.p;
-
-        var testSlurp = GameObjectFactory.CreateKnown(GameObjectType.Slurp);
-        testSlurp.Spatial.Transform.p += new Vector2(500, 450);
-        AddGameObject(testSlurp);
-
       }
+	  
+	  {
+        var go = GameObjectFactory.CreateKnown(GameObjectType.Camera);
+        go.GetComponent<CameraComponent>().Bounds = GraphicsDevice.Viewport.Bounds.Size.ToVector2();
+
+        go.Spatial.Transform.p = Global.Owliver.GetWorldSpatialData().Transform.p;
+
+        ActiveCamera = go;
+        AddGameObject(ActiveCamera);
+	  }
+      var testSlurp = GameObjectFactory.CreateKnown(GameObjectType.Slurp);
+      testSlurp.Spatial.Transform.p += new Vector2(500, 450);
+      AddGameObject(testSlurp);
 
       CurrentLevel.LoadContent();
       CurrentLevel.CullingCenter = Global.Owliver;
@@ -259,66 +387,23 @@ namespace Owlicity
     {
       float deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-      if(GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+      Input.Update(deltaSeconds,
+        out GameInput owliverInput,
+        out GameInput companionInput,
+        out GameInput debugInput);
+
+      if(owliverInput.WantsPause)
       {
         Exit();
       }
 
-      if(Keyboard.GetState().IsKeyDown(Keys.D1))
-        deltaSeconds *= 2;
+      Global.Owliver.GetComponent<OwliverComponent>().Input = owliverInput;
 
-      if(Keyboard.GetState().IsKeyDown(Keys.D2))
-        deltaSeconds *= 4;
+      // TODO(manu): Make use of `compationInput`!
 
-      if(Keyboard.GetState().IsKeyDown(Keys.D3))
-        deltaSeconds *= 8;
-
-      Vector2 inputVector = Vector2.Zero;
-      if(Keyboard.GetState().IsKeyDown(Keys.Right))
-      {
-        inputVector.X += 1.0f;
-      }
-
-      if(Keyboard.GetState().IsKeyDown(Keys.Left))
-      {
-        inputVector.X -= 1.0f;
-      }
-
-      if(Keyboard.GetState().IsKeyDown(Keys.Up))
-      {
-        inputVector.Y -= 1.0f;
-      }
-
-      if(Keyboard.GetState().IsKeyDown(Keys.Down))
-      {
-        inputVector.Y += 1.0f;
-      }
-
-      Global.Owliver.Components.OfType<MovementComponent>().First().InputVector += inputVector;
-
-      inputVector = Vector2.Zero;
-      if(Keyboard.GetState().IsKeyDown(Keys.D))
-      {
-        inputVector.X += 1.0f;
-      }
-
-      if(Keyboard.GetState().IsKeyDown(Keys.A))
-      {
-        inputVector.X -= 1.0f;
-      }
-
-      if(Keyboard.GetState().IsKeyDown(Keys.W))
-      {
-        inputVector.Y -= 1.0f;
-      }
-
-      if(Keyboard.GetState().IsKeyDown(Keys.S))
-      {
-        inputVector.Y += 1.0f;
-      }
-
-      const float speed = 400.0f;
-      cam.Spatial.Transform.p += inputVector.GetClampedTo(1.0f) * (speed * deltaSeconds);
+#if DEBUG
+      ActiveCamera.GetComponent<MovementComponent>().Input = debugInput;
+#endif
 
       // Add pending game objects.
       GameObjects.AddRange(GameObjectsPendingAdd);
@@ -359,9 +444,6 @@ namespace Owlicity
       }
       GameObjectsPendingRemove.Clear();
 
-      // Camera simulation.
-      cam.Update(deltaSeconds);
-
       base.Update(gameTime);
     }
 
@@ -374,6 +456,7 @@ namespace Owlicity
       float deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
       GraphicsDevice.Clear(Color.CornflowerBlue);
+      Camera cam = ActiveCamera.GetComponent<CameraComponent>().Camera;
       Matrix viewMatrix = cam.ViewMatrix;
       Matrix projectionMatrix = cam.ProjectionMatrix;
 

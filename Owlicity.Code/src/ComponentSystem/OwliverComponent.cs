@@ -26,13 +26,27 @@ namespace Owlicity
 
     public override void PrePhysicsUpdate(float deltaSeconds)
     {
+      // Note(manu): Don't call the parent's version because we do it outselves.
+      //base.PrePhysicsUpdate(deltaSeconds);
+
       float x = ControlledBody.LinearVelocity.X;
       if(Math.Abs(x) > float.Epsilon)
       {
         _oldX = x;
       }
 
-      base.PrePhysicsUpdate(deltaSeconds);
+      GameInput input = ConsumeInput();
+      PerformMovement(input.MovementVector, deltaSeconds);
+
+      if(input.WantsAttack)
+      {
+        // TODO(manu)
+      }
+
+      if(input.WantsInteraction)
+      {
+        // TODO(manu)
+      }
     }
 
     public override void Update(float deltaSeconds)

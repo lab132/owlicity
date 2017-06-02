@@ -28,14 +28,16 @@ namespace Owlicity
       get => ControlledBodyComponent?.Body;
     }
 
+    public GameInput Input;
+
     public MovementComponent(GameObject owner) : base(owner)
     {
     }
 
-    public Vector2 ConsumeInputVector()
+    public GameInput ConsumeInput()
     {
-      Vector2 result = InputVector;
-      InputVector = Vector2.Zero;
+      GameInput result = Input;
+      Input = new GameInput();
       return result;
     }
 
@@ -43,18 +45,22 @@ namespace Owlicity
     {
       base.PrePhysicsUpdate(deltaSeconds);
 
-      Vector2 inputVector = ConsumeInputVector();
-      if(inputVector != Vector2.Zero)
+      GameInput input = ConsumeInput();
+      PerformMovement(input.MovementVector, deltaSeconds);
+    }
+
+    public void PerformMovement(Vector2 movementVector, float deltaSeconds)
+    {
+      if(movementVector != Vector2.Zero)
       {
-        Vector2 movementVector = inputVector.GetClampedTo(1.0f) * MaxMovementSpeed;
         Body body = ControlledBody;
         if(body != null)
         {
-          body.LinearVelocity = movementVector;
+          body.LinearVelocity = movementVector * MaxMovementSpeed;
         }
         else
         {
-          // TODO(manu): Manual simulation.
+          Owner.Spatial.Transform.p += movementVector * MaxMovementSpeed * deltaSeconds;
         }
       }
     }
