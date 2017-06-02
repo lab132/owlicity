@@ -223,6 +223,11 @@ namespace Owlicity
         Global.Owliver = go;
 
         cam.Spatial.Transform.p = go.Spatial.Transform.p;
+
+        var testSlurp = GameObjectFactory.CreateKnown(GameObjectType.Slurp);
+        testSlurp.Spatial.Transform.p += new Vector2(500, 450);
+        AddGameObject(testSlurp);
+
       }
 
       CurrentLevel.LoadContent();

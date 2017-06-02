@@ -13,7 +13,7 @@ namespace Owlicity
     //
     // Init data
     //
-    public int NumParticlesPerTexture;
+    public int NumParticles;
     public string[] TextureContentNames;
     public Color[] AvailableColors;
 
@@ -38,7 +38,21 @@ namespace Owlicity
         textures.Add(texture);
       }
 
-      Emitter = new ParticleEmitter(NumParticlesPerTexture, textures, AvailableColors.ToList());
+      Emitter = new ParticleEmitter(NumParticles, textures, AvailableColors.ToList());
+    }
+
+    public void Emit(Vector2? emitAt = null, int numParticles = -1)
+    {
+      Vector2 spawnPosition;
+      if (emitAt != null)
+      {
+        spawnPosition = emitAt.Value;
+      } else
+      {
+        spawnPosition = this.GetWorldSpatialData().Transform.p;
+      }
+      
+      Emitter.EmitParticles(spawnPosition);
     }
 
     public override void Update(float deltaSeconds)

@@ -44,9 +44,14 @@ namespace Owlicity
       _freeParticleSlots = new Stack<int>(Enumerable.Range(0, _maxNumParticles));
     }
 
-    public void EmitParticles(Vector2 position)
+    public void EmitParticles(Vector2 position, int numParticles = -1)
     {
-      while (_freeParticleSlots.Count > 0)
+      if (numParticles == -1)
+      {
+        numParticles = _maxNumParticles;
+      }
+
+      while (_freeParticleSlots.Count > 0 && numParticles > 0)
       {
         int idx = _freeParticleSlots.Pop();
         var particle = new Particle
@@ -58,6 +63,8 @@ namespace Owlicity
           TTL = _random.NextFloatBetween(MinTTL, MaxTTL),
         };
         _particles[idx] = particle;
+        numParticles--;
+
       }
     }
 

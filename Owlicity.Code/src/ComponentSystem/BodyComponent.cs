@@ -31,7 +31,6 @@ namespace Owlicity
     // Runtime data
     //
     public Body Body;
-    public Fixture Fixture;
 
     public BodyComponent(GameObject owner) : base(owner)
     {
@@ -58,7 +57,7 @@ namespace Owlicity
             bodyType: BodyType,
             userdata: this);
           Vertices vertices = Global.Game.Content.Load<Vertices>(ShapeContentName);
-          Fixture = FixtureFactory.AttachLoopShape(vertices, Body, this);
+          FixtureFactory.AttachLoopShape(vertices, Body, this);
         }
         break;
       }

@@ -52,6 +52,8 @@ namespace Owlicity
       {
         var deco = GameObjectFactory.CreateKnown(layout.ObjectType);
         SpriteAnimationComponent sa = deco.Components.OfType<SpriteAnimationComponent>().Single();
+#if false
+        // Choose random initial frame
         sa.OnPostInitialize += delegate ()
         {
           int startFrame = level.Random.Next(3);
@@ -60,6 +62,7 @@ namespace Owlicity
             sa.ActiveAnimation.AdvanceFrameIndex();
           }
         };
+#endif
         deco.Spatial.Transform.p += layout.Offset;
         deco.AttachTo(_screenGameObject);
 

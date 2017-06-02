@@ -341,6 +341,7 @@ namespace Owlicity
             config.TileCount = 7;
             config.TileDim = new Point(210, 270);
             config.Hotspot = 0.5f * config.TileDim.ToVector2();
+            config.Scale = Global.SlurpScale;
           }
           break;
 

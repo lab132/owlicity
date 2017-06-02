@@ -14,5 +14,7 @@ namespace Owlicity
 
     public static readonly Vector2 OwliverScale = new Vector2(0.5f);
     public static readonly Vector2 BonbonScale = new Vector2(0.6f);
+    public static readonly Vector2 SlurpScale = new Vector2(0.5f);
+
   }
 }

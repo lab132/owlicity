@@ -194,6 +194,95 @@ namespace Owlicity
         break;
 
         case GameObjectType.Slurp:
+        {
+            var bc = new BodyComponent(go)
+            {
+              InitMode = BodyComponentInitMode.Manual,
+              ShapeContentName = "slurp_collision",
+              BodyType = BodyType.Static
+            };
+
+            bc.OnInitialize += delegate ()
+            {
+              SpatialData s = go.GetWorldSpatialData();
+              bc.Body = new Body(
+                world: Global.Game.World,
+                position: s.Transform.p,
+                rotation: s.Transform.q.GetAngle(),
+                bodyType: BodyType.Dynamic,
+                userdata: bc);
+              bc.Body.FixedRotation = true;
+
+              float radius = 80 * Global.SlurpScale.X;
+              float density = 10; // ??
+              FixtureFactory.AttachCircle(
+                radius: radius,
+                density: density,
+                body: bc.Body,
+                offset: new Vector2(0, -25) * Global.SlurpScale,
+                userData: bc);
+              FixtureFactory.AttachCircle(
+                radius: radius,
+                density: density,
+                body: bc.Body,
+                offset: new Vector2(0, 100) * Global.SlurpScale,
+                userData: bc);
+            };
+
+              go.RootComponent = bc;
+
+            var sa = new SpriteAnimationComponent(go)
+            {
+              AnimationTypes = new List<SpriteAnimationType>
+              {
+                SpriteAnimationType.Slurp_Idle,
+              }
+            };
+
+            sa.AttachTo(bc);
+
+            var mc = new MovementComponent(go)
+            {
+              ControlledBodyComponent = bc,
+            };
+
+            var pc = new ParticleEmitterComponent(go)
+            {
+              NumParticles = 10,
+              TextureContentNames = new[]
+              {
+                "confetti/confetti_01",
+                "confetti/confetti_02",
+                "confetti/confetti_03",
+                "confetti/confetti_04",
+                "confetti/confetti_05",
+                "confetti/confetti_06",
+                "confetti/confetti_07",
+              },
+
+              AvailableColors = new[]
+              {
+                  new Color(0x73, 0x4c, 0x87), // purple
+                  new Color(0xa3, 0x3b, 0x41), // red
+                  new Color(0xda, 0x67, 0x77), // red2
+                  new Color(0x41, 0x6d, 0x9c), // blue
+                  new Color(0x7a, 0xaa, 0xdd), // blue2
+                  new Color(0x5f, 0x72, 0x2d), // green
+                  new Color(0x9f, 0xb5, 0x63), // green2
+                  new Color(0xda, 0xa7, 0x44), // yellow
+                  new Color(0xf4, 0xd3, 0x92), // yellow2
+              },
+
+              IsEmittingEnabled =false,
+
+            };
+            pc.AttachTo(bc);
+
+            var ec = new EnemyComponent(type, go);
+           
+
+        }
+        break; 
         throw new NotImplementedException();
 
         case GameObjectType.BackgroundScreen:
