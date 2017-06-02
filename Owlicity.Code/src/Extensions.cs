@@ -70,13 +70,13 @@ namespace Owlicity
 
     public static float NextBilateralFloat(this Random rand)
     {
-      return rand.NextFloat() * 2 - 1;
+      return (rand.NextFloat() * 2.0f) - 1;
     }
 
     public static float NextFloatBetween(this Random rand, float lower, float upper)
     {
       float t = rand.NextFloat();
-      float result = ((1 - t) * lower) + (t * upper);
+      float result = MathHelper.LerpPrecise(lower, upper, t);
       return result;
     }
 

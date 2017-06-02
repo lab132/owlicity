@@ -248,7 +248,7 @@ namespace Owlicity
 
             var pc = new ParticleEmitterComponent(go)
             {
-              NumParticles = 10,
+              NumParticles = 512,
               TextureContentNames = new[]
               {
                 "confetti/confetti_01",
@@ -275,6 +275,12 @@ namespace Owlicity
 
               IsEmittingEnabled =false,
 
+            };
+
+            pc.OnPostInitialize += delegate ()
+            {
+              pc.Emitter.MaxParticleSpread = 0;
+              pc.Emitter.MaxParticleSpeed = 100;
             };
             pc.AttachTo(bc);
 

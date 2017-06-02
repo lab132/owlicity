@@ -15,7 +15,8 @@ namespace Owlicity
     public float MaxTTL { get; set; } = 2.0f;
     public float MaxParticleSpeed { get; set; } = 20.0f;
     public float MaxParticleSpread { get; set; } = 20.0f;
-    public Vector2 Gravity { get; set; } = new Vector2(0.0f, -1.5f);
+    public float MaxAngularVelocity { get; set; } = 10.0f;
+    public Vector2 Gravity { get; set; } = new Vector2(0.0f, 1.5f);
     private Random _random = new Random();
     private Particle[] _particles;
     private Texture2D[] _textures;
@@ -56,11 +57,12 @@ namespace Owlicity
         int idx = _freeParticleSlots.Pop();
         var particle = new Particle
         {
-          Velocity = MaxParticleSpeed * _random.NextBilateralVector2(),
-          Position = position + MaxParticleSpread * _random.NextBilateralVector2(),
+          Velocity = MaxParticleSpeed * _random.NextBilateralVector2().GetClampedTo(1.0f),
+          Position = position + MaxParticleSpread * _random.NextBilateralVector2().GetClampedTo(1.0f),
           Color = _random.Choose(_colors),
           Texture = _random.Choose(_textures),
           TTL = _random.NextFloatBetween(MinTTL, MaxTTL),
+          AngularVelocity = _random.NextFloatBetween(-MaxAngularVelocity, MaxAngularVelocity)
         };
         _particles[idx] = particle;
         numParticles--;
@@ -84,6 +86,7 @@ namespace Owlicity
           {
             _particles[i].Velocity += Gravity * deltaSeconds;
             _particles[i].Position += _particles[i].Velocity * deltaSeconds;
+            _particles[i].Rotation += _particles[i].AngularVelocity * deltaSeconds;
           }
         }
       }
@@ -95,7 +98,7 @@ namespace Owlicity
       {
         if (_particles[i].TTL > 0)
         {
-          spriteBatch.Draw(_particles[i].Texture, _particles[i].Position, _particles[i].Color);
+          spriteBatch.Draw(texture: _particles[i].Texture, position: _particles[i].Position, color: _particles[i].Color, rotation: _particles[i].Rotation, scale: new Vector2(0.5f), effects: SpriteEffects.None, layerDepth: 0.0f);
         }
       }
     }

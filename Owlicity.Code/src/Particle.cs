@@ -11,7 +11,9 @@ namespace Owlicity
   struct Particle
   {
     public Vector2 Position { get; set; }
+    public float Rotation { get; set; }
     public Vector2 Velocity { get; set; }
+    public float AngularVelocity { get; set; }
     public Color Color { get; set; }
     public Texture2D Texture { get; set; }
     public float TTL { get; set; }
