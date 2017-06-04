@@ -56,8 +56,11 @@ namespace Owlicity
             rotation: Spatial.Transform.q.GetAngle(),
             bodyType: BodyType,
             userdata: this);
-          Vertices vertices = Global.Game.Content.Load<Vertices>(ShapeContentName);
-          FixtureFactory.AttachLoopShape(vertices, Body, this);
+          List<Vertices> listOfVertices = Global.Game.Content.Load<List<Vertices>>(ShapeContentName);
+          foreach(Vertices vertices in listOfVertices)
+          {
+            FixtureFactory.AttachLoopShape(vertices, Body, this);
+          }
         }
         break;
       }

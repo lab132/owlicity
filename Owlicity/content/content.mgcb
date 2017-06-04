@@ -99,8 +99,15 @@
 /build:dummy_level_4.png
 
 #begin slurp_collision.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=False
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=1.5
 /build:slurp_collision.png
 
 #begin particle.png
@@ -185,283 +192,479 @@
 /build:orange_spritesheet.png
 
 #begin level01/layout/layout_00.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_00.png
 
 #begin level01/layout/layout_01.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_01.png
 
 #begin level01/layout/layout_02.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_02.png
 
 #begin level01/layout/layout_03.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_03.png
 
 #begin level01/layout/layout_10.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_10.png
 
 #begin level01/layout/layout_11.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_11.png
 
 #begin level01/layout/layout_12.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_12.png
 
 #begin level01/layout/layout_13.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_13.png
 
 #begin level01/layout/layout_20.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_20.png
 
 #begin level01/layout/layout_21.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_21.png
 
 #begin level01/layout/layout_22.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_22.png
 
 #begin level01/layout/layout_23.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_23.png
 
 #begin level01/layout/layout_30.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_30.png
 
 #begin level01/layout/layout_31.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_31.png
 
 #begin level01/layout/layout_32.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_32.png
 
 #begin level01/layout/layout_33.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_33.png
 
 #begin level01/layout/layout_40.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_40.png
 
 #begin level01/layout/layout_41.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_41.png
 
 #begin level01/layout/layout_42.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_42.png
 
 #begin level01/layout/layout_43.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_43.png
 
 #begin level01/layout/layout_50.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_50.png
 
 #begin level01/layout/layout_51.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_51.png
 
 #begin level01/layout/layout_52.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_52.png
 
 #begin level01/layout/layout_53.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_53.png
 
 #begin level01/layout/layout_60.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_60.png
 
 #begin level01/layout/layout_61.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_61.png
 
 #begin level01/layout/layout_62.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_62.png
 
 #begin level01/layout/layout_63.png
-/importer:OwlicityLevelLayoutImporter
+/importer:TextureImporter
 /processor:OwlicityLayoutProcessor
 /build:level01/layout/layout_63.png
 
 #begin level01/static_collision/static_collision_00.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_00.png
 
 #begin level01/static_collision/static_collision_01.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_01.png
 
 #begin level01/static_collision/static_collision_02.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_02.png
 
 #begin level01/static_collision/static_collision_03.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_03.png
 
 #begin level01/static_collision/static_collision_10.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_10.png
 
 #begin level01/static_collision/static_collision_11.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_11.png
 
 #begin level01/static_collision/static_collision_12.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_12.png
 
 #begin level01/static_collision/static_collision_13.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_13.png
 
 #begin level01/static_collision/static_collision_20.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_20.png
 
 #begin level01/static_collision/static_collision_21.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_21.png
 
 #begin level01/static_collision/static_collision_22.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_22.png
 
 #begin level01/static_collision/static_collision_23.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_23.png
 
 #begin level01/static_collision/static_collision_30.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_30.png
 
 #begin level01/static_collision/static_collision_31.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_31.png
 
 #begin level01/static_collision/static_collision_32.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_32.png
 
 #begin level01/static_collision/static_collision_33.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_33.png
 
 #begin level01/static_collision/static_collision_40.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_40.png
 
 #begin level01/static_collision/static_collision_41.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_41.png
 
 #begin level01/static_collision/static_collision_42.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_42.png
 
 #begin level01/static_collision/static_collision_43.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_43.png
 
 #begin level01/static_collision/static_collision_50.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_50.png
 
 #begin level01/static_collision/static_collision_51.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_51.png
 
 #begin level01/static_collision/static_collision_52.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_52.png
 
 #begin level01/static_collision/static_collision_53.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_53.png
 
 #begin level01/static_collision/static_collision_60.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_60.png
 
 #begin level01/static_collision/static_collision_61.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_61.png
 
 #begin level01/static_collision/static_collision_62.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_62.png
 
 #begin level01/static_collision/static_collision_63.png
-/importer:OwlicityCollisionImporter
+/importer:TextureImporter
 /processor:OwlicityCollisionProcessor
+/processorParam:PolygonDetectionType=Integrated
+/processorParam:HoleDetection=False
+/processorParam:MultipartDetection=True
+/processorParam:PixelOffsetOptimization=False
+/processorParam:UniformScale=1
+/processorParam:AlphaTolerance=20
+/processorParam:HullTolerance=4
 /build:level01/static_collision/static_collision_63.png
 
 #begin level01/level1_ground_00.png

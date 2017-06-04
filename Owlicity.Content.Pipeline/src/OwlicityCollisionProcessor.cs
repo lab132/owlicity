@@ -1,8 +1,13 @@
-﻿using Microsoft.Xna.Framework;
+﻿
+#define DIAGNOSTICS
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using VelcroPhysics.Shared;
 using VelcroPhysics.Tools.TextureTools;
 
@@ -17,20 +22,53 @@ namespace Owlicity.Content.Pipeline
   /// This should be part of a Content Pipeline Extension Library project.
   /// </summary>
   [ContentProcessor(DisplayName = "Collision Processor - Owlicity")]
-  public class OwlicityCollisionProcessor : ContentProcessor<CollisionTexture, Vertices>
+  public class OwlicityCollisionProcessor : ContentProcessor<TextureContent, List<Vertices>>
   {
-    public override Vertices Process(CollisionTexture input, ContentProcessorContext context)
+    public VerticesDetectionType PolygonDetectionType { get; set; }
+    public bool HoleDetection { get; set; }
+    public bool MultipartDetection { get; set; }
+    public bool PixelOffsetOptimization { get; set; }
+    public float UniformScale { get; set; } = 1.0f;
+    public int AlphaTolerance { get; set; } = 20;
+    public float HullTolerance { get; set; } = 1.5f;
+
+    public override List<Vertices> Process(TextureContent input, ContentProcessorContext context)
     {
-      Debug.Assert(input.Bytes.Length % 4 == 0);
-      uint[] data = new uint[input.Bytes.Length / 4];
-      for (int dataIndex = 0; dataIndex < data.Length; dataIndex++)
+      BitmapContent bitmap = input.Faces[0][0];
+      byte[] bytes = bitmap.GetPixelData();
+      Debug.Assert(bytes.Length % 4 == 0);
+
+      // Note(manu): If this were C/C++, we could simply reinterpret the byte-array as a uint-array...
+      uint[] data = new uint[bytes.Length / 4];
+      for(int dataIndex = 0; dataIndex < data.Length; dataIndex++)
       {
         int byteIndex = dataIndex * 4;
-        uint value = BitConverter.ToUInt32(input.Bytes, byteIndex);
-        data[dataIndex] = value;
+        data[dataIndex] = BitConverter.ToUInt32(bytes, byteIndex);
       }
-      Vertices vertices = TextureConverter.DetectVertices(data, input.TextureWidth);
+
+      DateTime vertStart = DateTime.Now;
+      TextureConverter textureConverter = new TextureConverter(data, bitmap.Width)
+      {
+        PolygonDetectionType = PolygonDetectionType,
+        HoleDetection = HoleDetection,
+        MultipartDetection = MultipartDetection,
+        PixelOffsetOptimization = PixelOffsetOptimization,
+        Transform = Matrix.CreateScale(UniformScale), // TODO(manu): Use z=1 instead?
+        AlphaTolerance = (byte)AlphaTolerance,
+        HullTolerance = HullTolerance,
+      };
+      List<Vertices> vertices = textureConverter.DetectVertices();
+      TimeSpan vertDuration = DateTime.Now - vertStart;
+      Diagnostic(context.Logger, $"Parsing vertices took {vertDuration.TotalSeconds.ToString("0.000")} seconds (VelcroPhysics).");
+
       return vertices;
+    }
+
+    void Diagnostic(ContentBuildLogger logger, string message)
+    {
+#if DIAGNOSTICS
+      logger.LogMessage(message);
+#endif
     }
   }
 }
