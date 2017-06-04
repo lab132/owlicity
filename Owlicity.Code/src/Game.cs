@@ -47,6 +47,8 @@ namespace Owlicity
     private GamePadState[] _prevGamepad = new GamePadState[3];
     private MouseState _prevMouse;
 
+    public float SpeedMultiplier = 1.0f;
+
     public void Update(float deltaSeconds,
       out GameInput characterInput, out GameInput companionInput, out GameInput debugInput)
     {
@@ -131,7 +133,8 @@ namespace Owlicity
         debugInput = new GameInput();
 
         // Mouse
-        Vector2 mouseMovement = timelessMouseDelta;
+        Vector2 mouseMovement = Vector2.Zero;
+        //mouseMovement = timelessMouseDelta;
 
         // Keyboard
         Vector2 keyboardMovement = new Vector2();
@@ -152,6 +155,21 @@ namespace Owlicity
         // Finalize
         debugInput.MovementVector = (keyboardMovement + gamepadMovement).GetClampedTo(1.0f) + mouseMovement;
       }
+
+      //
+      // General input
+      //
+      float speedMultiplierDelta = 0.0f;
+      if(newKeyboard.IsKeyDown(Keys.D1) && _prevKeyboard.IsKeyUp(Keys.D1)) speedMultiplierDelta -= 0.5f;
+      if(newKeyboard.IsKeyDown(Keys.D2) && _prevKeyboard.IsKeyUp(Keys.D2)) speedMultiplierDelta += 0.5f;
+
+      if(newKeyboard.IsKeyDown(Keys.D3) && _prevKeyboard.IsKeyUp(Keys.D3))
+      {
+        speedMultiplierDelta = 0.0f;
+        SpeedMultiplier = 1.0f;
+      }
+
+      SpeedMultiplier = MathHelper.Clamp(SpeedMultiplier + speedMultiplierDelta, 0.1f, 10.0f);
 
       _prevKeyboard = newKeyboard;
       _prevGamepad = newGamepad;
@@ -391,6 +409,10 @@ namespace Owlicity
         out GameInput owliverInput,
         out GameInput companionInput,
         out GameInput debugInput);
+
+#if DEBUG
+      deltaSeconds *= Input.SpeedMultiplier;
+#endif
 
       if(owliverInput.WantsPause)
       {
