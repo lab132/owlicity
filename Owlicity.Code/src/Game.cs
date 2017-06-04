@@ -33,39 +33,76 @@ namespace Owlicity
 
   public struct GameInput
   {
-    // Has a length of <= 1.0f
-    public Vector2 MovementVector;
-
     public bool WantsInteraction;
     public bool WantsAttack;
     public bool WantsPause;
+
+    public void Reset()
+    {
+      this = new GameInput();
+    }
+  }
+  
+  public struct DebugInput
+  {
+    public float SpeedMultiplier;
+    public bool TogglePhysicsDebugView;
+
+    public void Reset()
+    {
+      TogglePhysicsDebugView = false;
+    }
+  }
+
+  public struct PlatformInput
+  {
+    public bool WantsExit;
+
+    public void Reset()
+    {
+      this = new PlatformInput();
+    }
   }
 
   public class InputHandler
   {
+    public const int NUM_SUPPORTED_GAMEPADS = 2;
+
     private KeyboardState _prevKeyboard;
-    private GamePadState[] _prevGamepad = new GamePadState[3];
     private MouseState _prevMouse;
+    private GamePadState[] _prevGamepad = new GamePadState[NUM_SUPPORTED_GAMEPADS];
 
-    public float SpeedMultiplier = 1.0f;
+    public Vector2 MouseSensitivity = Vector2.One;
+    public Vector2[] LeftThumbstickSensitivity = Enumerable.Repeat(new Vector2(1, -1), NUM_SUPPORTED_GAMEPADS).ToArray();
+    public Vector2[] RightThumbstickSensitivity = Enumerable.Repeat(new Vector2(1, -1), NUM_SUPPORTED_GAMEPADS).ToArray();
 
-    public void Update(float deltaSeconds,
-      out GameInput characterInput, out GameInput companionInput, out GameInput debugInput)
+    public GameInput CharacterInput;
+    public Vector2 CharacterMovement;
+
+    public GameInput CompanionInput;
+    public Vector2 CompanionMovement;
+
+    public PlatformInput PlatformInput;
+
+    public DebugInput DebugInput = new DebugInput { SpeedMultiplier = 1.0f };
+    public Vector2 DebugMovement;
+
+
+    public void Update(float deltaSeconds)
     {
       KeyboardState newKeyboard = Keyboard.GetState();
-      GamePadState[] newGamepad = new[]
-      {
-        GamePad.GetState(0),
-        GamePad.GetState(1),
-        GamePad.GetState(2),
-      };
       MouseState newMouse = Mouse.GetState();
+      GamePadState[] newGamepad = new GamePadState[NUM_SUPPORTED_GAMEPADS];
+      for(int gamepadIndex = 0; gamepadIndex < NUM_SUPPORTED_GAMEPADS; gamepadIndex++)
+      {
+        newGamepad[gamepadIndex] = GamePad.GetState(gamepadIndex);
+      }
 
       Vector2 mouseDelta = Vector2.Zero;
       Vector2 timelessMouseDelta = Vector2.Zero;
       if(deltaSeconds > 0)
       {
-        mouseDelta = (newMouse.Position - _prevMouse.Position).ToVector2();
+        mouseDelta = (newMouse.Position - _prevMouse.Position).ToVector2() * MouseSensitivity;
         timelessMouseDelta = mouseDelta / deltaSeconds;
       }
 
@@ -73,7 +110,9 @@ namespace Owlicity
       // Character input
       //
       {
-        characterInput = new GameInput();
+        // Reset
+        CharacterInput.Reset();
+        CharacterMovement = Vector2.Zero;
 
         // Mouse
         Vector2 mouseMovement = Vector2.Zero;
@@ -84,28 +123,27 @@ namespace Owlicity
         if(newKeyboard.IsKeyDown(Keys.Right)) keyboardMovement.X += 1.0f;
         if(newKeyboard.IsKeyDown(Keys.Up)) keyboardMovement.Y -= 1.0f;
         if(newKeyboard.IsKeyDown(Keys.Down)) keyboardMovement.Y += 1.0f;
-        if(newKeyboard.IsKeyDown(Keys.Space) && _prevKeyboard.IsKeyUp(Keys.Space)) characterInput.WantsAttack = true;
-        if(newKeyboard.IsKeyDown(Keys.Enter) && _prevKeyboard.IsKeyUp(Keys.Enter)) characterInput.WantsInteraction = true;
-        if(newKeyboard.IsKeyDown(Keys.Escape) && _prevKeyboard.IsKeyUp(Keys.Escape)) characterInput.WantsPause = true;
+        if(newKeyboard.WasKeyPressed(Keys.Space, ref _prevKeyboard)) CharacterInput.WantsAttack = true;
+        if(newKeyboard.WasKeyPressed(Keys.Enter, ref _prevKeyboard)) CharacterInput.WantsInteraction = true;
+        if(newKeyboard.WasKeyPressed(Keys.Escape, ref _prevKeyboard)) CharacterInput.WantsPause = true;
 
         // Gamepad
-        if(newGamepad[0].IsButtonDown(Buttons.Y) && _prevGamepad[0].IsButtonUp(Buttons.Y)) characterInput.WantsAttack = true;
-        if(newGamepad[0].IsButtonDown(Buttons.A) && _prevGamepad[0].IsButtonUp(Buttons.A)) characterInput.WantsInteraction = true;
-        if(newGamepad[0].IsButtonDown(Buttons.Start) && _prevGamepad[0].IsButtonUp(Buttons.Start)) characterInput.WantsInteraction = true;
-
-        Vector2 gamepadMovement = new Vector2(
-          newGamepad[0].ThumbSticks.Left.X,
-          -newGamepad[0].ThumbSticks.Left.Y);
+        const int padIndex = 0;
+        Vector2 gamepadMovement = newGamepad[padIndex].ThumbSticks.Left * LeftThumbstickSensitivity[padIndex];
+        if(newGamepad[padIndex].WasButtonPressed(Buttons.Y, ref _prevGamepad[padIndex])) CharacterInput.WantsAttack = true;
+        if(newGamepad[padIndex].WasButtonPressed(Buttons.A, ref _prevGamepad[padIndex])) CharacterInput.WantsInteraction = true;
+        if(newGamepad[padIndex].WasButtonPressed(Buttons.Start, ref _prevGamepad[padIndex])) CharacterInput.WantsInteraction = true;
 
         // Finalize
-        characterInput.MovementVector = (keyboardMovement + gamepadMovement).GetClampedTo(1.0f) + mouseMovement;
+        CharacterMovement = (keyboardMovement + gamepadMovement).GetClampedTo(1.0f) + mouseMovement;
       }
 
       //
       // Companion input
       //
       {
-        companionInput = new GameInput();
+        CompanionInput.Reset();
+        CompanionMovement = Vector2.Zero;
 
         // Mouse
         Vector2 mouseMovement = Vector2.Zero;
@@ -114,23 +152,22 @@ namespace Owlicity
         Vector2 keyboardMovement = new Vector2();
 
         // Gamepad
-        if(newGamepad[1].IsButtonDown(Buttons.Y) && _prevGamepad[1].IsButtonUp(Buttons.Y)) companionInput.WantsAttack = true;
-        if(newGamepad[1].IsButtonDown(Buttons.A) && _prevGamepad[1].IsButtonUp(Buttons.A)) companionInput.WantsInteraction = true;
-        if(newGamepad[1].IsButtonDown(Buttons.Start) && _prevGamepad[1].IsButtonUp(Buttons.Start)) companionInput.WantsInteraction = true;
-
-        Vector2 gamepadMovement = new Vector2(
-          newGamepad[1].ThumbSticks.Left.X,
-          -newGamepad[1].ThumbSticks.Left.Y);
+        const int padIndex = 1;
+        Vector2 gamepadMovement = newGamepad[padIndex].ThumbSticks.Left * LeftThumbstickSensitivity[padIndex];
+        if(newGamepad[padIndex].IsButtonDown(Buttons.Y) && _prevGamepad[padIndex].IsButtonUp(Buttons.Y)) CompanionInput.WantsAttack = true;
+        if(newGamepad[padIndex].IsButtonDown(Buttons.A) && _prevGamepad[padIndex].IsButtonUp(Buttons.A)) CompanionInput.WantsInteraction = true;
+        if(newGamepad[padIndex].IsButtonDown(Buttons.Start) && _prevGamepad[padIndex].IsButtonUp(Buttons.Start)) CompanionInput.WantsInteraction = true;
 
         // Finalize
-        companionInput.MovementVector = (keyboardMovement + gamepadMovement).GetClampedTo(1.0f) + mouseMovement;
+        CompanionMovement = (keyboardMovement + gamepadMovement).GetClampedTo(1.0f) + mouseMovement;
       }
 
       //
       // Debug input
       //
       {
-        debugInput = new GameInput();
+        DebugInput.Reset();
+        DebugMovement = Vector2.Zero;
 
         // Mouse
         Vector2 mouseMovement = Vector2.Zero;
@@ -143,33 +180,40 @@ namespace Owlicity
         if(newKeyboard.IsKeyDown(Keys.W)) keyboardMovement.Y -= 1.0f;
         if(newKeyboard.IsKeyDown(Keys.S)) keyboardMovement.Y += 1.0f;
 
-        // Gamepad
-        if(newGamepad[2].IsButtonDown(Buttons.Y) && _prevGamepad[2].IsButtonUp(Buttons.Y)) debugInput.WantsAttack = true;
-        if(newGamepad[2].IsButtonDown(Buttons.A) && _prevGamepad[2].IsButtonUp(Buttons.A)) debugInput.WantsInteraction = true;
-        if(newGamepad[2].IsButtonDown(Buttons.Start) && _prevGamepad[2].IsButtonUp(Buttons.Start)) debugInput.WantsInteraction = true;
+        float speedMultiplierDelta = 0.0f;
+        if(newKeyboard.WasKeyPressed(Keys.D1, ref _prevKeyboard)) speedMultiplierDelta -= 0.5f;
+        if(newKeyboard.WasKeyPressed(Keys.D2, ref _prevKeyboard)) speedMultiplierDelta += 0.5f;
+        if(newKeyboard.WasKeyPressed(Keys.D3, ref _prevKeyboard))
+        {
+          speedMultiplierDelta = 0.0f;
+          DebugInput.SpeedMultiplier = 1.0f;
+        }
+        else
+        {
+          DebugInput.SpeedMultiplier = MathHelper.Clamp(DebugInput.SpeedMultiplier + speedMultiplierDelta, 0.1f, 10.0f);
+        }
 
-        Vector2 gamepadMovement = new Vector2(
-          newGamepad[0].ThumbSticks.Right.X,
-          -newGamepad[0].ThumbSticks.Right.Y);
+
+        // Gamepad
+        const int padIndex = 0;
+        Vector2 gamepadMovement = newGamepad[padIndex].ThumbSticks.Right * RightThumbstickSensitivity[padIndex];
 
         // Finalize
-        debugInput.MovementVector = (keyboardMovement + gamepadMovement).GetClampedTo(1.0f) + mouseMovement;
+        DebugMovement = (keyboardMovement + gamepadMovement).GetClampedTo(1.0f) + mouseMovement;
       }
 
       //
-      // General input
+      // Platform input
       //
-      float speedMultiplierDelta = 0.0f;
-      if(newKeyboard.IsKeyDown(Keys.D1) && _prevKeyboard.IsKeyUp(Keys.D1)) speedMultiplierDelta -= 0.5f;
-      if(newKeyboard.IsKeyDown(Keys.D2) && _prevKeyboard.IsKeyUp(Keys.D2)) speedMultiplierDelta += 0.5f;
+      PlatformInput.Reset();
 
-      if(newKeyboard.IsKeyDown(Keys.D3) && _prevKeyboard.IsKeyUp(Keys.D3))
+      if(newKeyboard.WasKeyPressed(Keys.Escape, ref _prevKeyboard)) PlatformInput.WantsExit = true;
+      if((newKeyboard.IsKeyDown(Keys.LeftAlt) || newKeyboard.IsKeyDown(Keys.RightAlt)) &&
+        newKeyboard.WasKeyPressed(Keys.F4, ref _prevKeyboard))
       {
-        speedMultiplierDelta = 0.0f;
-        SpeedMultiplier = 1.0f;
+        PlatformInput.WantsExit = true;
       }
 
-      SpeedMultiplier = MathHelper.Clamp(SpeedMultiplier + speedMultiplierDelta, 0.1f, 10.0f);
 
       _prevKeyboard = newKeyboard;
       _prevGamepad = newGamepad;
@@ -405,26 +449,29 @@ namespace Owlicity
     {
       float deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-      Input.Update(deltaSeconds,
-        out GameInput owliverInput,
-        out GameInput companionInput,
-        out GameInput debugInput);
+      Input.Update(deltaSeconds);
 
-#if DEBUG
-      deltaSeconds *= Input.SpeedMultiplier;
-#endif
-
-      if(owliverInput.WantsPause)
+      if(Input.PlatformInput.WantsExit)
       {
         Exit();
       }
 
-      Global.Owliver.GetComponent<OwliverComponent>().Input = owliverInput;
+#if DEBUG
+      deltaSeconds *= Input.DebugInput.SpeedMultiplier;
+#endif
 
-      // TODO(manu): Make use of `compationInput`!
+      OwliverComponent oc = Global.Owliver.GetComponent<OwliverComponent>();
+      oc.MovementVector = Input.CharacterMovement;
+      oc.Input = Input.CharacterInput;
+
+      // TODO(manu): Make use of `Input.CompationInput`!
 
 #if DEBUG
-      ActiveCamera.GetComponent<MovementComponent>().Input = debugInput;
+      {
+        var mv = ActiveCamera.GetComponent<MovementComponent>();
+        //mv.Input = Input.DebugInput;
+        mv.MovementVector = Input.DebugMovement;
+      }
 #endif
 
       // Add pending game objects.
@@ -460,10 +507,11 @@ namespace Owlicity
 
       // Remove pending game objects.
       GameObjects.RemoveAll(go => GameObjectsPendingRemove.Contains(go));
-      foreach(GameObject go in GameObjectsPendingRemove)
-      {
-        go.Deinitialize();
-      }
+      // TODO(manu): Deinitialize game object?
+      //foreach(GameObject go in GameObjectsPendingRemove)
+      //{
+      //  go.Deinitialize();
+      //}
       GameObjectsPendingRemove.Clear();
 
       base.Update(gameTime);

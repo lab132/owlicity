@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Primitives2D;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Owlicity
 {
@@ -112,6 +113,46 @@ namespace Owlicity
       Debug.Assert(choices.Length > 0);
       var idx = rand.Next(choices.Length);
       return choices[idx];
+    }
+  }
+
+  public static class InputStateExtensions
+  {
+    //
+    // Keyboard
+    //
+
+    // Whether the given key is now down but was previously up.
+    public static bool WasKeyPressed(this KeyboardState self, Keys key, ref KeyboardState prevState)
+    {
+      bool result = self.IsKeyDown(key) && prevState.IsKeyUp(key);
+      return result;
+    }
+
+    // Whether the given key is now up but was previously down.
+    public static bool WasKeyReleased(this KeyboardState self, Keys key, ref KeyboardState prevState)
+    {
+      bool result = self.IsKeyUp(key) && prevState.IsKeyDown(key);
+      return result;
+    }
+
+
+    //
+    // GamePad
+    //
+
+    // Whether the given button is now down but was previously up.
+    public static bool WasButtonPressed(this GamePadState self, Buttons button, ref GamePadState prevState)
+    {
+      bool result = self.IsButtonDown(button) && prevState.IsButtonUp(button);
+      return result;
+    }
+
+    // Whether the given button is now up but was previously down.
+    public static bool WasButtonReleased(this GamePadState self, Buttons button, ref GamePadState prevState)
+    {
+      bool result = self.IsButtonUp(button) && prevState.IsButtonDown(button);
+      return result;
     }
   }
 }

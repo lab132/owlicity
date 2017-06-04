@@ -1,4 +1,4 @@
-﻿// #define CAMERA_BODY
+﻿// #define CAMERA_HAS_BODY
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -62,18 +62,15 @@ namespace Owlicity
       ComponentBase[] toInit = Components.Where(c => c.IsInitializationEnabled).ToArray();
       foreach(ComponentBase component in toInit)
       {
+        component.BeforeInitialize?.Invoke();
         component.Initialize();
       }
 
       foreach(ComponentBase component in toInit)
       {
+        component.BeforePostInitialize?.Invoke();
         component.PostInitialize();
       }
-    }
-
-    public void Deinitialize()
-    {
-      // TODO(manu): Do we need this?
     }
 
     public void PrePhysicsUpdate(float deltaSeconds)
@@ -158,7 +155,7 @@ namespace Owlicity
           {
           };
 
-#if CAMERA_BODY
+#if CAMERA_HAS_BODY
           var bc = new BodyComponent(go)
           {
             InitMode = BodyComponentInitMode.Manual,
@@ -181,7 +178,6 @@ namespace Owlicity
           };
           go.RootComponent = bc;
 
-          cc.CameraBodyComponent = bc;
           cc.AttachTo(bc);
 #else
           cc.AttachTo(go);
@@ -190,9 +186,6 @@ namespace Owlicity
           var mc = new MovementComponent(go)
           {
           };
-#if CAMERA_BODY
-          mc.ControlledBodyComponent = bc;
-#endif
         }
         break;
 
@@ -202,7 +195,7 @@ namespace Owlicity
           {
             InitMode = BodyComponentInitMode.Manual,
           };
-          bc.OnInitialize += () =>
+          bc.BeforeInitialize += () =>
           {
             SpatialData s = go.GetWorldSpatialData();
             bc.Body = new Body(
@@ -236,7 +229,6 @@ namespace Owlicity
           var oc = new OwliverComponent(go)
           {
           };
-          oc.ControlledBodyComponent = bc;
 
           var sa = new SpriteAnimationComponent(go)
           {
@@ -258,11 +250,9 @@ namespace Owlicity
           var bc = new BodyComponent(go)
           {
             InitMode = BodyComponentInitMode.Manual,
-            ShapeContentName = "slurp_collision",
-            BodyType = BodyType.Static
           };
 
-          bc.OnInitialize += delegate ()
+          bc.BeforeInitialize += () =>
           {
             SpatialData s = go.GetWorldSpatialData();
             bc.Body = new Body(
@@ -275,7 +265,7 @@ namespace Owlicity
 
             float radius = 80 * Global.SlurpScale.X;
             float density = 10; // ??
-              FixtureFactory.AttachCircle(
+            FixtureFactory.AttachCircle(
               radius: radius,
               density: density,
               body: bc.Body,
@@ -285,7 +275,7 @@ namespace Owlicity
               radius: radius,
               density: density,
               body: bc.Body,
-              offset: new Vector2(0, 100) * Global.SlurpScale,
+              offset: new Vector2(0, 25) * Global.SlurpScale,
               userData: bc);
           };
 
@@ -302,7 +292,6 @@ namespace Owlicity
 
           var mc = new MovementComponent(go)
           {
-            ControlledBodyComponent = bc,
           };
 
           var pc = new ParticleEmitterComponent(go)
@@ -335,7 +324,7 @@ namespace Owlicity
             IsEmittingEnabled = false,
           };
 
-          pc.OnPostInitialize += delegate ()
+          pc.BeforePostInitialize += delegate ()
           {
             pc.Emitter.MaxParticleSpread = 0;
             pc.Emitter.MaxParticleSpeed = 100;
@@ -360,7 +349,7 @@ namespace Owlicity
             InitMode = BodyComponentInitMode.FromContent,
             BodyType = BodyType.Static,
           };
-          bc.OnPostInitialize += () =>
+          bc.BeforePostInitialize += () =>
           {
             bc.Body.CollisionCategories = Global.LevelCollisionCategory;
           };
@@ -402,7 +391,7 @@ namespace Owlicity
           {
             AnimationTypes = animTypes,
           };
-          sa.OnPostInitialize += () =>
+          sa.BeforePostInitialize += () =>
           {
             sa.RenderDepth = Global.Game.CalcDepth(sa.GetWorldSpatialData(), go.Layer);
           };

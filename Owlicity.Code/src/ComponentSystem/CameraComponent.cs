@@ -38,6 +38,8 @@ namespace Owlicity
       base.Initialize();
 
       Camera.ProjectionMatrix = Matrix.CreateOrthographicOffCenter(0, Bounds.X, Bounds.Y, 0, -1, 1);
+
+      CameraBodyComponent = Owner.GetComponent<BodyComponent>();
     }
 
     public override void PrePhysicsUpdate(float deltaSeconds)

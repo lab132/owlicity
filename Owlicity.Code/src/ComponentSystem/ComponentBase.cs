@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,14 +11,15 @@ namespace Owlicity
   public abstract class ComponentBase
   {
     public GameObject Owner;
+
     public bool IsInitializationEnabled = true;
     public bool IsPrePhysicsUpdateEnabled = true;
     public bool IsUpdateEnabled = true;
     public bool IsDrawingEnabled = true;
     public bool IsDebugDrawingEnabled = true;
 
-    public Action OnInitialize;
-    public Action OnPostInitialize;
+    public Action BeforeInitialize;
+    public Action BeforePostInitialize;
 
     public ComponentBase(GameObject owner)
     {
@@ -25,17 +27,8 @@ namespace Owlicity
       Owner.AddComponent(this);
     }
 
-    public virtual void Initialize()
-    {
-      OnInitialize?.Invoke();
-    }
-
-    public virtual void PostInitialize()
-    {
-      IsInitializationEnabled = false;
-      OnPostInitialize?.Invoke();
-    }
-
+    public virtual void Initialize() { }
+    public virtual void PostInitialize() { } // TODO(manu): Maybe rename. BeginPlay?
     public virtual void PrePhysicsUpdate(float deltaSeconds) { }
     public virtual void Update(float deltaSeconds) { }
     public virtual void Draw(float deltaSeconds, SpriteBatch batch) { }

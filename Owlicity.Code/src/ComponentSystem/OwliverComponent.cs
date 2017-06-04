@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,22 +13,35 @@ namespace Owlicity
     private float _oldX;
     private bool _isMoving;
 
-    private SpriteAnimationComponent _animationComponent;
+    public SpriteAnimationComponent AnimationComponent { get; set; }
+
+    public GameInput Input;
 
     public OwliverComponent(GameObject owner) : base(owner)
     {
     }
 
+    public GameInput ConsumeInput()
+    {
+      GameInput result = Input;
+      Input.Reset();
+      return result;
+    }
+
     public override void Initialize()
     {
       base.Initialize();
-      _animationComponent = Owner.Components.OfType<SpriteAnimationComponent>().First();
+
+      if(AnimationComponent == null)
+      {
+        AnimationComponent = Owner.GetComponent<SpriteAnimationComponent>();
+        Debug.Assert(AnimationComponent != null, "Owliver has no animation component!");
+      }
     }
 
     public override void PrePhysicsUpdate(float deltaSeconds)
     {
-      // Note(manu): Don't call the parent's version because we do it outselves.
-      //base.PrePhysicsUpdate(deltaSeconds);
+      base.PrePhysicsUpdate(deltaSeconds);
 
       float x = ControlledBody.LinearVelocity.X;
       if(Math.Abs(x) > float.Epsilon)
@@ -36,7 +50,6 @@ namespace Owlicity
       }
 
       GameInput input = ConsumeInput();
-      PerformMovement(input.MovementVector, deltaSeconds);
 
       if(input.WantsAttack)
       {
@@ -84,7 +97,7 @@ namespace Owlicity
 
       if(newAnimationType != SpriteAnimationType.Unknown)
       {
-        _animationComponent.ChangeActiveAnimation(newAnimationType);
+        AnimationComponent.ChangeActiveAnimation(newAnimationType);
       }
     }
   }

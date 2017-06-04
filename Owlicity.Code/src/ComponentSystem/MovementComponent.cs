@@ -26,25 +26,36 @@ namespace Owlicity
       get => ControlledBodyComponent?.Body;
     }
 
-    public GameInput Input;
+    // Set this from the outside to make this component perform some movement.
+    public Vector2 MovementVector;
 
     public MovementComponent(GameObject owner) : base(owner)
     {
     }
 
-    public GameInput ConsumeInput()
+    public Vector2 ConsumeMovementVector()
     {
-      GameInput result = Input;
-      Input = new GameInput();
+      Vector2 result = MovementVector;
+      MovementVector = Vector2.Zero;
       return result;
+    }
+
+    public override void Initialize()
+    {
+      base.Initialize();
+
+      if(ControlledBodyComponent == null)
+      {
+        ControlledBodyComponent = Owner.GetComponent<BodyComponent>();
+      }
     }
 
     public override void PrePhysicsUpdate(float deltaSeconds)
     {
       base.PrePhysicsUpdate(deltaSeconds);
 
-      GameInput input = ConsumeInput();
-      PerformMovement(input.MovementVector, deltaSeconds);
+      Vector2 movementVector = ConsumeMovementVector();
+      PerformMovement(movementVector, deltaSeconds);
     }
 
     public void PerformMovement(Vector2 movementVector, float deltaSeconds)

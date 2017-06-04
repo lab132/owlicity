@@ -16,45 +16,45 @@ namespace Owlicity
     {
     }
 
-    public override void Initialize()
+    public override void PostInitialize()
     {
-      base.Initialize();
+      base.PostInitialize();
 
       var bc = Owner.GetComponent<BodyComponent>();
       var pec = Owner.GetComponent<ParticleEmitterComponent>();
 
       var owliverBC = Global.Owliver.GetComponent<BodyComponent>();
-      bc.OnPostInitialize += delegate ()
+      bc.Body.OnCollision += delegate (Fixture fixtureA, Fixture fixtureB, Contact contact)
       {
-        bc.Body.OnCollision += delegate (Fixture fixtureA, Fixture fixtureB, Contact contact)
+        if(fixtureA.UserData == owliverBC || fixtureB.UserData == owliverBC)
         {
-          if (fixtureA.UserData == owliverBC || fixtureB.UserData == owliverBC)
-          {
-            pec.Emit(fixtureB.Body.Position + contact.Manifold.LocalPoint);
-          }
-        };
+          pec.Emit(fixtureB.Body.Position + contact.Manifold.LocalPoint);
+        }
       };
-      
     }
+
     public override void Update(float deltaSeconds)
     {
       switch(EnemyType)
       {
         case GameObjectType.Slurp:
         {
-            float movementSpeed = 0.1f;
-            base.Update(deltaSeconds);
-            var mov = Owner.Components.OfType<MovementComponent>().Single();
+          base.Update(deltaSeconds);
+          var mov = Owner.GetComponent<MovementComponent>();
 
-            var owliverPosition = Global.Owliver.GetWorldSpatialData().Transform.p;
-            var enemyPos = Owner.GetWorldSpatialData().Transform.p;
+          var owliverPosition = Global.Owliver.GetWorldSpatialData().Transform.p;
+          var enemyPos = Owner.GetWorldSpatialData().Transform.p;
 
-            var movementVec = (owliverPosition - enemyPos).GetNormalized() * movementSpeed;
-            mov.Input.MovementVector += movementVec;
-          }
-          break;
+          const float movementSpeed = 0.1f;
+          var movementVector = (owliverPosition - enemyPos).GetNormalized() * movementSpeed;
+          mov.MovementVector += movementVector;
+        }
+        break;
+
         default:
+        {
           throw new NotImplementedException();
+        }
       }
 
     }
