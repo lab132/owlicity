@@ -344,7 +344,7 @@ namespace Owlicity
             config.TileSheetName = "owliver_idle_front_left_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(121, 90);
+            config.Hotspot = new Vector2(133, 90);
           }
           break;
 
@@ -362,7 +362,7 @@ namespace Owlicity
             config.TileSheetName = "owliver_walk_front_left_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(121, 90);
+            config.Hotspot = new Vector2(133, 90);
           }
           break;
 
@@ -370,7 +370,7 @@ namespace Owlicity
           {
             config.TileSheetName = "owliver_attack_spritesheet";
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(121, 90);
+            config.Hotspot = new Vector2(164, 90);
             config.TileCount = 5;
             config.PingPong = false;
             config.NumLoopsToPlay = 1;
@@ -382,7 +382,7 @@ namespace Owlicity
             config.TileSheetName = "owliver_attack_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(121, 90);
+            config.Hotspot = new Vector2(90, 90);
             config.TileCount = 5;
             config.PingPong = false;
             config.NumLoopsToPlay = 1;
@@ -393,7 +393,7 @@ namespace Owlicity
           {
             config.TileSheetName = "owliver_attack_fishingrod_spritesheet";
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(121, 90);
+            config.Hotspot = new Vector2(164, 90);
             config.TileCount = 5;
             config.PingPong = false;
             config.NumLoopsToPlay = 1;
@@ -405,7 +405,7 @@ namespace Owlicity
             config.TileSheetName = "owliver_attack_fishingrod_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(121, 90);
+            config.Hotspot = new Vector2(90, 90);
             config.TileCount = 5;
             config.PingPong = false;
             config.NumLoopsToPlay = 1;
