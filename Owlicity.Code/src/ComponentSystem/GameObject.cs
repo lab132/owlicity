@@ -234,10 +234,14 @@ namespace Owlicity
           {
             AnimationTypes = new List<SpriteAnimationType>
             {
-               SpriteAnimationType.Owliver_Idle_Left,
-               SpriteAnimationType.Owliver_Idle_Right,
-               SpriteAnimationType.Owliver_Walk_Left,
-               SpriteAnimationType.Owliver_Walk_Right,
+              SpriteAnimationType.Owliver_Idle_Left,
+              SpriteAnimationType.Owliver_Idle_Right,
+              SpriteAnimationType.Owliver_Walk_Left,
+              SpriteAnimationType.Owliver_Walk_Right,
+              SpriteAnimationType.Owliver_AttackStick_Left,
+              SpriteAnimationType.Owliver_AttackStick_Right,
+              SpriteAnimationType.Owliver_AttackFishingRod_Left,
+              SpriteAnimationType.Owliver_AttackFishingRod_Right,
             },
           };
           sa.Spatial.Transform.p += new Vector2(0, -10);

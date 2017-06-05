@@ -188,6 +188,10 @@ namespace Owlicity
     Owliver_Idle_Right,
     Owliver_Walk_Left,
     Owliver_Walk_Right,
+    Owliver_AttackStick_Left,
+    Owliver_AttackStick_Right,
+    Owliver_AttackFishingRod_Left,
+    Owliver_AttackFishingRod_Right,
 
     Slurp_Idle,
 
@@ -329,6 +333,40 @@ namespace Owlicity
           {
             //TileSheetName = "owliver_walk_front_right_spritesheet",
             config.TileSheetName = "owliver_walk_front_left_spritesheet";
+            config.SpriteEffects = SpriteEffects.FlipHorizontally;
+            config.Scale = Global.OwliverScale;
+            config.Hotspot = new Vector2(121, 90);
+          }
+          break;
+
+          case SpriteAnimationType.Owliver_AttackStick_Left:
+          {
+            config.TileSheetName = "owliver_attack_spritesheet";
+            config.Scale = Global.OwliverScale;
+            config.Hotspot = new Vector2(121, 90);
+          }
+          break;
+
+          case SpriteAnimationType.Owliver_AttackStick_Right:
+          {
+            config.TileSheetName = "owliver_attack_spritesheet";
+            config.SpriteEffects = SpriteEffects.FlipHorizontally;
+            config.Scale = Global.OwliverScale;
+            config.Hotspot = new Vector2(121, 90);
+          }
+          break;
+
+          case SpriteAnimationType.Owliver_AttackFishingRod_Left:
+          {
+            config.TileSheetName = "owliver_attack_fishingrod_spritesheet";
+            config.Scale = Global.OwliverScale;
+            config.Hotspot = new Vector2(121, 90);
+          }
+          break;
+
+          case SpriteAnimationType.Owliver_AttackFishingRod_Right:
+          {
+            config.TileSheetName = "owliver_attack_fishingrod_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
             config.Hotspot = new Vector2(121, 90);
