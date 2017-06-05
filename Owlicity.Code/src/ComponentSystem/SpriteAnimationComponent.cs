@@ -9,6 +9,10 @@ using Microsoft.Xna.Framework.Primitives2D;
 
 namespace Owlicity
 {
+  // TODO(manu): Consider not using SpriteAnimationType in this class but rather a handle-based approach.
+  //             The current implementation does not enable you to provide any kind of animiation, only the predefined ones.
+  //             It also prevents the ability to pre-configure the default state of an animation instance.
+  //             The SpriteAnimationType enum is just convenience to create known animations.
   public class SpriteAnimationComponent : DrawComponent
   {
     //
@@ -20,9 +24,10 @@ namespace Owlicity
     // Runtime data
     //
     public SpriteAnimationType ActiveAnimationType { get; private set; }
-    public SpriteAnimationInstance ActiveAnimation { get { return _animInstances[ActiveAnimationType]; } }
+    public SpriteAnimationInstance ActiveAnimation { get { return AnimationInstances[ActiveAnimationType]; } }
+    public Action<SpriteAnimationType, SpriteAnimationPlaybackState, SpriteAnimationPlaybackState> OnAnimationPlaybackStateChanged;
 
-    private Dictionary<SpriteAnimationType, SpriteAnimationInstance> _animInstances =
+    public Dictionary<SpriteAnimationType, SpriteAnimationInstance> AnimationInstances =
       new Dictionary<SpriteAnimationType, SpriteAnimationInstance>();
 
     public SpriteAnimationComponent(GameObject owner) : base(owner)
@@ -36,21 +41,26 @@ namespace Owlicity
       foreach(SpriteAnimationType type in AnimationTypes)
       {
         SpriteAnimationInstance animation = SpriteAnimationFactory.CreateAnimationInstance(type);
-        _animInstances.Add(type, animation);
+        AnimationInstances.Add(type, animation);
       }
 
       Hotspot.AttachTo(this);
       ChangeActiveAnimation(AnimationTypes[0]);
     }
 
-    public void ChangeActiveAnimation(SpriteAnimationType newAnimationType)
+    public void ChangeActiveAnimation(SpriteAnimationType newAnimationType, bool transferState = false)
     {
       Debug.Assert(newAnimationType != SpriteAnimationType.Unknown);
 
       if(newAnimationType != ActiveAnimationType)
       {
+        bool hasOldState = false;
+        SpriteAnimationState oldState = default(SpriteAnimationState);
         if(ActiveAnimationType != SpriteAnimationType.Unknown)
         {
+          hasOldState = true;
+          oldState = ActiveAnimation.State;
+
           ActiveAnimation.Stop();
         }
 
@@ -58,6 +68,12 @@ namespace Owlicity
         Hotspot.Transform.p = -(ActiveAnimation.State.Hotspot * ActiveAnimation.State.Scale);
 
         ActiveAnimation.Play();
+
+        if(hasOldState && transferState)
+        {
+          ActiveAnimation.State.CurrentFrameTime = oldState.CurrentFrameTime;
+          ActiveAnimation.State.CurrentFrameIndex = oldState.CurrentFrameIndex;
+        }
       }
     }
 
@@ -65,7 +81,14 @@ namespace Owlicity
     {
       base.Update(deltaSeconds);
 
+      SpriteAnimationPlaybackState oldPlaybackState = ActiveAnimation.State.PlaybackState;
       ActiveAnimation.Update(deltaSeconds);
+      SpriteAnimationPlaybackState newPlaybackState = ActiveAnimation.State.PlaybackState;
+
+      if(newPlaybackState != oldPlaybackState)
+      {
+        OnAnimationPlaybackStateChanged?.Invoke(ActiveAnimationType, oldPlaybackState, newPlaybackState);
+      }
     }
 
     public override void Draw(float deltaSeconds, SpriteBatch batch)

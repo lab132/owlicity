@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using VelcroPhysics.Dynamics;
 using VelcroPhysics.Factories;
@@ -42,6 +43,19 @@ namespace Owlicity
     {
       return !(a == b);
     }
+
+    public override bool Equals(object obj)
+    {
+      return obj is OwliverState && this == (OwliverState)obj;
+    }
+
+    public override int GetHashCode()
+    {
+      // TODO(manu): BETTER HASH FUNCTION!!!
+      return (int)MovementMode << 16 |
+             (int)FacingDirection << 8 |
+             (int)WeaponType << 0;
+    }
   }
 
   public class OwliverComponent : MovementComponent
@@ -54,6 +68,14 @@ namespace Owlicity
     public Action<OwliverState, OwliverState> OnStateChanged;
 
     public GameInput Input;
+
+    private List<SpriteAnimationType> _attackAnimations = new List<SpriteAnimationType>
+    {
+      SpriteAnimationType.Owliver_AttackStick_Left,
+      SpriteAnimationType.Owliver_AttackStick_Right,
+      SpriteAnimationType.Owliver_AttackFishingRod_Left,
+      SpriteAnimationType.Owliver_AttackFishingRod_Right,
+    };
 
     public OwliverComponent(GameObject owner) : base(owner)
     {
@@ -75,13 +97,27 @@ namespace Owlicity
         AnimationComponent = Owner.GetComponent<SpriteAnimationComponent>();
         Debug.Assert(AnimationComponent != null, "Owliver has no animation component!");
       }
+
+      AnimationComponent.OnAnimationPlaybackStateChanged += OnAnimationLoopFinished;
+    }
+
+    private void OnAnimationLoopFinished(SpriteAnimationType animType, SpriteAnimationPlaybackState oldPlaybackState, SpriteAnimationPlaybackState newPlaybackState)
+    {
+      bool isAttackAnimation = _attackAnimations.Contains(animType);
+      if(isAttackAnimation)
+      {
+        if(oldPlaybackState == SpriteAnimationPlaybackState.Playing && newPlaybackState != SpriteAnimationPlaybackState.Playing)
+        {
+          OwliverState newState = CurrentState;
+          newState.MovementMode = OwliverMovementMode.Walking;
+          ChangeState(ref newState);
+        }
+      }
     }
 
     public override void PostInitialize()
     {
       base.PostInitialize();
-
-      //FixtureFactory.AttachRectangle(10, 100, 10000, Vector2.Zero, ControlledBody, ControlledBodyComponent);
     }
 
     public override void PrePhysicsUpdate(float deltaSeconds)
@@ -101,14 +137,6 @@ namespace Owlicity
 
       Vector2 dp = ControlledBody.LinearVelocity;
       float movementSpeed = dp.Length();
-
-#if false
-      bool wasMoving = _isMoving;
-      _isMoving = movementSpeed > 10.0f;
-      bool wasFacingRight = _oldX > 0.01f;
-      bool isFacingLeft = dp.X < -0.01f;
-      bool isFacingRight = dp.X > 0.01f;
-#endif
 
       OwliverState newState = CurrentState;
 
@@ -149,6 +177,7 @@ namespace Owlicity
       if(input.WantsAttack)
       {
         // TODO(manu)
+        newState.MovementMode = OwliverMovementMode.Attacking;
       }
 
       if(input.WantsInteraction)
@@ -156,105 +185,76 @@ namespace Owlicity
         // TODO(manu)
       }
 
-      if(newState != CurrentState)
-      {
-        OwliverState oldState = CurrentState;
-        CurrentState = newState;
-        StateChanged(ref oldState);
-      }
-
-#if false
-      if(!_isAttacking)
-      {
-        SpriteAnimationType newAnimationType = SpriteAnimationType.Unknown;
-        if(_isMoving)
-        {
-          if(isFacingLeft) newAnimationType = SpriteAnimationType.Owliver_Walk_Left;
-          else if(isFacingRight) newAnimationType = SpriteAnimationType.Owliver_Walk_Right;
-        }
-        else
-        {
-          if(wasMoving)
-          {
-            if(wasFacingRight) newAnimationType = SpriteAnimationType.Owliver_Idle_Right;
-            else newAnimationType = SpriteAnimationType.Owliver_Idle_Left;
-          }
-          else
-          {
-            if(isFacingLeft) newAnimationType = SpriteAnimationType.Owliver_Idle_Left;
-            else if(isFacingRight) newAnimationType = SpriteAnimationType.Owliver_Idle_Right;
-          }
-        }
-
-        if(newAnimationType != SpriteAnimationType.Unknown)
-        {
-          AnimationComponent.ChangeActiveAnimation(newAnimationType);
-        }
-      }
-#endif
+      ChangeState(ref newState);
     }
 
-    public void StateChanged(ref OwliverState oldState)
+    public void ChangeState(ref OwliverState newState)
     {
-      OnStateChanged?.Invoke(oldState, CurrentState);
+      OwliverState oldState = CurrentState;
+      CurrentState = newState;
+
+      OnStateChanged?.Invoke(oldState, newState);
 
       //bool changedFacingDirFromLeftToRight = oldState.FacingDirection == OwliverFacingDirection.Left && CurrentState.FacingDirection == OwliverFacingDirection.Right;
       //bool changedFacingDirFromRightToLeft = oldState.FacingDirection == OwliverFacingDirection.Right && CurrentState.FacingDirection == OwliverFacingDirection.Left;
 
-      switch(CurrentState.MovementMode)
+      bool transferAnimationState = oldState.MovementMode == newState.MovementMode &&
+                                    oldState.FacingDirection != newState.FacingDirection;
+
+      switch(newState.MovementMode)
       {
         case OwliverMovementMode.Idle:
         {
-          if(CurrentState.FacingDirection == OwliverFacingDirection.Right)
+          if(newState.FacingDirection == OwliverFacingDirection.Right)
           {
-            AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_Idle_Right);
+            AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_Idle_Right, transferAnimationState);
           }
-          else if(CurrentState.FacingDirection == OwliverFacingDirection.Left)
+          else if(newState.FacingDirection == OwliverFacingDirection.Left)
           {
-            AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_Idle_Left);
+            AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_Idle_Left, transferAnimationState);
           }
         }
         break;
 
         case OwliverMovementMode.Walking:
         {
-          if(CurrentState.FacingDirection == OwliverFacingDirection.Right)
+          if(newState.FacingDirection == OwliverFacingDirection.Right)
           {
-            AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_Walk_Right);
+            AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_Walk_Right, transferAnimationState);
           }
-          else if(CurrentState.FacingDirection == OwliverFacingDirection.Left)
+          else if(newState.FacingDirection == OwliverFacingDirection.Left)
           {
-            AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_Walk_Left);
+            AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_Walk_Left, transferAnimationState);
           }
         }
         break;
 
         case OwliverMovementMode.Attacking:
         {
-          switch(CurrentState.WeaponType)
+          switch(newState.WeaponType)
           {
             case OwliverWeaponType.Stick:
             {
-              if(CurrentState.FacingDirection == OwliverFacingDirection.Right)
+              if(newState.FacingDirection == OwliverFacingDirection.Right)
               {
-                AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackStick_Right);
+                AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackStick_Right, transferAnimationState);
               }
-              else if(CurrentState.FacingDirection == OwliverFacingDirection.Left)
+              else if(newState.FacingDirection == OwliverFacingDirection.Left)
               {
-                AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackStick_Left);
+                AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackStick_Left, transferAnimationState);
               }
             }
             break;
 
             case OwliverWeaponType.FishingRod:
             {
-              if(CurrentState.FacingDirection == OwliverFacingDirection.Right)
+              if(newState.FacingDirection == OwliverFacingDirection.Right)
               {
-                AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackFishingRod_Right);
+                AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackFishingRod_Right, transferAnimationState);
               }
-              else if(CurrentState.FacingDirection == OwliverFacingDirection.Left)
+              else if(newState.FacingDirection == OwliverFacingDirection.Left)
               {
-                AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackFishingRod_Left);
+                AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackFishingRod_Left, transferAnimationState);
               }
             }
             break;

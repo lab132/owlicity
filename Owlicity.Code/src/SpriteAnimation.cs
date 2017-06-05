@@ -48,6 +48,8 @@ namespace Owlicity
     public SpriteEffects SpriteEffects;
     public Vector2 Scale;
     public bool PingPong;
+    public int NumLoopsToPlay;
+    public int CurrentLoopIndex;
     public float SecondsPerFrame;
 
     public float FramesPerSecond
@@ -68,6 +70,10 @@ namespace Owlicity
     public SpriteAnimationData Data;
     public SpriteAnimationState State;
 
+    public bool IsPlaying { get => State.PlaybackState == SpriteAnimationPlaybackState.Playing; }
+    public bool IsPaused { get => State.PlaybackState == SpriteAnimationPlaybackState.Paused; }
+    public bool IsStopped { get => State.PlaybackState == SpriteAnimationPlaybackState.Stopped; }
+
     private Sprite _currentSprite;
 
     public void Init(SpriteAnimationData data)
@@ -77,6 +83,7 @@ namespace Owlicity
       {
         SecondsPerFrame = data.Config.SecondsPerFrame,
         PingPong = data.Config.PingPong,
+        NumLoopsToPlay = data.Config.NumLoopsToPlay ?? int.MaxValue,
         Scale = data.Config.Scale,
         SpriteEffects = data.Config.SpriteEffects,
         Hotspot = data.Config.Hotspot,
@@ -94,7 +101,7 @@ namespace Owlicity
       {
         State.CurrentFrameTime += deltaSeconds;
         int oldFrameIndex = State.CurrentFrameIndex;
-        while (State.CurrentFrameTime >= State.SecondsPerFrame)
+        while (State.CurrentFrameTime >= State.SecondsPerFrame && State.PlaybackState == SpriteAnimationPlaybackState.Playing)
         {
           State.CurrentFrameTime -= State.SecondsPerFrame;
           AdvanceFrameIndex();
@@ -106,7 +113,8 @@ namespace Owlicity
     {
       if (Data.Frames.Count > 0)
       {
-        SpriteAnimationFrame frame = Data.Frames[State.CurrentFrameIndex];
+        int frameIndex = MathHelper.Clamp(State.CurrentFrameIndex, 0, Data.Frames.Count - 1);
+        SpriteAnimationFrame frame = Data.Frames[frameIndex];
         _currentSprite.TextureOffset = frame.Offset;
         _currentSprite.Scale = State.Scale;
         _currentSprite.SpriteEffects = State.SpriteEffects;
@@ -124,15 +132,23 @@ namespace Owlicity
           newFrameIndex = State.CurrentFrameIndex + 1;
           if(newFrameIndex >= Data.Frames.Count)
           {
-            if(State.PingPong)
+            State.CurrentLoopIndex++;
+            if(State.CurrentLoopIndex >= State.NumLoopsToPlay)
             {
-              // Note(manu): Just reverse the playback mode.
-              State.PlaybackMode = SpriteAnimationPlaybackMode.Backward;
-              newFrameIndex = State.CurrentFrameIndex;
+              Stop();
             }
             else
             {
-              newFrameIndex = 0;
+              if(State.PingPong)
+              {
+                // Note(manu): Just reverse the playback mode.
+                State.PlaybackMode = SpriteAnimationPlaybackMode.Backward;
+                newFrameIndex = State.CurrentFrameIndex;
+              }
+              else
+              {
+                newFrameIndex = 0;
+              }
             }
           }
         } break;
@@ -142,15 +158,23 @@ namespace Owlicity
           newFrameIndex = State.CurrentFrameIndex - 1;
           if(newFrameIndex < 0)
           {
-            if(State.PingPong)
+            State.CurrentLoopIndex++;
+            if(State.CurrentLoopIndex >= State.NumLoopsToPlay)
             {
-              // Note(manu): Just reverse the playback mode.
-              State.PlaybackMode = SpriteAnimationPlaybackMode.Forward;
-              newFrameIndex = State.CurrentFrameIndex;
+              Stop();
             }
             else
             {
-              newFrameIndex = Data.Frames.Count - 1;
+              if(State.PingPong)
+              {
+                // Note(manu): Just reverse the playback mode.
+                State.PlaybackMode = SpriteAnimationPlaybackMode.Forward;
+                newFrameIndex = State.CurrentFrameIndex;
+              }
+              else
+              {
+                newFrameIndex = Data.Frames.Count - 1;
+              }
             }
           }
         } break;
@@ -217,6 +241,7 @@ namespace Owlicity
     public SpriteEffects SpriteEffects;
     public float SecondsPerFrame;
     public bool PingPong;
+    public int? NumLoopsToPlay;
     public Vector2 Hotspot;
 
     public static SpriteAnimationConfig Default
@@ -264,8 +289,10 @@ namespace Owlicity
       SpriteAnimationData result = null;
       if(config.TileCount > 0 || config.TileDim.X > 0 || config.TileDim.Y > 0)
       {
-        result = new SpriteAnimationData();
-        result.Config = config;
+        result = new SpriteAnimationData()
+        {
+          Config = config
+        };
         result.Frames.Capacity = config.TileCount;
         int numCols = atlas.Width / config.TileDim.X;
         int numRows = atlas.Height / config.TileDim.Y;
@@ -344,6 +371,9 @@ namespace Owlicity
             config.TileSheetName = "owliver_attack_spritesheet";
             config.Scale = Global.OwliverScale;
             config.Hotspot = new Vector2(121, 90);
+            config.TileCount = 5;
+            config.PingPong = false;
+            config.NumLoopsToPlay = 1;
           }
           break;
 
@@ -353,6 +383,9 @@ namespace Owlicity
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
             config.Hotspot = new Vector2(121, 90);
+            config.TileCount = 5;
+            config.PingPong = false;
+            config.NumLoopsToPlay = 1;
           }
           break;
 
@@ -361,6 +394,9 @@ namespace Owlicity
             config.TileSheetName = "owliver_attack_fishingrod_spritesheet";
             config.Scale = Global.OwliverScale;
             config.Hotspot = new Vector2(121, 90);
+            config.TileCount = 5;
+            config.PingPong = false;
+            config.NumLoopsToPlay = 1;
           }
           break;
 
@@ -370,6 +406,9 @@ namespace Owlicity
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
             config.Hotspot = new Vector2(121, 90);
+            config.TileCount = 5;
+            config.PingPong = false;
+            config.NumLoopsToPlay = 1;
           }
           break;
 

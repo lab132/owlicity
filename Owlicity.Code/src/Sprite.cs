@@ -12,12 +12,12 @@ namespace Owlicity
 {
   public class Sprite
   {
-    public Texture2D Texture { get; set; }
-    public Point TextureOffset { get; set; }
-    public Point TextureDim { get; set; }
-    public Vector2 Scale { get; set; } = Vector2.One;
-    public Color Tint { get; set; } = Color.White;
-    public SpriteEffects SpriteEffects { get; set; }
+    public Texture2D Texture;
+    public Point TextureOffset;
+    public Point TextureDim;
+    public Vector2 Scale = Vector2.One;
+    public Color Tint = Color.White;
+    public SpriteEffects SpriteEffects;
 
     public void Draw(SpriteBatch spriteBatch, SpatialData spatial, float depth)
     {
