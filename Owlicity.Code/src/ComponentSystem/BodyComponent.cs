@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Primitives2D;
 using System.Collections.Generic;
 using VelcroPhysics.Dynamics;
 using VelcroPhysics.Factories;

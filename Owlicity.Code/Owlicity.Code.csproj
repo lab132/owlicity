@@ -60,7 +60,6 @@
     <Compile Include="src\Math.cs" />
     <Compile Include="src\Particle.cs" />
     <Compile Include="src\ParticleEmitter.cs" />
-    <Compile Include="src\Primitives2D.cs" />
     <Compile Include="src\Screen.cs" />
     <Compile Include="src\Sprite.cs" />
     <Compile Include="src\SpriteAnimation.cs" />
