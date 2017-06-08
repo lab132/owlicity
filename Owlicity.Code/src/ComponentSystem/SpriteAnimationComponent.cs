@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Owlicity
 {
@@ -86,16 +87,18 @@ namespace Owlicity
         OnAnimationPlaybackStateChanged?.Invoke(ActiveAnimationType, oldPlaybackState, newPlaybackState);
       }
 
-      Global.Game.MainDrawCommands.Add(batch =>
-      {
-        SpatialData worldSpatial = Hotspot.GetWorldSpatialData();
-        ActiveAnimation.Draw(batch, worldSpatial, RenderDepth);
-      });
-
       Global.Game.DebugDrawCommands.Add(view =>
       {
         view.DrawCircle(this.GetWorldSpatialData().Position, Global.ToMeters(10), new Color(0xdd, 0x99, 0x44));
       });
+    }
+
+    public override void Draw(SpriteBatch batch)
+    {
+      base.Draw(batch);
+
+      SpatialData worldSpatial = Hotspot.GetWorldSpatialData();
+      ActiveAnimation.Draw(batch, worldSpatial, RenderDepth);
     }
   }
 }

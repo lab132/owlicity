@@ -245,7 +245,6 @@ namespace Owlicity
     public GameObject Owliver { get; set; }
 
     public bool MainDrawingEnabled = true;
-    public List<MainDrawCommand> MainDrawCommands { get; } = new List<MainDrawCommand>();
 
     public bool DebugDrawingEnabled;
     public List<DebugDrawCommand> DebugDrawCommands { get; } = new List<DebugDrawCommand>();
@@ -471,7 +470,6 @@ namespace Owlicity
     protected override void Update(GameTime gameTime)
     {
       CurrentFrameIndex++;
-      MainDrawCommands.Clear();
       DebugDrawCommands.Clear();
 
       float deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -569,9 +567,9 @@ namespace Owlicity
       if(MainDrawingEnabled)
       {
         batch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, viewMatrix);
-        foreach(MainDrawCommand drawCommand in MainDrawCommands)
+        foreach(GameObject go in GameObjects)
         {
-          drawCommand(batch);
+          go.Draw(batch);
         }
         batch.End();
       }

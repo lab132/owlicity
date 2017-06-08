@@ -62,11 +62,12 @@ namespace Owlicity
         Emitter.EmitParticles(spawnPosition);
       }
       Emitter.Update(deltaSeconds);
+    }
 
-      Global.Game.MainDrawCommands.Add(batch =>
-      {
-        Emitter.Draw(batch);
-      });
+    public override void Draw(SpriteBatch batch)
+    {
+      base.Draw(batch);
+      Emitter.Draw(batch);
     }
   }
 }

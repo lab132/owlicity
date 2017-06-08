@@ -28,15 +28,12 @@ namespace Owlicity
       }
     }
 
-    public override void Update(float deltaSeconds)
+    public override void Draw(SpriteBatch batch)
     {
-      base.Update(deltaSeconds);
+      base.Draw(batch);
 
-      Global.Game.MainDrawCommands.Add(batch =>
-      {
-        SpatialData worldSpatial = Hotspot.GetWorldSpatialData();
-        Sprite.Draw(batch, worldSpatial, RenderDepth);
-      });
+      SpatialData worldSpatial = Hotspot.GetWorldSpatialData();
+      Sprite.Draw(batch, worldSpatial, RenderDepth);
     }
   }
 }

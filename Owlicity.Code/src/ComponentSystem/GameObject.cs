@@ -1,6 +1,7 @@
 ﻿// #define CAMERA_HAS_BODY
 
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -85,6 +86,14 @@ namespace Owlicity
       foreach(ComponentBase component in Components.Where(c => c.IsUpdateEnabled))
       {
         component.Update(deltaSeconds);
+      }
+    }
+
+    public void Draw(SpriteBatch batch)
+    {
+      foreach(ComponentBase component in Components.Where(c => c.IsDrawEnabled))
+      {
+        component.Draw(batch);
       }
     }
   }

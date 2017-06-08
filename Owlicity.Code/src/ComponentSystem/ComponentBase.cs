@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace Owlicity
 {
@@ -9,6 +10,7 @@ namespace Owlicity
     public bool IsInitializationEnabled = true;
     public bool IsPrePhysicsUpdateEnabled = true;
     public bool IsUpdateEnabled = true;
+    public bool IsDrawEnabled = true;
 
     public Action BeforeInitialize;
     public Action BeforePostInitialize;
@@ -23,6 +25,7 @@ namespace Owlicity
     public virtual void PostInitialize() { } // TODO(manu): Maybe rename. BeginPlay?
     public virtual void PrePhysicsUpdate(float deltaSeconds) { }
     public virtual void Update(float deltaSeconds) { }
+    public virtual void Draw(SpriteBatch batch) { }
   }
 
   public class SpatialComponent : ComponentBase, ISpatial
