@@ -70,6 +70,7 @@ namespace Owlicity
       var pec = Owner.GetComponent<ParticleEmitterComponent>();
 
       var owliverBC = Global.Game.Owliver.GetComponent<BodyComponent>();
+      var owliverSqc = Global.Game.Owliver.GetComponent<SquashComponent>();
       bc.Body.OnCollision += delegate (Fixture fixtureA, Fixture fixtureB, Contact contact)
       {
         Debug.Assert(fixtureA.UserData != owliverBC);
@@ -79,6 +80,9 @@ namespace Owlicity
         {
           Vector2 contactWorldPosition = fixtureB.Body.Position + contact.Manifold.LocalPoint;
           pec.Emit(contactWorldPosition, 40);
+
+          owliverSqc.SetupDefaultSquashData(0.25f);
+          owliverSqc.StartSquashing();
         }
       };
     }

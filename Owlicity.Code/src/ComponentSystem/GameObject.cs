@@ -223,6 +223,8 @@ namespace Owlicity
           {
           };
 
+          var sqc = new SquashComponent(go);
+
           var sa = new SpriteAnimationComponent(go)
           {
             AnimationTypes = new List<SpriteAnimationType>
