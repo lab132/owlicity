@@ -1,5 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using VelcroPhysics.Collision.ContactSystem;
 using VelcroPhysics.Dynamics;
 
@@ -21,16 +24,13 @@ namespace Owlicity
     public bool IsChasing;
 
     public MovementComponent MovementComponent { get; set; }
-    public SpriteAnimationComponent SpriteAnimationComponent { get; set; }
+    public SquashComponent SquashComponent { get; set; }
 
-    public float MeanHitTime = 0.25f;
-    public float HalfMeanHitTime => 0.5f * MeanHitTime;
+    public float DefaultHitDuration = 0.25f;
+    public float CurrentHitDuration;
     public float CurrentHitTime;
 
-    public bool IsHit => CurrentHitTime > 0.0f;
-
-    private Vector2 NormalScale = Vector2.One;
-    private Vector2 HitScale = new Vector2(1.5f, 0.5f);
+    public bool IsHit => CurrentHitDuration > 0.0f;
 
     public EnemyComponent(GameObject owner) : base(owner)
     {
@@ -45,9 +45,9 @@ namespace Owlicity
         MovementComponent = Owner.GetComponent<MovementComponent>();
       }
 
-      if(SpriteAnimationComponent == null)
+      if(SquashComponent == null)
       {
-        SpriteAnimationComponent = Owner.GetComponent<SpriteAnimationComponent>();
+        SquashComponent = Owner.GetComponent<SquashComponent>();
       }
 
       switch(EnemyType)
@@ -72,9 +72,13 @@ namespace Owlicity
       var owliverBC = Global.Game.Owliver.GetComponent<BodyComponent>();
       bc.Body.OnCollision += delegate (Fixture fixtureA, Fixture fixtureB, Contact contact)
       {
-        if(fixtureA.UserData == owliverBC || fixtureB.UserData == owliverBC)
+        Debug.Assert(fixtureA.UserData != owliverBC);
+        Debug.Assert(fixtureA.UserData == bc);
+
+        if(fixtureB.UserData == owliverBC)
         {
-          pec.Emit(fixtureB.Body.Position + contact.Manifold.LocalPoint);
+          Vector2 contactWorldPosition = fixtureB.Body.Position + contact.Manifold.LocalPoint;
+          pec.Emit(contactWorldPosition, 40);
         }
       };
     }
@@ -122,38 +126,16 @@ namespace Owlicity
     {
       base.Update(deltaSeconds);
 
-      if(CurrentHitTime > 0.0f)
+      if(IsHit)
       {
-        CurrentHitTime -= deltaSeconds;
-        if(CurrentHitTime < 0.0f)
+        CurrentHitTime += deltaSeconds;
+        if(CurrentHitTime >= CurrentHitDuration)
         {
-          CurrentHitTime = 0.0f;
-        }
-      }
-
-      if(SpriteAnimationComponent != null)
-      {
-        if(IsHit)
-        {
-          // TODO(manu): Replace this with a curve!
-          Vector2 scale;
-          if(CurrentHitTime > HalfMeanHitTime)
-          {
-            float time = CurrentHitTime - HalfMeanHitTime;
-            float alpha = time / HalfMeanHitTime;
-            scale = Vector2.LerpPrecise(HitScale, NormalScale, alpha);
-          }
-          else
-          {
-            float alpha = CurrentHitTime / HalfMeanHitTime;
-            scale = Vector2.LerpPrecise(NormalScale, HitScale, alpha);
-          }
-
-          SpriteAnimationComponent.AdditionalScale = scale;
+          CurrentHitDuration = 0.0f;
         }
         else
         {
-          SpriteAnimationComponent.AdditionalScale = null;
+          // TODO(manu): Do something while being hit?
         }
       }
 
@@ -166,7 +148,13 @@ namespace Owlicity
 
     public void Hit(float strength)
     {
-      CurrentHitTime = MeanHitTime * strength;
+      CurrentHitDuration = strength * DefaultHitDuration;
+      CurrentHitTime = 0.0f;
+
+      SquashComponent.SetupDefaultSquashData(CurrentHitDuration);
+      SquashComponent.StartSquashing();
+
+      // TODO(manu): Particle effects!
     }
   }
 }

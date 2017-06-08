@@ -18,7 +18,7 @@ namespace Owlicity
     // Runtime data
     //
     public ParticleEmitter Emitter;
-    public bool IsEmittingEnabled = true;
+    //public bool IsEmittingEnabled; // Note(manu): Unused for now.
 
     public ParticleEmitterComponent(GameObject owner) : base(owner)
     {
@@ -48,19 +48,14 @@ namespace Owlicity
       {
         spawnPosition = this.GetWorldSpatialData().Position;
       }
-      
-      Emitter.EmitParticles(spawnPosition);
+
+      Emitter.EmitParticles(spawnPosition, numParticles);
     }
 
     public override void Update(float deltaSeconds)
     {
       base.Update(deltaSeconds);
 
-      if(IsEmittingEnabled)
-      {
-        Vector2 spawnPosition = this.GetWorldSpatialData().Position;
-        Emitter.EmitParticles(spawnPosition);
-      }
       Emitter.Update(deltaSeconds);
     }
 

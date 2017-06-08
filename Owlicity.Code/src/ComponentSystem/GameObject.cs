@@ -288,13 +288,18 @@ namespace Owlicity
           };
           sa.AttachTo(bc);
 
+          var sqc = new SquashComponent(go)
+          {
+          };
+
           var mc = new MovementComponent(go)
           {
           };
 
-          var pc = new ParticleEmitterComponent(go)
+          var pec = new ParticleEmitterComponent(go)
           {
             NumParticles = 512,
+
             TextureContentNames = new[]
             {
               "confetti/confetti_01",
@@ -306,28 +311,15 @@ namespace Owlicity
               "confetti/confetti_07",
             },
 
-            AvailableColors = new[]
-            {
-              new Color(0x73, 0x4c, 0x87), // purple
-              new Color(0xa3, 0x3b, 0x41), // red
-              new Color(0xda, 0x67, 0x77), // red2
-              new Color(0x41, 0x6d, 0x9c), // blue
-              new Color(0x7a, 0xaa, 0xdd), // blue2
-              new Color(0x5f, 0x72, 0x2d), // green
-              new Color(0x9f, 0xb5, 0x63), // green2
-              new Color(0xda, 0xa7, 0x44), // yellow
-              new Color(0xf4, 0xd3, 0x92), // yellow2
-            },
-
-            IsEmittingEnabled = false,
+            AvailableColors = Global.AllConfettiColors,
           };
 
-          pc.BeforePostInitialize += delegate ()
+          pec.BeforePostInitialize += delegate ()
           {
-            pc.Emitter.MaxParticleSpread = 0;
-            pc.Emitter.MaxParticleSpeed = 5f;
+            pec.Emitter.MaxParticleSpread = 0.1f;
+            pec.Emitter.MaxParticleSpeed = 5f;
           };
-          pc.AttachTo(bc);
+          pec.AttachTo(bc);
 
           var ec = new EnemyComponent(go)
           {
@@ -335,7 +327,6 @@ namespace Owlicity
           };
         }
         break;
-        throw new NotImplementedException();
 
         case GameObjectType.BackgroundScreen:
         {
