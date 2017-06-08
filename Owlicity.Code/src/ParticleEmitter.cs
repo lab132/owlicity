@@ -96,13 +96,20 @@ namespace Owlicity
       {
         if (_particles[i].TTL > 0)
         {
+          Vector2 hotspot = Vector2.Zero;
+
+          // Note(manu): Enable the following to rotate particles around their center.
+#if false
+          hotspot = 0.5f * _particles[i].Texture.Bounds.Size.ToVector2();
+#endif
+
           spriteBatch.Draw(
             texture: _particles[i].Texture,
             position: _particles[i].Position,
             sourceRectangle: null,
             color: _particles[i].Color,
             rotation: _particles[i].Rotation,
-            origin: Vector2.Zero, // Note(manu): I still have no idea what this parameter does.
+            origin: hotspot,
             scale: Global.RenderScale,
             effects: SpriteEffects.None,
             layerDepth: 0.0f); // TODO(manu): Proper depth for particles.

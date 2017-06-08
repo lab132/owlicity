@@ -325,7 +325,7 @@ namespace Owlicity
           pc.BeforePostInitialize += delegate ()
           {
             pc.Emitter.MaxParticleSpread = 0;
-            pc.Emitter.MaxParticleSpeed = 100;
+            pc.Emitter.MaxParticleSpeed = 5f;
           };
           pc.AttachTo(bc);
 
