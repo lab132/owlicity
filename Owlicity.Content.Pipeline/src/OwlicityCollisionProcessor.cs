@@ -53,7 +53,7 @@ namespace Owlicity.Content.Pipeline
         HoleDetection = HoleDetection,
         MultipartDetection = MultipartDetection,
         PixelOffsetOptimization = PixelOffsetOptimization,
-        Transform = Matrix.CreateScale(UniformScale), // TODO(manu): Use z=1 instead?
+        Transform = Matrix.CreateScale(UniformScale * Global.RenderScale), // TODO(manu): Use z=1 instead?
         AlphaTolerance = (byte)AlphaTolerance,
         HullTolerance = HullTolerance,
       };

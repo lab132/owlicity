@@ -1,12 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Owlicity
 {
@@ -47,7 +43,7 @@ namespace Owlicity
     {
       Screen screen = new Screen
       {
-        WorldPosition = new Vector2(posX * ScreenTileWidth, posY * ScreenTileHeight),
+        WorldPosition = Global.ToMeters(posX * ScreenTileWidth, posY * ScreenTileHeight),
         GridPosition = new Point(posX, posY),
       };
       _screens[posY, posX] = screen;
@@ -88,19 +84,11 @@ namespace Owlicity
       }
     }
 
-    public void Draw(float deltaSeconds, SpriteBatch batch)
-    {
-      foreach (Screen screen in _activeScreens)
-      {
-        screen.Draw(batch);
-      }
-    }
-
     private List<Screen> GetActiveScreens()
     {
       var screenList = new List<Screen>();
 
-      Vector2 focus = CullingCenter.Spatial.GetWorldSpatialData().Transform.p;
+      Vector2 focus = CullingCenter.Spatial.GetWorldSpatialData().Position;
       int tileX = (int) focus.X / ScreenTileWidth;
       int tileY = (int) focus.Y / ScreenTileHeight;
 

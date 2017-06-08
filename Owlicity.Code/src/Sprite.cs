@@ -1,12 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Primitives2D;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VelcroPhysics.Shared;
 
 namespace Owlicity
 {
@@ -27,12 +20,12 @@ namespace Owlicity
 
       spriteBatch.Draw(
         texture: Texture,
-        position: spatial.Transform.p,
+        position: spatial.Position,
         sourceRectangle: new Rectangle { Location = TextureOffset, Size = textureDim },
         color: Tint,
-        rotation: spatial.Transform.q.GetAngle(),
+        rotation: spatial.Rotation.Radians,
         origin: Vector2.Zero, // Note(manu): I have no idea what this parameter does.
-        scale: Scale,
+        scale: Scale * Global.RenderScale,
         effects: SpriteEffects,
         layerDepth: depth);
 

@@ -1,9 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Primitives2D;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using VelcroPhysics.Dynamics;
-using VelcroPhysics.Factories;
+using VelcroPhysics.Shared;
 
 namespace Owlicity
 {
@@ -81,6 +83,63 @@ namespace Owlicity
     {
     }
 
+    public AABB WeaponAABB
+    {
+      get
+      {
+        Vector2 worldPosition = Owner.GetWorldSpatialData().Position;
+
+        AABB local;
+        switch(CurrentState.WeaponType)
+        {
+          case OwliverWeaponType.Stick:
+          local = new AABB
+          {
+            LowerBound = Global.ToMeters(0, -50),
+            UpperBound = Global.ToMeters(150, 70),
+          };
+          break;
+
+          case OwliverWeaponType.FishingRod:
+          throw new NotImplementedException();
+          //break;
+
+          default: throw new ArgumentException();
+        }
+
+        if(CurrentState.FacingDirection == OwliverFacingDirection.Left)
+        {
+          // Mirror along the y-axis.
+          float lowerX = local.LowerBound.X;
+          float upperX = local.UpperBound.X;
+          local.UpperBound.X = -lowerX;
+          local.LowerBound.X = -upperX;
+        }
+
+        AABB result = new AABB
+        {
+          LowerBound = Global.OwliverScale * local.LowerBound + worldPosition,
+          UpperBound = Global.OwliverScale * local.UpperBound + worldPosition,
+        };
+
+        return result;
+      }
+    }
+
+    public float WeaponScale
+    {
+      get
+      {
+        switch(CurrentState.WeaponType)
+        {
+          case OwliverWeaponType.Stick: return 1.0f;
+          case OwliverWeaponType.FishingRod: return 2.0f;
+        }
+
+        throw new ArgumentException("CurrentState.WeaponType");
+      }
+    }
+
     public GameInput ConsumeInput()
     {
       GameInput result = Input;
@@ -140,7 +199,7 @@ namespace Owlicity
 
       OwliverState newState = CurrentState;
 
-      const float movementChangeThreshold = 10.0f;
+      const float movementChangeThreshold = 0.01f;
       switch(CurrentState.MovementMode)
       {
         case OwliverMovementMode.Idle:
@@ -186,6 +245,55 @@ namespace Owlicity
       }
 
       ChangeState(ref newState);
+
+      AABB weaponAABB = WeaponAABB;
+      if(CurrentState.MovementMode == OwliverMovementMode.Attacking)
+      {
+        List<Fixture> fixtures = Global.Game.World.QueryAABB(ref weaponAABB);
+        Body owliverBody = ControlledBody;
+        foreach(Body enemy in fixtures.Where(f => f.CollidesWith.HasFlag(Global.OwliverWeaponCollisionCategory))
+                                      .Select(f => f.Body)
+                                      .Distinct())
+        {
+          bool performHit = true;
+          BodyComponent bc = (BodyComponent)enemy.UserData;
+          EnemyComponent ec = bc.Owner.GetComponent<EnemyComponent>();
+          if(ec != null)
+          {
+            if(ec.IsHit)
+            {
+              performHit = false;
+            }
+          }
+
+          if(performHit)
+          {
+            const float strength = 1.0f;
+            const float impulseFactor = strength * 0.1f;
+            Vector2 impulse = impulseFactor * (enemy.Position - owliverBody.Position);
+            enemy.ApplyLinearImpulse(impulse);
+
+            if(ec != null)
+            {
+              ec.Hit(strength);
+            }
+
+            AABB aabb = enemy.ComputeAABB();
+            Global.Game.DebugDrawCommands.Add(view =>
+            {
+              view.DrawAABB(ref aabb, Color.Cyan);
+            });
+          }
+        }
+      }
+
+      {
+        Color color = CurrentState.MovementMode == OwliverMovementMode.Attacking ? Color.Navy : Color.Gray;
+        Global.Game.DebugDrawCommands.Add(view =>
+        {
+          view.DrawAABB(ref weaponAABB, color);
+        });
+      }
     }
 
     public void ChangeState(ref OwliverState newState)
@@ -194,9 +302,6 @@ namespace Owlicity
       CurrentState = newState;
 
       OnStateChanged?.Invoke(oldState, newState);
-
-      //bool changedFacingDirFromLeftToRight = oldState.FacingDirection == OwliverFacingDirection.Left && CurrentState.FacingDirection == OwliverFacingDirection.Right;
-      //bool changedFacingDirFromRightToLeft = oldState.FacingDirection == OwliverFacingDirection.Right && CurrentState.FacingDirection == OwliverFacingDirection.Left;
 
       bool transferAnimationState = oldState.MovementMode == newState.MovementMode &&
                                     oldState.FacingDirection != newState.FacingDirection;

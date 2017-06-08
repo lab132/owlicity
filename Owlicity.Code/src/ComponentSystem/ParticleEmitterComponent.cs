@@ -1,10 +1,7 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
 
 namespace Owlicity
 {
@@ -49,7 +46,7 @@ namespace Owlicity
         spawnPosition = emitAt.Value;
       } else
       {
-        spawnPosition = this.GetWorldSpatialData().Transform.p;
+        spawnPosition = this.GetWorldSpatialData().Position;
       }
       
       Emitter.EmitParticles(spawnPosition);
@@ -61,17 +58,15 @@ namespace Owlicity
 
       if(IsEmittingEnabled)
       {
-        Vector2 spawnPosition = this.GetWorldSpatialData().Transform.p;
+        Vector2 spawnPosition = this.GetWorldSpatialData().Position;
         Emitter.EmitParticles(spawnPosition);
       }
       Emitter.Update(deltaSeconds);
-    }
 
-    public override void Draw(float deltaSeconds, SpriteBatch batch)
-    {
-      base.Draw(deltaSeconds, batch);
-
-      Emitter.Draw(batch);
+      Global.Game.MainDrawCommands.Add(batch =>
+      {
+        Emitter.Draw(batch);
+      });
     }
   }
 }

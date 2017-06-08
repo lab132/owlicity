@@ -1,17 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VelcroPhysics.Collision.Filtering;
 
 namespace Owlicity
 {
-  public static class Global
+  public static partial class Global
   {
     public static OwlGame Game { get; set; }
-    public static GameObject Owliver { get; set; }
 
     public static readonly Vector2 OwliverScale = new Vector2(0.5f);
     public static readonly Vector2 BonbonScale = new Vector2(0.6f);
@@ -19,6 +13,7 @@ namespace Owlicity
 
     public const Category LevelCollisionCategory = Category.Cat1;
     public const Category OwliverCollisionCategory = Category.Cat2;
-    public const Category EnemyCollisionCategory = Category.Cat3;
+    public const Category OwliverWeaponCollisionCategory = Category.Cat3;
+    public const Category EnemyCollisionCategory = Category.Cat4;
   }
 }

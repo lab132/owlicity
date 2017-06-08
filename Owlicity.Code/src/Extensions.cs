@@ -1,13 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Primitives2D;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework.Primitives2D;
-using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
-using Microsoft.Xna.Framework.Input;
+using VelcroPhysics.Collision.Shapes;
+using VelcroPhysics.Dynamics;
+using VelcroPhysics.Shared;
 
 namespace Owlicity
 {
@@ -47,18 +47,18 @@ namespace Owlicity
 
       return result;
     }
-  }
 
-  public static class SpriteBatchExtensions
-  {
-    public static void FillRectangle(this SpriteBatch self, RectF rect, Color color)
+    public static void GetDirectionAndLength(this Vector2 self, out Vector2 direction, out float length)
     {
-      self.FillRectangle(rect.ToRectangle(), color);
-    }
-
-    public static void FillRectangle(this SpriteBatch self, RectF rect, Color color, Angle angle)
-    {
-      self.FillRectangle(rect.ToRectangle(), color, angle.Radians);
+      length = self.Length();
+      if(length == 0.0f)
+      {
+        direction = Vector2.Zero;
+      }
+      else
+      {
+        direction = self / length;
+      }
     }
   }
 
@@ -152,6 +152,31 @@ namespace Owlicity
     public static bool WasButtonReleased(this GamePadState self, Buttons button, ref GamePadState prevState)
     {
       bool result = self.IsButtonUp(button) && prevState.IsButtonDown(button);
+      return result;
+    }
+  }
+
+  public static class BodyExtensions
+  {
+    // Computes the combined AABB from this body by iterating all fixture shapes and calculating their AABB.
+    public static AABB ComputeAABB(this Body self)
+    {
+      AABB result = new AABB
+      {
+        LowerBound = new Vector2(float.MaxValue),
+        UpperBound = new Vector2(float.MinValue),
+      };
+
+      foreach(Fixture fixture in self.FixtureList)
+      {
+        Shape shape = fixture.Shape;
+        for(int childIndex = 0; childIndex < shape.ChildCount; childIndex++)
+        {
+          shape.ComputeAABB(out AABB shapeAABB, ref self._xf, childIndex);
+          result.Combine(ref shapeAABB);
+        }
+      }
+
       return result;
     }
   }

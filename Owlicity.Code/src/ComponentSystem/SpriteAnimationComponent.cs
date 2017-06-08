@@ -1,11 +1,8 @@
-﻿using System;
-using Microsoft.Xna.Framework.Graphics;
-using VelcroPhysics;
-using VelcroPhysics.Shared;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using System.Diagnostics;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Primitives2D;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Owlicity
 {
@@ -65,7 +62,7 @@ namespace Owlicity
         }
 
         ActiveAnimationType = newAnimationType;
-        Hotspot.Transform.p = -(ActiveAnimation.State.Hotspot * ActiveAnimation.State.Scale);
+        Hotspot.Position = -(ActiveAnimation.State.Hotspot * ActiveAnimation.State.Scale * Global.MetersPerPixel);
 
         ActiveAnimation.Play();
 
@@ -89,21 +86,17 @@ namespace Owlicity
       {
         OnAnimationPlaybackStateChanged?.Invoke(ActiveAnimationType, oldPlaybackState, newPlaybackState);
       }
-    }
 
-    public override void Draw(float deltaSeconds, SpriteBatch batch)
-    {
-      base.Draw(deltaSeconds, batch);
+      Global.Game.MainDrawCommands.Add(batch =>
+      {
+        SpatialData worldSpatial = Hotspot.GetWorldSpatialData();
+        ActiveAnimation.Draw(batch, worldSpatial, RenderDepth);
+      });
 
-      SpatialData worldSpatial = Hotspot.GetWorldSpatialData();
-      ActiveAnimation.Draw(batch, worldSpatial, RenderDepth);
-    }
-
-    public override void DebugDraw(float deltaSeconds, SpriteBatch batch)
-    {
-      base.DebugDraw(deltaSeconds, batch);
-
-      batch.DrawCircle(this.GetWorldSpatialData().Transform.p, 10, 9, new Color(0xdd, 0x99, 0x44));
+      Global.Game.DebugDrawCommands.Add(view =>
+      {
+        view.DrawCircle(this.GetWorldSpatialData().Position, Global.ToMeters(10), new Color(0xdd, 0x99, 0x44));
+      });
     }
   }
 }

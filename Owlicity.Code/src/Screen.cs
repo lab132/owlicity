@@ -1,19 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VelcroPhysics.Shared;
 
 namespace Owlicity
 {
   public struct ScreenLayoutInfo
   {
-    public Vector2 Offset;
+    public Vector2 OffsetInMeters;
     public GameObjectType ObjectType;
   }
 
@@ -35,7 +29,7 @@ namespace Owlicity
       //
       {
         var go = GameObjectFactory.CreateKnown(GameObjectType.BackgroundScreen);
-        go.Spatial.Transform.p += WorldPosition;
+        go.Spatial.Position += WorldPosition;
 
         var bc = go.Components.OfType<BodyComponent>().Single();
         bc.ShapeContentName = collisionContentName;
@@ -51,7 +45,7 @@ namespace Owlicity
       foreach(ScreenLayoutInfo layout in layoutInfos)
       {
         var deco = GameObjectFactory.CreateKnown(layout.ObjectType);
-        SpriteAnimationComponent sa = deco.Components.OfType<SpriteAnimationComponent>().Single();
+        SpriteAnimationComponent sa = deco.GetComponent<SpriteAnimationComponent>();
 #if false
         // Choose random initial frame
         sa.OnPostInitialize += delegate ()
@@ -63,7 +57,7 @@ namespace Owlicity
           }
         };
 #endif
-        deco.Spatial.Transform.p += layout.Offset;
+        deco.Spatial.Position += layout.OffsetInMeters;
         deco.AttachTo(_screenGameObject);
 
         Global.Game.AddGameObject(deco);
@@ -81,25 +75,6 @@ namespace Owlicity
         Global.Game.RemoveGameObject(deco);
       }
       _decorationObjects.Clear();
-    }
-
-    public void Draw(SpriteBatch batch)
-    {
-#if false
-      Debug.Assert(GroundTexture != null);
-
-      SpatialData spatial = _screenGameObject.GetWorldSpatialData();
-
-      batch.Draw(GroundTexture,
-        position: spatial.Transform.p,
-        sourceRectangle: null,
-        color: Color.White,
-        rotation: spatial.Transform.q.GetAngle(),
-        origin: Vector2.Zero,
-        scale: 1,
-        effects: SpriteEffects.None,
-        layerDepth: 1.0f);
-#endif
     }
   }
 }

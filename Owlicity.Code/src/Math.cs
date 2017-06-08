@@ -1,107 +1,27 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VelcroPhysics.Shared;
 
 namespace Owlicity
 {
   public struct Angle
   {
-    private float _value;
-
-    public float Radians
-    {
-      get { return _value; }
-      set { _value = value; }
-    }
+    public float Radians;
 
     public float Degrees
     {
-      get { return _value; }
-      set { _value = value; }
+      get => MathHelper.ToDegrees(Radians);
+      set { Radians = MathHelper.ToRadians(value); }
     }
 
-    public static Angle operator +(Angle A, Angle B)
+    public static Angle operator +(Angle a, Angle b)
     {
-      return new Angle { _value = A._value + B._value };
+      return new Angle { Radians = a.Radians + b.Radians };
     }
 
-    public static Angle operator -(Angle A, Angle B)
+    public static Angle operator -(Angle a, Angle b)
     {
-      return new Angle { _value = A._value - B._value };
-    }
-  }
-
-  public struct RectF
-  {
-    public Vector2 Center;
-    public Vector2 HalfExtents;
-
-    public Vector2 Extents
-    {
-      get { return 2.0f * HalfExtents; }
-      set { HalfExtents = 0.5f * value; }
-    }
-
-    public Vector2 BottomLeft
-    {
-      get { return Center + new Vector2(-HalfExtents.X, HalfExtents.Y); }
-      set { Center = value + new Vector2(HalfExtents.X, -HalfExtents.Y); }
-    }
-
-    public Vector2 Left
-    {
-      get { return Center + new Vector2(-HalfExtents.X, 0.0f); }
-      set { Center = value + new Vector2(HalfExtents.X, 0.0f); }
-    }
-
-    public Vector2 TopLeft
-    {
-      get { return Center + new Vector2(-HalfExtents.X, -HalfExtents.Y); }
-      set { Center = value + new Vector2(HalfExtents.X, HalfExtents.Y); }
-    }
-
-    public Vector2 Top
-    {
-      get { return Center + new Vector2(0.0f, -HalfExtents.Y); }
-      set { Center = value + new Vector2(0.0f, HalfExtents.Y); }
-    }
-
-    public Vector2 TopRight
-    {
-      get { return Center + new Vector2(HalfExtents.X, -HalfExtents.Y); }
-      set { Center = value + new Vector2(-HalfExtents.X, HalfExtents.Y); }
-    }
-
-    public Vector2 Right
-    {
-      get { return Center + new Vector2(HalfExtents.X, 0.0f); }
-      set { Center = value + new Vector2(-HalfExtents.X, 0.0f); }
-    }
-
-    public Vector2 BottomRight
-    {
-      get { return Center + new Vector2(HalfExtents.X, HalfExtents.Y); }
-      set { Center = value + new Vector2(-HalfExtents.X, -HalfExtents.Y); }
-    }
-
-    public Vector2 Bottom
-    {
-      get { return Center + new Vector2(0.0f, HalfExtents.Y); }
-      set { Center = value + new Vector2(0.0f, -HalfExtents.Y); }
-    }
-
-    public Rectangle ToRectangle()
-    {
-      return new Rectangle
-      {
-        Location = Left.ToPoint(),
-        Size = Extents.ToPoint(),
-      };
+      return new Angle { Radians = a.Radians - b.Radians };
     }
   }
 
@@ -115,12 +35,13 @@ namespace Owlicity
     public SpatialData Spatial { get => this; }
 
     public ISpatial Parent;
-    public Transform Transform;
+    public Vector2 Position;
+    public Angle Rotation;
+    public Transform Transform_ => new Transform { p = Position, q = new Rot(Rotation.Radians), };
 
     public override string ToString()
     {
-      float degrees = new Angle { Radians = Transform.q.GetAngle() }.Degrees;
-      return $"{Transform.p}|{degrees}°";
+      return $"{Position}|{Rotation.Degrees}°";
     }
   }
 
@@ -133,15 +54,15 @@ namespace Owlicity
     /// </summary>
     public static SpatialData GetWorldSpatialData(this ISpatial self)
     {
-      Vector2 position = new Vector2();
-      float angle = 0.0f;
+      Vector2 position = Vector2.Zero;
+      float radians = 0.0f;
 
       ISpatial parent = self;
       while(parent != null)
       {
         SpatialData spatial = parent.Spatial;
-        position += spatial.Transform.p;
-        angle += spatial.Transform.q.GetAngle();
+        position += spatial.Position;
+        radians += spatial.Rotation.Radians;
 
         Debug.Assert(spatial.Parent != parent);
         parent = spatial.Parent;
@@ -149,11 +70,8 @@ namespace Owlicity
 
       SpatialData result = new SpatialData
       {
-        Transform = new Transform
-        {
-          p = position,
-          q = new Rot(angle)
-        },
+        Position = position,
+        Rotation = new Angle { Radians = radians },
       };
 
       return result;
@@ -173,8 +91,8 @@ namespace Owlicity
       if(newParent != self)
       {
         SpatialData offset = new SpatialData();
-        offset.Transform.p = positionOffset;
-        offset.Transform.q = new Rot(rotationOffset.Radians);
+        offset.Position = positionOffset;
+        offset.Rotation = rotationOffset;
 
         offset.AttachTo(newParent);
         self.AttachTo(offset);

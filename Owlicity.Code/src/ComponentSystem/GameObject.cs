@@ -1,7 +1,6 @@
 ﻿// #define CAMERA_HAS_BODY
 
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -88,22 +87,6 @@ namespace Owlicity
         component.Update(deltaSeconds);
       }
     }
-
-    public void Draw(float deltaSeconds, SpriteBatch batch)
-    {
-      foreach(ComponentBase component in Components.Where(c => c.IsDrawingEnabled))
-      {
-        component.Draw(deltaSeconds, batch);
-      }
-    }
-
-    public void DebugDraw(float deltaSeconds, SpriteBatch batch)
-    {
-      foreach(ComponentBase component in Components.Where(c => c.IsDebugDrawingEnabled))
-      {
-        component.DebugDraw(deltaSeconds, batch);
-      }
-    }
   }
 
   public enum GameObjectType
@@ -167,7 +150,7 @@ namespace Owlicity
               world: Global.Game.World,
               width: cc.Bounds.X,
               height: cc.Bounds.Y,
-              density: 10.0f, // ??
+              density: 1.0f, // ??
               position: initSpatial.Transform.p,
               rotation: initSpatial.Transform.q.GetAngle(),
               bodyType: BodyType.Kinematic, // TODO(manu): Make this dynamic.
@@ -200,31 +183,32 @@ namespace Owlicity
             SpatialData s = go.GetWorldSpatialData();
             bc.Body = new Body(
               world: Global.Game.World,
-              position: s.Transform.p,
-              rotation: s.Transform.q.GetAngle(),
+              position: s.Position,
+              rotation: s.Rotation.Radians,
               bodyType: BodyType.Dynamic,
               userdata: bc);
+
+            float radius = Global.ToMeters(50 * Global.OwliverScale.X);
+            float density = 1; // ??
+            FixtureFactory.AttachCircle(
+              radius: radius,
+              density: density,
+              body: bc.Body,
+              offset: Global.ToMeters(0, 10) * Global.OwliverScale,
+              userData: bc);
+            FixtureFactory.AttachCircle(
+              radius: radius,
+              density: density,
+              body: bc.Body,
+              offset: Global.ToMeters(0, 60) * Global.OwliverScale,
+              userData: bc);
+
             bc.Body.FixedRotation = true;
             bc.Body.CollisionCategories = Global.OwliverCollisionCategory;
             bc.Body.CollidesWith = Global.LevelCollisionCategory | Global.EnemyCollisionCategory;
-
-            float radius = 50 * Global.OwliverScale.X;
-            float density = 10; // ??
-            FixtureFactory.AttachCircle(
-              radius: radius,
-              density: density,
-              body: bc.Body,
-              offset: new Vector2(0, 10) * Global.OwliverScale,
-              userData: bc);
-            FixtureFactory.AttachCircle(
-              radius: radius,
-              density: density,
-              body: bc.Body,
-              offset: new Vector2(0, 60) * Global.OwliverScale,
-              userData: bc);
-
-            go.RootComponent = bc;
           };
+
+          go.RootComponent = bc;
 
           var oc = new OwliverComponent(go)
           {
@@ -244,7 +228,7 @@ namespace Owlicity
               SpriteAnimationType.Owliver_AttackFishingRod_Right,
             },
           };
-          sa.Spatial.Transform.p += new Vector2(0, -10);
+          sa.Spatial.Position += Global.ToMeters(0, -10);
           sa.AttachTo(bc);
         }
         break;
@@ -261,26 +245,27 @@ namespace Owlicity
             SpatialData s = go.GetWorldSpatialData();
             bc.Body = new Body(
               world: Global.Game.World,
-              position: s.Transform.p,
-              rotation: s.Transform.q.GetAngle(),
+              position: s.Position,
+              rotation: s.Rotation.Radians,
               bodyType: BodyType.Dynamic,
               userdata: bc);
-            bc.Body.FixedRotation = true;
 
-            float radius = 80 * Global.SlurpScale.X;
-            float density = 10; // ??
+            float radius = Global.ToMeters(80 * Global.SlurpScale.X);
+            float density = 0.01f; // ??
             FixtureFactory.AttachCircle(
               radius: radius,
               density: density,
               body: bc.Body,
-              offset: new Vector2(0, -25) * Global.SlurpScale,
+              offset: Global.ToMeters(0, -25) * Global.SlurpScale,
               userData: bc);
             FixtureFactory.AttachCircle(
               radius: radius,
               density: density,
               body: bc.Body,
-              offset: new Vector2(0, 25) * Global.SlurpScale,
+              offset: Global.ToMeters(0, 25) * Global.SlurpScale,
               userData: bc);
+
+            bc.Body.FixedRotation = true;
           };
 
           go.RootComponent = bc;
@@ -288,9 +273,9 @@ namespace Owlicity
           var sa = new SpriteAnimationComponent(go)
           {
             AnimationTypes = new List<SpriteAnimationType>
-              {
-                SpriteAnimationType.Slurp_Idle,
-              }
+            {
+              SpriteAnimationType.Slurp_Idle,
+            }
           };
           sa.AttachTo(bc);
 

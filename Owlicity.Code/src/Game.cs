@@ -1,17 +1,14 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Primitives2D;
+using Microsoft.Xna.Framework.Media;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System;
-using VelcroPhysics.Shared;
-using VelcroPhysics.Dynamics;
-using VelcroPhysics.Factories;
-using VelcroPhysics.DebugViews.MonoGame;
-using VelcroPhysics.Extensions.DebugView;
 using System.Linq;
-using Microsoft.Xna.Framework.Media;
+using VelcroPhysics.DebugViews.MonoGame;
+using VelcroPhysics.Dynamics;
+using VelcroPhysics.Extensions.DebugView;
 
 /*
   TODO:
@@ -46,11 +43,15 @@ namespace Owlicity
   public struct DebugInput
   {
     public float SpeedMultiplier;
+    public bool ToggleMainDrawing;
+    public bool ToggleDebugDrawing;
     public bool TogglePhysicsDebugView;
 
     public void Reset()
     {
-      TogglePhysicsDebugView = false;
+      float preservedSpeedMultiplier = SpeedMultiplier;
+      this = new DebugInput();
+      SpeedMultiplier = preservedSpeedMultiplier;
     }
   }
 
@@ -179,6 +180,9 @@ namespace Owlicity
         if(newKeyboard.IsKeyDown(Keys.D)) keyboardMovement.X += 1.0f;
         if(newKeyboard.IsKeyDown(Keys.W)) keyboardMovement.Y -= 1.0f;
         if(newKeyboard.IsKeyDown(Keys.S)) keyboardMovement.Y += 1.0f;
+        if(newKeyboard.WasKeyPressed(Keys.F1, ref _prevKeyboard)) DebugInput.ToggleMainDrawing = true;
+        if(newKeyboard.WasKeyPressed(Keys.F2, ref _prevKeyboard)) DebugInput.ToggleDebugDrawing = true;
+        if(newKeyboard.WasKeyPressed(Keys.F3, ref _prevKeyboard)) DebugInput.TogglePhysicsDebugView = true;
 
         float speedMultiplierDelta = 0.0f;
         if(newKeyboard.WasKeyPressed(Keys.D1, ref _prevKeyboard)) speedMultiplierDelta -= 0.5f;
@@ -221,6 +225,9 @@ namespace Owlicity
     }
   }
 
+  public delegate void MainDrawCommand(SpriteBatch batch);
+  public delegate void DebugDrawCommand(DebugView view);
+
   /// <summary>
   /// This is the main type for your game.
   /// </summary>
@@ -233,8 +240,19 @@ namespace Owlicity
     public Level CurrentLevel;
 
     public World World { get; set; }
-    public DebugView PhysicsDebugView { get; set; }
     public InputHandler Input = new InputHandler();
+
+    public GameObject Owliver { get; set; }
+
+    public bool MainDrawingEnabled = true;
+    public List<MainDrawCommand> MainDrawCommands { get; } = new List<MainDrawCommand>();
+
+    public bool DebugDrawingEnabled;
+    public List<DebugDrawCommand> DebugDrawCommands { get; } = new List<DebugDrawCommand>();
+
+    public DebugView PhysicsDebugView { get; set; }
+
+    public int CurrentFrameIndex { get; private set; }
 
     //
     // Game object stuff
@@ -269,7 +287,7 @@ namespace Owlicity
     {
       // Note(manu): 0 means front, 1 means back.
       float maxY = Level.SCREEN_DIMENSION * CurrentLevel.ScreenTileHeight;
-      float y = MathHelper.Clamp(spatial.Transform.p.Y, 0, maxY);
+      float y = MathHelper.Clamp(spatial.Position.Y, 0, maxY);
       float alpha = y / maxY;
 
       float depth;
@@ -322,15 +340,21 @@ namespace Owlicity
     /// </summary>
     protected override void Initialize()
     {
+#if DEBUG
+      DebugDrawingEnabled = true;
+#endif
+
       SpriteAnimationFactory.Initialize(Content);
       GameObjectFactory.Initialize();
 
       World = new World(gravity: Vector2.Zero);
 
-      PhysicsDebugView = new DebugView(World);
-      PhysicsDebugView.Flags = DebugViewFlags.Shape |
+      PhysicsDebugView = new DebugView(World)
+      {
+        Flags = DebugViewFlags.Shape |
                                DebugViewFlags.PolygonPoints |
-                               DebugViewFlags.AABB;
+                               DebugViewFlags.AABB
+      };
 
       base.Initialize();
     }
@@ -393,7 +417,7 @@ namespace Owlicity
           TextureContentNames = new[] { "particle" },
           AvailableColors = new[] { Color.White, Color.Red, Color.Green, },
         };
-        //pe.Spatial.Transform.p += sa.
+        //pe.Spatial.Position += sa.
         pe.AttachTo(bc);
 
         AddGameObject(go);
@@ -401,27 +425,26 @@ namespace Owlicity
 #endif
 
       {
-        var go = GameObjectFactory.CreateKnown(GameObjectType.Owliver);
-        go.Spatial.Transform.p += new Vector2(450, 600);
-        AddGameObject(go);
-        Global.Owliver = go;
+        Owliver = GameObjectFactory.CreateKnown(GameObjectType.Owliver);
+        Owliver.Spatial.Position += Global.ToMeters(450, 600);
+        AddGameObject(Owliver);
       }
-	  
-	  {
-        var go = GameObjectFactory.CreateKnown(GameObjectType.Camera);
-        go.GetComponent<CameraComponent>().Bounds = GraphicsDevice.Viewport.Bounds.Size.ToVector2();
 
-        go.Spatial.Transform.p = Global.Owliver.GetWorldSpatialData().Transform.p;
+      {
+        ActiveCamera = GameObjectFactory.CreateKnown(GameObjectType.Camera);
+        ActiveCamera.GetComponent<CameraComponent>().Bounds = GraphicsDevice.Viewport.Bounds.Size.ToVector2();
+        ActiveCamera.GetComponent<MovementComponent>().MaxMovementSpeed = 5.0f;
 
-        ActiveCamera = go;
+        ActiveCamera.Spatial.Position = Owliver.GetWorldSpatialData().Position;
+
         AddGameObject(ActiveCamera);
-	  }
+      }
       var testSlurp = GameObjectFactory.CreateKnown(GameObjectType.Slurp);
-      testSlurp.Spatial.Transform.p += new Vector2(500, 450);
+      testSlurp.Spatial.Position += Global.ToMeters(500, 450);
       AddGameObject(testSlurp);
 
       CurrentLevel.LoadContent();
-      CurrentLevel.CullingCenter = Global.Owliver;
+      CurrentLevel.CullingCenter = Owliver;
 
       var BackgroundMusic = Content.Load<Song>("snd/FiluAndDina_-_Video_Game_Background_-_Edit");
       MediaPlayer.IsRepeating = true;
@@ -447,6 +470,10 @@ namespace Owlicity
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
     protected override void Update(GameTime gameTime)
     {
+      CurrentFrameIndex++;
+      MainDrawCommands.Clear();
+      DebugDrawCommands.Clear();
+
       float deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
       Input.Update(deltaSeconds);
@@ -458,21 +485,28 @@ namespace Owlicity
 
 #if DEBUG
       deltaSeconds *= Input.DebugInput.SpeedMultiplier;
-#endif
 
-      OwliverComponent oc = Global.Owliver.GetComponent<OwliverComponent>();
-      oc.MovementVector = Input.CharacterMovement;
-      oc.Input = Input.CharacterInput;
-
-      // TODO(manu): Make use of `Input.CompationInput`!
-
-#if DEBUG
       {
         var mv = ActiveCamera.GetComponent<MovementComponent>();
         //mv.Input = Input.DebugInput;
         mv.MovementVector = Input.DebugMovement;
       }
+
+      if(Input.DebugInput.ToggleMainDrawing)
+        MainDrawingEnabled = !MainDrawingEnabled;
+
+      if(Input.DebugInput.ToggleDebugDrawing)
+        DebugDrawingEnabled = !DebugDrawingEnabled;
+
+      if(Input.DebugInput.TogglePhysicsDebugView)
+        PhysicsDebugView.Enabled = !PhysicsDebugView.Enabled;
 #endif
+
+      OwliverComponent oc = Owliver.GetComponent<OwliverComponent>();
+      oc.MovementVector = Input.CharacterMovement;
+      oc.Input = Input.CharacterInput;
+
+      // TODO(manu): Make use of `Input.CompationInput`!
 
       // Add pending game objects.
       GameObjects.AddRange(GameObjectsPendingAdd);
@@ -523,6 +557,8 @@ namespace Owlicity
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
     protected override void Draw(GameTime gameTime)
     {
+      base.Draw(gameTime);
+
       float deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
       GraphicsDevice.Clear(Color.CornflowerBlue);
@@ -530,32 +566,29 @@ namespace Owlicity
       Matrix viewMatrix = cam.ViewMatrix;
       Matrix projectionMatrix = cam.ProjectionMatrix;
 
-      batch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, viewMatrix);
-      CurrentLevel.Draw(deltaSeconds, batch);
-
-      foreach(GameObject go in GameObjects)
+      if(MainDrawingEnabled)
       {
-        go.Draw(deltaSeconds, batch);
+        batch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, viewMatrix);
+        foreach(MainDrawCommand drawCommand in MainDrawCommands)
+        {
+          drawCommand(batch);
+        }
+        batch.End();
       }
 
-      //dummy.Draw(batch);
-
-      // Draw the origin of the world.
-      int radius = 2;
-      batch.FillRectangle(new Rectangle { X = -radius, Y = -radius, Width = 2 * radius, Height = 2 * radius }, Color.Lime);
-
-      batch.End();
-
-      batch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, viewMatrix);
-      foreach(GameObject go in GameObjects)
+      if(DebugDrawingEnabled)
       {
-        go.DebugDraw(deltaSeconds, batch);
+        //batch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, viewMatrix);
+        PhysicsDebugView.BeginCustomDraw(ref projectionMatrix, ref viewMatrix);
+        foreach(DebugDrawCommand drawCommand in DebugDrawCommands)
+        {
+          drawCommand(PhysicsDebugView);
+        }
+        PhysicsDebugView.EndCustomDraw();
+        //batch.End();
       }
-      batch.End();
 
       PhysicsDebugView.RenderDebugData(ref projectionMatrix, ref viewMatrix);
-
-      base.Draw(gameTime);
     }
   }
 }

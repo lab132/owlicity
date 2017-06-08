@@ -1,9 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VelcroPhysics.Dynamics;
 
 namespace Owlicity
@@ -13,8 +8,8 @@ namespace Owlicity
     //
     // Init data
     //
-    public float MaxMovementSpeed = 400.0f;
-    public float MovementDamping = 0.85f;
+    public float MaxMovementSpeed = 1.5f;
+    public float MovementDamping = 0.15f; // Loss of linear velocity per frame.
 
     //
     // Runtime data
@@ -65,11 +60,13 @@ namespace Owlicity
         Body body = ControlledBody;
         if(body != null)
         {
-          body.LinearVelocity = movementVector * MaxMovementSpeed;
+          Vector2 impulse = movementVector;
+          body.ApplyLinearImpulse(ref impulse);
+          body.LinearVelocity = body.LinearVelocity.GetClampedTo(MaxMovementSpeed);
         }
         else
         {
-          Owner.Spatial.Transform.p += movementVector * MaxMovementSpeed * deltaSeconds;
+          Owner.Spatial.Position += movementVector * MaxMovementSpeed * deltaSeconds;
         }
       }
     }
@@ -79,9 +76,10 @@ namespace Owlicity
       base.Update(deltaSeconds);
 
       Body body = ControlledBody;
-      if(body != null)
+      if(body != null && MovementDamping > 0.0f)
       {
-        body.LinearVelocity *= MovementDamping;
+        float preserved = 1 - MovementDamping;
+        body.LinearVelocity *= preserved;
       }
     }
   }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework.Graphics;
 
 namespace Owlicity
 {
@@ -33,15 +28,15 @@ namespace Owlicity
       }
     }
 
-    public override void Draw(float deltaSeconds, SpriteBatch batch)
+    public override void Update(float deltaSeconds)
     {
-      base.Draw(deltaSeconds, batch);
+      base.Update(deltaSeconds);
 
-      if(Sprite != null)
+      Global.Game.MainDrawCommands.Add(batch =>
       {
         SpatialData worldSpatial = Hotspot.GetWorldSpatialData();
         Sprite.Draw(batch, worldSpatial, RenderDepth);
-      }
+      });
     }
   }
 }

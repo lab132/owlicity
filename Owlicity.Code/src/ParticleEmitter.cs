@@ -3,8 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Owlicity
 {
@@ -105,7 +103,7 @@ namespace Owlicity
             color: _particles[i].Color,
             rotation: _particles[i].Rotation,
             origin: Vector2.Zero, // Note(manu): I still have no idea what this parameter does.
-            scale: Vector2.One,
+            scale: Global.RenderScale,
             effects: SpriteEffects.None,
             layerDepth: 0.0f); // TODO(manu): Proper depth for particles.
         }

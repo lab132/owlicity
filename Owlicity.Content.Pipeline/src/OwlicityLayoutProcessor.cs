@@ -99,10 +99,7 @@ namespace Owlicity.Content.Pipeline
 
       Diagnostic(context.Logger, $"Parsing pixel data took {duration.TotalSeconds.ToString("0.000")} seconds.");
 
-      // For all following warnings.
-      context.Logger.Indent();
-
-      List<ScreenLayoutInfo> result = new List<ScreenLayoutInfo>();
+      List<ScreenLayoutInfo> result = new List<ScreenLayoutInfo>(numJobs * 200);
       foreach(JobInfo jobResult in jobInfos)
       {
         result.AddRange(jobResult.infos);
@@ -116,8 +113,6 @@ namespace Owlicity.Content.Pipeline
       DetectClosePixels(context, result);
 #endif
 
-      context.Logger.Unindent();
-
       return result;
     }
 
@@ -128,15 +123,15 @@ namespace Owlicity.Content.Pipeline
       uint[] data = new uint[width];
       for(int localPixelIndex = 0; localPixelIndex < data.Length; localPixelIndex++)
       {
-        int x = localPixelIndex;
-        int y = rowOffset;
-
         int pixelIndex = pixelOffset + localPixelIndex;
         int byteIndex = pixelIndex * 4;
         Color pixel = new Color(BitConverter.ToUInt32(bytes, byteIndex));
 
         if(pixel.A > 0)
         {
+          int x = localPixelIndex;
+          int y = rowOffset;
+
           uint hexColor = (uint)pixel.R << 24 | (uint)pixel.G << 16 | (uint)pixel.B << 8 | (uint)0xFF;
           GameObjectType objectType = GetGameObjectTypeFromColor(hexColor);
           if(objectType != GameObjectType.Unknown)
@@ -144,12 +139,12 @@ namespace Owlicity.Content.Pipeline
             infos.Add(new ScreenLayoutInfo
             {
               ObjectType = objectType,
-              Offset = new Vector2(x, y),
+              OffsetInMeters = Global.ToMeters(x, y),
             });
           }
           else
           {
-            warnings.Add($"Unknown layout color: {pixel} (hex: 0x{hexColor.ToString("X8")})");
+            warnings.Add($"Unknown layout color at {x + 1}x{y + 1}: {pixel} (hex: 0x{hexColor.ToString("X8")})");
           }
         }
       }
@@ -175,13 +170,16 @@ namespace Owlicity.Content.Pipeline
       {
         for(int otherIndex = infoIndex + 1; otherIndex < infos.Count; otherIndex++)
         {
-          Vector2 a = infos[infoIndex].Offset;
-          Vector2 b = infos[otherIndex].Offset;
+          Vector2 a = infos[infoIndex].OffsetInMeters;
+          Vector2 b = infos[otherIndex].OffsetInMeters;
 
-          float distance = Vector2.Distance(a, b);
+          float distance = Global.ToPixels(Vector2.Distance(a, b));
           if(distance <= 2)
           {
-            context.Logger.LogWarning(null, null, $"Pixels are too close together (distance: {distance}): {a} <-> {b}");
+            // Note(manu): a and b are zero-based offsets. We report the one-based pixel because that's what the artist expects.
+            Point aPixelPos = (a + Vector2.One).ToPoint();
+            Point bPixelPos = (b + Vector2.One).ToPoint();
+            context.Logger.LogWarning(null, null, $"Pixels are really close together (distance: {distance}): {aPixelPos} <-> {bPixelPos}");
           }
         }
       }
