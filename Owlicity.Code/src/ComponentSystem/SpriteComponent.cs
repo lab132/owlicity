@@ -32,7 +32,7 @@ namespace Owlicity
     {
       base.Draw(batch);
 
-      SpatialData worldSpatial = Hotspot.GetWorldSpatialData();
+      SpatialData worldSpatial = this.GetWorldSpatialData();
       Sprite.Draw(batch, worldSpatial, RenderDepth);
     }
   }

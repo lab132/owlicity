@@ -21,6 +21,7 @@ namespace Owlicity
     public bool IsChasing;
 
     public MovementComponent MovementComponent { get; set; }
+    public SpriteAnimationComponent SpriteAnimationComponent { get; set; }
 
     public float MeanHitTime = 0.25f;
     public float HalfMeanHitTime => 0.5f * MeanHitTime;
@@ -29,7 +30,7 @@ namespace Owlicity
     public bool IsHit => CurrentHitTime > 0.0f;
 
     private Vector2 NormalScale = Vector2.One;
-    private Vector2 HitScale = Vector2.One;
+    private Vector2 HitScale = new Vector2(1.5f, 0.5f);
 
     public EnemyComponent(GameObject owner) : base(owner)
     {
@@ -42,6 +43,11 @@ namespace Owlicity
       if(MovementComponent == null)
       {
         MovementComponent = Owner.GetComponent<MovementComponent>();
+      }
+
+      if(SpriteAnimationComponent == null)
+      {
+        SpriteAnimationComponent = Owner.GetComponent<SpriteAnimationComponent>();
       }
 
       switch(EnemyType)
@@ -106,7 +112,9 @@ namespace Owlicity
           default: throw new NotImplementedException();
         }
 
+#if true
         MovementComponent.PerformMovement(movementVector, deltaSeconds);
+#endif
       }
     }
 
@@ -123,6 +131,32 @@ namespace Owlicity
         }
       }
 
+      if(SpriteAnimationComponent != null)
+      {
+        if(IsHit)
+        {
+          // TODO(manu): Replace this with a curve!
+          Vector2 scale;
+          if(CurrentHitTime > HalfMeanHitTime)
+          {
+            float time = CurrentHitTime - HalfMeanHitTime;
+            float alpha = time / HalfMeanHitTime;
+            scale = Vector2.LerpPrecise(HitScale, NormalScale, alpha);
+          }
+          else
+          {
+            float alpha = CurrentHitTime / HalfMeanHitTime;
+            scale = Vector2.LerpPrecise(NormalScale, HitScale, alpha);
+          }
+
+          SpriteAnimationComponent.AdditionalScale = scale;
+        }
+        else
+        {
+          SpriteAnimationComponent.AdditionalScale = null;
+        }
+      }
+
       Global.Game.DebugDrawCommands.Add(view =>
       {
         Color color = IsHit ? Color.Red : IsChasing ? Color.Yellow : Color.Green;
@@ -132,8 +166,7 @@ namespace Owlicity
 
     public void Hit(float strength)
     {
-      const float meanHitTime = 0.25f;
-      CurrentHitTime = meanHitTime * strength;
+      CurrentHitTime = MeanHitTime * strength;
     }
   }
 }

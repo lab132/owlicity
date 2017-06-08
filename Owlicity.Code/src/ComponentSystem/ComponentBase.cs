@@ -40,7 +40,6 @@ namespace Owlicity
   public abstract class DrawComponent : SpatialComponent
   {
     public float RenderDepth;
-    public SpatialData Hotspot = new SpatialData();
 
     public DrawComponent(GameObject owner) : base(owner)
     {
@@ -49,8 +48,6 @@ namespace Owlicity
     public override void Initialize()
     {
       base.Initialize();
-
-      Hotspot.AttachTo(this);
     }
 
     public override void Update(float deltaSeconds)

@@ -270,7 +270,9 @@ namespace Owlicity
             const float strength = 1.0f;
             const float impulseFactor = strength * 0.1f;
             Vector2 impulse = impulseFactor * (enemy.Position - owliverBody.Position);
+#if true
             enemy.ApplyLinearImpulse(impulse);
+#endif
 
             if(ec != null)
             {

@@ -105,14 +105,20 @@ namespace Owlicity
       }
     }
 
-    public void Draw(SpriteBatch spriteBatch, SpatialData spatial, float depth)
+    public void Draw(SpriteBatch spriteBatch, SpatialData spatial, float depth, Vector2? additionalScale = null)
     {
       if (Data.Frames.Count > 0)
       {
+        Vector2 scale = State.Scale;
+        if(additionalScale != null)
+          scale *= additionalScale.Value;
+
         int frameIndex = MathHelper.Clamp(State.CurrentFrameIndex, 0, Data.Frames.Count - 1);
         SpriteAnimationFrame frame = Data.Frames[frameIndex];
+
         _currentSprite.TextureOffset = frame.Offset;
-        _currentSprite.Scale = State.Scale;
+        _currentSprite.Hotspot = State.Hotspot;
+        _currentSprite.Scale = scale;
         _currentSprite.SpriteEffects = State.SpriteEffects;
         _currentSprite.Draw(spriteBatch, spatial, depth);
       }

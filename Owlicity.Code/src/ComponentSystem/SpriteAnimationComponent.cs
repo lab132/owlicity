@@ -27,6 +27,8 @@ namespace Owlicity
     public Dictionary<SpriteAnimationType, SpriteAnimationInstance> AnimationInstances =
       new Dictionary<SpriteAnimationType, SpriteAnimationInstance>();
 
+    public Vector2? AdditionalScale;
+
     public SpriteAnimationComponent(GameObject owner) : base(owner)
     {
     }
@@ -41,7 +43,6 @@ namespace Owlicity
         AnimationInstances.Add(type, animation);
       }
 
-      Hotspot.AttachTo(this);
       ChangeActiveAnimation(AnimationTypes[0]);
     }
 
@@ -62,7 +63,6 @@ namespace Owlicity
         }
 
         ActiveAnimationType = newAnimationType;
-        Hotspot.Position = -(ActiveAnimation.State.Hotspot * ActiveAnimation.State.Scale * Global.MetersPerPixel);
 
         ActiveAnimation.Play();
 
@@ -97,8 +97,8 @@ namespace Owlicity
     {
       base.Draw(batch);
 
-      SpatialData worldSpatial = Hotspot.GetWorldSpatialData();
-      ActiveAnimation.Draw(batch, worldSpatial, RenderDepth);
+      SpatialData worldSpatial = this.GetWorldSpatialData();
+      ActiveAnimation.Draw(batch, worldSpatial, RenderDepth, AdditionalScale);
     }
   }
 }

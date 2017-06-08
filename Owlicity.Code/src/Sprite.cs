@@ -8,6 +8,7 @@ namespace Owlicity
     public Texture2D Texture;
     public Point TextureOffset;
     public Point TextureDim;
+    public Vector2 Hotspot;
     public Vector2 Scale = Vector2.One;
     public Color Tint = Color.White;
     public SpriteEffects SpriteEffects;
@@ -18,14 +19,17 @@ namespace Owlicity
       if(textureDim == Point.Zero)
         textureDim = Texture.Bounds.Size;
 
+      Rectangle sourceRect = new Rectangle { Location = TextureOffset, Size = textureDim };
+      Vector2 scale = Scale * Global.RenderScale;
+
       spriteBatch.Draw(
         texture: Texture,
         position: spatial.Position,
-        sourceRectangle: new Rectangle { Location = TextureOffset, Size = textureDim },
+        sourceRectangle: sourceRect,
         color: Tint,
         rotation: spatial.Rotation.Radians,
-        origin: Vector2.Zero, // Note(manu): I have no idea what this parameter does.
-        scale: Scale * Global.RenderScale,
+        origin: Hotspot,
+        scale: scale,
         effects: SpriteEffects,
         layerDepth: depth);
 
