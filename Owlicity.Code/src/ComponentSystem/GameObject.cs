@@ -1,6 +1,4 @@
-﻿// #define CAMERA_HAS_BODY
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -146,34 +144,7 @@ namespace Owlicity
           var cc = new CameraComponent(go)
           {
           };
-
-#if CAMERA_HAS_BODY
-          var bc = new BodyComponent(go)
-          {
-            InitMode = BodyComponentInitMode.Manual,
-          };
-          bc.OnInitialize += () =>
-          {
-            SpatialData initSpatial = go.GetWorldSpatialData();
-            bc.Body = BodyFactory.CreateRectangle(
-              world: Global.Game.World,
-              width: cc.Bounds.X,
-              height: cc.Bounds.Y,
-              density: 1.0f, // ??
-              position: initSpatial.Transform.p,
-              rotation: initSpatial.Transform.q.GetAngle(),
-              bodyType: BodyType.Kinematic, // TODO(manu): Make this dynamic.
-              userData: bc);
-            bc.Body.FixedRotation = true;
-            bc.Body.CollisionCategories = Category.None;
-            bc.Body.CollidesWith = Global.LevelCollisionCategory;
-          };
-          go.RootComponent = bc;
-
-          cc.AttachTo(bc);
-#else
           cc.AttachTo(go);
-#endif
 
           var mc = new MovementComponent(go)
           {

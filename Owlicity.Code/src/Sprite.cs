@@ -19,30 +19,22 @@ namespace Owlicity
       if(textureDim == Point.Zero)
         textureDim = Texture.Bounds.Size;
 
-      Rectangle sourceRect = new Rectangle { Location = TextureOffset, Size = textureDim };
-      Vector2 scale = Scale * Global.RenderScale;
+      Rectangle sourceRect = new Rectangle
+      {
+        Location = TextureOffset,
+        Size = textureDim
+      };
 
-      spriteBatch.Draw(
-        texture: Texture,
+      spriteBatch.OwlicityDraw(
         position: spatial.Position,
+        rotation: spatial.Rotation,
+        scale: Scale,
+        depth: depth,
+        texture: Texture,
+        hotspot: Hotspot,
         sourceRectangle: sourceRect,
-        color: Tint,
-        rotation: spatial.Rotation.Radians,
-        origin: Hotspot,
-        scale: scale,
-        effects: SpriteEffects,
-        layerDepth: depth);
-
-#if false
-      spriteBatch.DrawString(
-        spriteFont: Global.Game.Content.Load<SpriteFont>("Font"),
-        text: $"depth: {depth}",
-        position: spatial.Transform.p,
-        color: Color.White
-      );
-
-      spriteBatch.DrawRectangle(spatial.Transform.p, textureDim.ToVector2() * Scale, Color.Red);
-#endif
+        tint: Tint,
+        spriteEffects: SpriteEffects);
     }
   }
 }

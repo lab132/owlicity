@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Owlicity
@@ -92,29 +93,34 @@ namespace Owlicity
 
     public void Draw(SpriteBatch spriteBatch)
     {
-      for (int i = 0; i < _maxNumParticles; i++)
+      Global.Game.Perf.BeginSample(PerformanceSlots.Particles);
+
+      for(int i = 0; i < _maxNumParticles; i++)
       {
         if (_particles[i].TTL > 0)
         {
           Vector2 hotspot = Vector2.Zero;
-
-          // Note(manu): Enable the following to rotate particles around their center.
 #if false
+          // Note(manu): Enable the following to rotate particles around their center.
           hotspot = 0.5f * _particles[i].Texture.Bounds.Size.ToVector2();
 #endif
+          // TODO(manu): Proper depth for particles.
+          float depth = 0.0f;
 
-          spriteBatch.Draw(
-            texture: _particles[i].Texture,
+          spriteBatch.OwlicityDraw(
             position: _particles[i].Position,
+            rotation: new Angle { Radians = _particles[i].Rotation },
+            scale: Vector2.One,
+            depth: depth,
             sourceRectangle: null,
-            color: _particles[i].Color,
-            rotation: _particles[i].Rotation,
-            origin: hotspot,
-            scale: Global.RenderScale,
-            effects: SpriteEffects.None,
-            layerDepth: 0.0f); // TODO(manu): Proper depth for particles.
+            texture: _particles[i].Texture,
+            hotspot: hotspot,
+            tint: _particles[i].Color,
+            spriteEffects: SpriteEffects.None);
         }
       }
+
+      Global.Game.Perf.EndSample(PerformanceSlots.Particles);
     }
   }
 }

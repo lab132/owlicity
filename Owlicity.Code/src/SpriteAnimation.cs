@@ -70,8 +70,6 @@ namespace Owlicity
     public bool IsPaused { get => State.PlaybackState == SpriteAnimationPlaybackState.Paused; }
     public bool IsStopped { get => State.PlaybackState == SpriteAnimationPlaybackState.Stopped; }
 
-    private Sprite _currentSprite;
-
     public void Init(SpriteAnimationData data)
     {
       Data = data;
@@ -83,11 +81,6 @@ namespace Owlicity
         Scale = data.Config.Scale,
         SpriteEffects = data.Config.SpriteEffects,
         Hotspot = data.Config.Hotspot,
-      };
-      _currentSprite = new Sprite
-      {
-        Texture = data.TileSheet,
-        TextureDim = data.Config.TileDim,
       };
     }
 
@@ -116,11 +109,16 @@ namespace Owlicity
         int frameIndex = MathHelper.Clamp(State.CurrentFrameIndex, 0, Data.Frames.Count - 1);
         SpriteAnimationFrame frame = Data.Frames[frameIndex];
 
-        _currentSprite.TextureOffset = frame.Offset;
-        _currentSprite.Hotspot = State.Hotspot;
-        _currentSprite.Scale = scale;
-        _currentSprite.SpriteEffects = State.SpriteEffects;
-        _currentSprite.Draw(spriteBatch, spatial, depth);
+        spriteBatch.OwlicityDraw(
+          spatial.Position,
+          spatial.Rotation,
+          scale,
+          depth,
+          Data.TileSheet,
+          State.Hotspot,
+          new Rectangle { Location = frame.Offset, Size = Data.Config.TileDim },
+          Color.White,
+          State.SpriteEffects);
       }
     }
 

@@ -9,6 +9,7 @@ using System.Linq;
 using VelcroPhysics.DebugViews.MonoGame;
 using VelcroPhysics.Dynamics;
 using VelcroPhysics.Extensions.DebugView;
+using VelcroPhysics.Shared;
 
 /*
   TODO:
@@ -46,6 +47,8 @@ namespace Owlicity
     public bool ToggleMainDrawing;
     public bool ToggleDebugDrawing;
     public bool TogglePhysicsDebugView;
+    public bool ToggleCameraVisibilityBounds;
+    public bool ResetCameraPosition;
 
     public void Reset()
     {
@@ -131,7 +134,7 @@ namespace Owlicity
         // Gamepad
         const int padIndex = 0;
         Vector2 gamepadMovement = newGamepad[padIndex].ThumbSticks.Left * LeftThumbstickSensitivity[padIndex];
-        if(newGamepad[padIndex].WasButtonPressed(Buttons.Y, ref _prevGamepad[padIndex])) CharacterInput.WantsAttack = true;
+        if(newGamepad[padIndex].WasButtonPressed(Buttons.X, ref _prevGamepad[padIndex])) CharacterInput.WantsAttack = true;
         if(newGamepad[padIndex].WasButtonPressed(Buttons.A, ref _prevGamepad[padIndex])) CharacterInput.WantsInteraction = true;
         if(newGamepad[padIndex].WasButtonPressed(Buttons.Start, ref _prevGamepad[padIndex])) CharacterInput.WantsInteraction = true;
 
@@ -180,22 +183,23 @@ namespace Owlicity
         if(newKeyboard.IsKeyDown(Keys.D)) keyboardMovement.X += 1.0f;
         if(newKeyboard.IsKeyDown(Keys.W)) keyboardMovement.Y -= 1.0f;
         if(newKeyboard.IsKeyDown(Keys.S)) keyboardMovement.Y += 1.0f;
+
         if(newKeyboard.WasKeyPressed(Keys.F1, ref _prevKeyboard)) DebugInput.ToggleMainDrawing = true;
         if(newKeyboard.WasKeyPressed(Keys.F2, ref _prevKeyboard)) DebugInput.ToggleDebugDrawing = true;
         if(newKeyboard.WasKeyPressed(Keys.F3, ref _prevKeyboard)) DebugInput.TogglePhysicsDebugView = true;
+        if(newKeyboard.WasKeyPressed(Keys.F4, ref _prevKeyboard)) DebugInput.ToggleCameraVisibilityBounds = true;
 
-        float speedMultiplierDelta = 0.0f;
-        if(newKeyboard.WasKeyPressed(Keys.D1, ref _prevKeyboard)) speedMultiplierDelta -= 0.5f;
-        if(newKeyboard.WasKeyPressed(Keys.D2, ref _prevKeyboard)) speedMultiplierDelta += 0.5f;
+        if(newKeyboard.WasKeyPressed(Keys.D1, ref _prevKeyboard)) DebugInput.SpeedMultiplier -= 0.5f;
+        if(newKeyboard.WasKeyPressed(Keys.D2, ref _prevKeyboard)) DebugInput.SpeedMultiplier += 0.5f;
         if(newKeyboard.WasKeyPressed(Keys.D3, ref _prevKeyboard))
         {
-          speedMultiplierDelta = 0.0f;
           DebugInput.SpeedMultiplier = 1.0f;
         }
         else
         {
-          DebugInput.SpeedMultiplier = MathHelper.Clamp(DebugInput.SpeedMultiplier + speedMultiplierDelta, 0.1f, 10.0f);
+          DebugInput.SpeedMultiplier = MathHelper.Clamp(DebugInput.SpeedMultiplier, min: 0.1f, max: 10.0f);
         }
+        if(newKeyboard.WasKeyPressed(Keys.D4, ref _prevKeyboard)) DebugInput.ResetCameraPosition = true;
 
 
         // Gamepad
@@ -225,8 +229,65 @@ namespace Owlicity
     }
   }
 
-  public delegate void MainDrawCommand(SpriteBatch batch);
   public delegate void DebugDrawCommand(DebugView view);
+
+  public enum PerformanceSlots
+  {
+    InputUpdate,
+    WorldStep,
+
+    Particles,
+
+    COUNT
+  }
+
+  public class Performance
+  {
+    public int NumSlots { get; private set; }
+    public int NumSamplesPerFrame { get; private set; }
+    public Stopwatch[,] Samples;
+
+    public int CurrentSampleIndex;
+
+    public void BeginSample(PerformanceSlots slot)
+    {
+      Stopwatch sample = Samples[(int)slot, CurrentSampleIndex];
+      Debug.Assert(!sample.IsRunning);
+      sample.Restart();
+    }
+
+    public void EndSample(PerformanceSlots slot)
+    {
+      Stopwatch sample = Samples[(int)slot, CurrentSampleIndex];
+      Debug.Assert(sample.IsRunning);
+      sample.Stop();
+    }
+
+    public void Initialize(int numSlots, int numFramesToCapture)
+    {
+      NumSlots = numSlots;
+      NumSamplesPerFrame = numFramesToCapture;
+      Samples = new Stopwatch[NumSlots, NumSamplesPerFrame];
+      for(int slotIndex = 0; slotIndex < NumSlots; slotIndex++)
+      {
+        for(int sampleIndex = 0; sampleIndex < NumSamplesPerFrame; sampleIndex++)
+        {
+          Samples[slotIndex, sampleIndex] = new Stopwatch();
+        }
+      }
+
+      CurrentSampleIndex = 0;
+    }
+
+    public void AdvanceFrame()
+    {
+      CurrentSampleIndex++;
+      if(CurrentSampleIndex >= NumSamplesPerFrame)
+      {
+        CurrentSampleIndex = 0;
+      }
+    }
+  }
 
   /// <summary>
   /// This is the main type for your game.
@@ -252,6 +313,8 @@ namespace Owlicity
     public DebugView PhysicsDebugView { get; set; }
 
     public int CurrentFrameIndex { get; private set; }
+
+    public Performance Perf { get; } = new Performance();
 
     //
     // Game object stuff
@@ -339,6 +402,8 @@ namespace Owlicity
     /// </summary>
     protected override void Initialize()
     {
+      Perf.Initialize((int)PerformanceSlots.COUNT, 120);
+
 #if DEBUG
       DebugDrawingEnabled = true;
 #endif
@@ -384,70 +449,38 @@ namespace Owlicity
         }
       }
 
-#if false
-      {
-        var go = new GameObject();
-        var bc = new BodyComponent(go)
-        {
-          InitMode = BodyComponentInitMode.FromContent,
-          BodyType = BodyType.Kinematic,
-          ShapeContentName = "slurp_collision",
-        };
-        go.RootComponent = bc;
-
-        var mv = new MovementComponent(go)
-        {
-          MaxMovementSpeed = 800.0f,
-        };
-        mv.ControlledBodyComponent = bc;
-
-        var sa = new SpriteAnimationComponent(go)
-        {
-          AnimationTypes = new List<SpriteAnimationType>
-          {
-            SpriteAnimationType.Slurp_Idle
-          }
-        };
-        sa.AttachTo(bc);
-
-        var pe = new ParticleEmitterComponent(go)
-        {
-          NumParticlesPerTexture = 100,
-          TextureContentNames = new[] { "particle" },
-          AvailableColors = new[] { Color.White, Color.Red, Color.Green, },
-        };
-        //pe.Spatial.Position += sa.
-        pe.AttachTo(bc);
-
-        AddGameObject(go);
-      }
-#endif
+      CurrentLevel.LoadContent();
 
       {
         Owliver = GameObjectFactory.CreateKnown(GameObjectType.Owliver);
         Owliver.Spatial.Position += Global.ToMeters(450, 600);
         AddGameObject(Owliver);
+
+        CurrentLevel.CullingCenter = Owliver;
       }
 
       {
         ActiveCamera = GameObjectFactory.CreateKnown(GameObjectType.Camera);
-        ActiveCamera.GetComponent<CameraComponent>().Bounds = GraphicsDevice.Viewport.Bounds.Size.ToVector2();
-        ActiveCamera.GetComponent<MovementComponent>().MaxMovementSpeed = 5.0f;
 
-#if false
-        ActiveCamera.Spatial.Position = Owliver.GetWorldSpatialData().Position;
-#else
+        var cc = ActiveCamera.GetComponent<CameraComponent>();
+        Vector2 camExtents = 0.5f * Global.ToMeters(GraphicsDevice.Viewport.Bounds.Size.ToVector2());
+        cc.Spatial.LocalAABB = new AABB
+        {
+          LowerBound = -camExtents,
+          UpperBound = camExtents,
+        };
+        cc.VisibilityBounds = CurrentLevel.LevelBounds;
+
+        var mc = ActiveCamera.GetComponent<MovementComponent>();
+        mc.MaxMovementSpeed = 5.0f;
+
         ActiveCamera.AttachTo(Owliver);
-#endif
 
         AddGameObject(ActiveCamera);
       }
       var testSlurp = GameObjectFactory.CreateKnown(GameObjectType.Slurp);
       testSlurp.Spatial.Position += Global.ToMeters(500, 450);
       AddGameObject(testSlurp);
-
-      CurrentLevel.LoadContent();
-      CurrentLevel.CullingCenter = Owliver;
 
       var BackgroundMusic = Content.Load<Song>("snd/FiluAndDina_-_Video_Game_Background_-_Edit");
       MediaPlayer.IsRepeating = true;
@@ -478,7 +511,9 @@ namespace Owlicity
 
       float deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
+      Perf.BeginSample(PerformanceSlots.InputUpdate);
       Input.Update(deltaSeconds);
+      Perf.EndSample(PerformanceSlots.InputUpdate);
 
       if(Input.PlatformInput.WantsExit)
       {
@@ -502,6 +537,24 @@ namespace Owlicity
 
       if(Input.DebugInput.TogglePhysicsDebugView)
         PhysicsDebugView.Enabled = !PhysicsDebugView.Enabled;
+
+      if(Input.DebugInput.ToggleCameraVisibilityBounds)
+      {
+        var cc = ActiveCamera.GetComponent<CameraComponent>();
+        if(cc.VisibilityBounds == null)
+        {
+          cc.VisibilityBounds = CurrentLevel.LevelBounds;
+        }
+        else
+        {
+          cc.VisibilityBounds = null;
+        }
+      }
+
+      if(Input.DebugInput.ResetCameraPosition)
+      {
+        ActiveCamera.Spatial.Position = Vector2.Zero;
+      }
 #endif
 
       OwliverComponent oc = Owliver.GetComponent<OwliverComponent>();
@@ -526,11 +579,13 @@ namespace Owlicity
 
       // Physics simulation
       float simTime = _excessSimTime + deltaSeconds;
+      Perf.BeginSample(PerformanceSlots.WorldStep);
       while(simTime > _secondsPerSimStep)
       {
         World.Step(_secondsPerSimStep);
         simTime -= _secondsPerSimStep;
       }
+      Perf.EndSample(PerformanceSlots.WorldStep);
       _excessSimTime = simTime;
 
       CurrentLevel.Update(deltaSeconds);
@@ -551,6 +606,8 @@ namespace Owlicity
       GameObjectsPendingRemove.Clear();
 
       base.Update(gameTime);
+
+      Perf.AdvanceFrame();
     }
 
     /// <summary>
@@ -561,36 +618,53 @@ namespace Owlicity
     {
       base.Draw(gameTime);
 
-      float deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
       GraphicsDevice.Clear(Color.CornflowerBlue);
       Camera cam = ActiveCamera.GetComponent<CameraComponent>().Camera;
-      Matrix viewMatrix = cam.ViewMatrix;
-      Matrix projectionMatrix = cam.ProjectionMatrix;
 
       if(MainDrawingEnabled)
       {
-        batch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, viewMatrix);
+        batch.Begin(sortMode: SpriteSortMode.BackToFront, effect: cam.Effect);
+
         foreach(GameObject go in GameObjects)
         {
           go.Draw(batch);
         }
+
         batch.End();
       }
 
       if(DebugDrawingEnabled)
       {
-        //batch.Begin(SpriteSortMode.BackToFront, null, null, null, null, null, viewMatrix);
-        PhysicsDebugView.BeginCustomDraw(ref projectionMatrix, ref viewMatrix);
+        PhysicsDebugView.BeginCustomDraw(ref cam.ProjectionMatrix, ref cam.ViewMatrix);
+
         foreach(DebugDrawCommand drawCommand in DebugDrawCommands)
         {
           drawCommand(PhysicsDebugView);
         }
+
+        for(int slot = 0; slot < Perf.NumSlots; slot++)
+        {
+          TimeSpan slotMin = TimeSpan.MaxValue;
+          TimeSpan slotMax = TimeSpan.MinValue;
+          TimeSpan slotAvg = TimeSpan.Zero;
+          for(int sampleIndex = 0; sampleIndex < Perf.NumSamplesPerFrame; sampleIndex++)
+          {
+            TimeSpan sampleValue = Perf.Samples[slot, sampleIndex].Elapsed;
+            if(sampleValue < slotMin) slotMin = sampleValue;
+            if(sampleValue > slotMax) slotMax = sampleValue;
+            slotAvg += sampleValue;
+          }
+          slotAvg = new TimeSpan(ticks: slotAvg.Ticks / Perf.NumSamplesPerFrame);
+
+          Vector2 pos = new Vector2(20, 30 * slot + 20);
+          Func<TimeSpan, string> f = ts => $"{ts.TotalMilliseconds.ToString("N04", System.Globalization.CultureInfo.InvariantCulture)}ms";
+          PhysicsDebugView.DrawString(pos, $"{(PerformanceSlots)slot}: min {f(slotMin)} | max {f(slotMax)} | avg {f(slotAvg)}");
+        }
+
         PhysicsDebugView.EndCustomDraw();
-        //batch.End();
       }
 
-      PhysicsDebugView.RenderDebugData(ref projectionMatrix, ref viewMatrix);
+      PhysicsDebugView.RenderDebugData(ref cam.ProjectionMatrix, ref cam.ViewMatrix);
     }
   }
 }

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Content;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using VelcroPhysics.Shared;
 
 namespace Owlicity
 {
@@ -23,6 +24,30 @@ namespace Owlicity
     public int ScreenTileWidth { get; set; } = 1920;
     public int ScreenTileHeight { get; set; } = 1080;
     public ISpatial CullingCenter { get; set; }
+
+    public AABB LevelBounds
+    {
+      get
+      {
+        AABB result = new AABB
+        {
+          LowerBound = new Vector2(float.MaxValue),
+          UpperBound = new Vector2(float.MinValue),
+        };
+        Vector2 extents = Global.ToMeters(ScreenTileWidth, ScreenTileHeight);
+
+        foreach(Screen screen in _screens)
+        {
+          if(screen != null)
+          {
+            result.LowerBound = Vector2.Min(result.LowerBound, screen.WorldPosition);
+            result.UpperBound = Vector2.Max(result.UpperBound, screen.WorldPosition + extents);
+          }
+        }
+
+        return result;
+      }
+    }
 
     public string ContentNameFormat_Ground;
     public string ContentNameFormat_Layout;

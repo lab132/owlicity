@@ -32,12 +32,22 @@ namespace Owlicity
 
   public class SpatialData : ISpatial
   {
-    public SpatialData Spatial { get => this; }
+    public SpatialData Spatial => this;
 
     public ISpatial Parent;
     public Vector2 Position;
     public Angle Rotation;
+
+    // Note(manu): Local to this SpatialData object, i.e. Position is not being accounted for.
+    public AABB LocalAABB;
+
     public Transform Transform_ => new Transform { p = Position, q = new Rot(Rotation.Radians), };
+
+    public AABB WorldAABB => new AABB
+    {
+      LowerBound = LocalAABB.LowerBound + Position,
+      UpperBound = LocalAABB.UpperBound + Position
+    };
 
     public override string ToString()
     {
@@ -49,7 +59,7 @@ namespace Owlicity
   {
     /// <summary>
     /// Gets the world position and rotation for this spatial object.
-    /// RenderDepth is not inherited.
+    /// The result has the same LocalAABB, i.e. it is not inherited.
     /// The result will have no parent.
     /// </summary>
     public static SpatialData GetWorldSpatialData(this ISpatial self)
@@ -72,9 +82,52 @@ namespace Owlicity
       {
         Position = position,
         Rotation = new Angle { Radians = radians },
+        LocalAABB = self.Spatial.LocalAABB,
       };
 
       return result;
+    }
+
+    public static void SetWorldPositionAndRotation(this ISpatial self, Vector2 worldPosition, Angle worldRotation)
+    {
+      if(self.Spatial.Parent != null)
+      {
+        SpatialData parent = self.Spatial.Parent.GetWorldSpatialData();
+        self.Spatial.Position = worldPosition - parent.Position;
+        self.Spatial.Rotation = worldRotation - parent.Rotation;
+      }
+      else
+      {
+        self.Spatial.Position = worldPosition;
+        self.Spatial.Rotation = worldRotation;
+      }
+    }
+
+
+    public static void SetWorldPosition(this ISpatial self, Vector2 worldPosition)
+    {
+      if(self.Spatial.Parent != null)
+      {
+        SpatialData parent = self.Spatial.Parent.GetWorldSpatialData();
+        self.Spatial.Position = worldPosition - parent.Position;
+      }
+      else
+      {
+        self.Spatial.Position = worldPosition;
+      }
+    }
+
+    public static void SetWorldRotation(this ISpatial self, Angle worldRotation)
+    {
+      if(self.Spatial.Parent != null)
+      {
+        SpatialData parent = self.Spatial.Parent.GetWorldSpatialData();
+        self.Spatial.Rotation = worldRotation - parent.Rotation;
+      }
+      else
+      {
+        self.Spatial.Rotation = worldRotation;
+      }
     }
 
     public static void AttachTo(this ISpatial self, ISpatial newParent)
@@ -90,9 +143,11 @@ namespace Owlicity
     {
       if(newParent != self)
       {
-        SpatialData offset = new SpatialData();
-        offset.Position = positionOffset;
-        offset.Rotation = rotationOffset;
+        SpatialData offset = new SpatialData()
+        {
+          Position = positionOffset,
+          Rotation = rotationOffset
+        };
 
         offset.AttachTo(newParent);
         self.AttachTo(offset);
