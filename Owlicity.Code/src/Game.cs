@@ -434,7 +434,11 @@ namespace Owlicity
         ActiveCamera.GetComponent<CameraComponent>().Bounds = GraphicsDevice.Viewport.Bounds.Size.ToVector2();
         ActiveCamera.GetComponent<MovementComponent>().MaxMovementSpeed = 5.0f;
 
+#if false
         ActiveCamera.Spatial.Position = Owliver.GetWorldSpatialData().Position;
+#else
+        ActiveCamera.AttachTo(Owliver);
+#endif
 
         AddGameObject(ActiveCamera);
       }
