@@ -217,6 +217,11 @@ namespace Owlicity
           };
           sa.Spatial.Position += Global.ToMeters(0, -10);
           sa.AttachTo(bc);
+
+          var hc = new HealthComponent(go)
+          {
+            MaxHealth = 3.0f,
+          };
         }
         break;
 

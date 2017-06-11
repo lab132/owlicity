@@ -32,6 +32,9 @@ namespace Owlicity
 
     public bool IsHit => CurrentHitDuration > 0.0f;
 
+    // The amount of damage caused by this enemy.
+    public float Damage = 1.0f;
+
     public EnemyComponent(GameObject owner) : base(owner)
     {
     }
@@ -71,6 +74,7 @@ namespace Owlicity
 
       var owliverBC = Global.Game.Owliver.GetComponent<BodyComponent>();
       var owliverSqc = Global.Game.Owliver.GetComponent<SquashComponent>();
+      var owliverHc = Global.Game.Owliver.GetComponent<HealthComponent>();
       bc.Body.OnCollision += delegate (Fixture fixtureA, Fixture fixtureB, Contact contact)
       {
         Debug.Assert(fixtureA.UserData != owliverBC);
@@ -83,6 +87,8 @@ namespace Owlicity
 
           owliverSqc.SetupDefaultSquashData(0.25f);
           owliverSqc.StartSquashing();
+
+          owliverHc.CurrentHealth -= Damage;
         }
       };
     }

@@ -44,6 +44,7 @@
     <Compile Include="src\ComponentSystem\BodyComponent.cs" />
     <Compile Include="src\ComponentSystem\EnemyComponent.cs" />
     <Compile Include="src\ComponentSystem\CameraComponent.cs" />
+    <Compile Include="src\ComponentSystem\HealthComponent.cs" />
     <Compile Include="src\ComponentSystem\MovementComponent.cs" />
     <Compile Include="src\ComponentSystem\ComponentBase.cs" />
     <Compile Include="src\ComponentSystem\OwliverComponent.cs" />

@@ -23,19 +23,32 @@ namespace Owlicity
   public class OwlHud
   {
     public SpriteAnimationInstance Anim;
-    public SpatialData Spatial = new SpatialData();
+
+    public GameObject Owliver;
+    public HealthComponent OwliverHealth;
+    public SpatialData OwliverHealthAnchor = new SpatialData();
 
     public void Initialize()
     {
       Anim = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.OwlHealthIcon);
       Anim.State.NumLoopsToPlay = int.MaxValue;
-      Spatial.Position = new Vector2(100, 40);
+      OwliverHealthAnchor.Position = new Vector2(40, 40);
+
+      Owliver = Global.Game.Owliver;
+      OwliverHealth = Owliver.GetComponent<HealthComponent>();
     }
 
     public void Draw(Renderer renderer, float deltaSeconds)
     {
       Anim.Update(deltaSeconds);
-      Anim.Draw(renderer, Spatial, depth: 0.0f);
+      int fullHP = (int)OwliverHealth.CurrentHealth;
+      float partialHP = OwliverHealth.CurrentHealth - fullHP;
+      SpatialData spatial = OwliverHealthAnchor.GetWorldSpatialData();
+      for(int healthIndex = 0; healthIndex < fullHP; healthIndex++)
+      {
+        Anim.Draw(renderer, spatial.GetWorldSpatialData(), depth: 0.0f);
+        spatial.Position.X += 40;
+      }
     }
   }
 
@@ -172,10 +185,6 @@ namespace Owlicity
     {
       Perf.Initialize((int)PerformanceSlots.COUNT, 120);
 
-#if DEBUG
-      DebugDrawingEnabled = true;
-#endif
-
       SpriteAnimationFactory.Initialize(Content);
       GameObjectFactory.Initialize();
 
@@ -183,9 +192,8 @@ namespace Owlicity
 
       PhysicsDebugView = new DebugView(World)
       {
-        Flags = DebugViewFlags.Shape |
-                               DebugViewFlags.PolygonPoints |
-                               DebugViewFlags.AABB
+        Flags = (DebugViewFlags)int.MaxValue,
+        Enabled = false,
       };
 
       base.Initialize();
@@ -410,6 +418,13 @@ namespace Owlicity
         WorldRenderer.End();
       }
 
+      if(HudEnabled)
+      {
+        UIRenderer.Begin(SpriteSortMode.Texture);
+        Hud.Draw(UIRenderer, deltaSeconds);
+        UIRenderer.End();
+      }
+
       if(DebugDrawingEnabled)
       {
         PhysicsDebugView.BeginCustomDraw(ref cam.ProjectionMatrix, ref cam.ViewMatrix);
@@ -442,13 +457,6 @@ namespace Owlicity
       }
 
       PhysicsDebugView.RenderDebugData(ref cam.ProjectionMatrix, ref cam.ViewMatrix);
-
-      if(HudEnabled)
-      {
-        UIRenderer.Begin(SpriteSortMode.Texture);
-        Hud.Draw(UIRenderer, deltaSeconds);
-        UIRenderer.End();
-      }
     }
   }
 }
