@@ -230,6 +230,8 @@ namespace Owlicity
     Orange_Idle,
 
     Bush_Idle,
+
+    OwlHealthIcon,
   }
 
   public struct SpriteAnimationConfig
@@ -244,18 +246,15 @@ namespace Owlicity
     public int? NumLoopsToPlay;
     public Vector2 Hotspot;
 
-    public static SpriteAnimationConfig Default
+    public static readonly SpriteAnimationConfig Default = new SpriteAnimationConfig
     {
-      get => new SpriteAnimationConfig
-      {
-        TileCount = 3,
-        TileDim = new Point(256, 256),
-        Scale = Vector2.One,
-        SecondsPerFrame = 0.05f,
-        PingPong = true,
-        Hotspot = new Vector2(128.0f, 128.0f),
-      };
-    }
+      TileCount = 3,
+      TileDim = new Point(256, 256),
+      Scale = Vector2.One,
+      SecondsPerFrame = 0.05f,
+      PingPong = true,
+      Hotspot = new Vector2(128.0f, 128.0f),
+    };
   }
 
   public static class SpriteAnimationFactory
@@ -471,6 +470,14 @@ namespace Owlicity
           }
           break;
 
+          case SpriteAnimationType.OwlHealthIcon:
+          {
+            config.TileSheetName = "health_icon_spritesheet";
+            config.TileDim = new Point(128);
+            config.Hotspot = 0.5f * config.TileDim.ToVector2();
+            config.Scale = new Vector2(0.5f);
+          }
+          break;
 
           default: throw new ArgumentException("Unknown sprite animation type.");
         }

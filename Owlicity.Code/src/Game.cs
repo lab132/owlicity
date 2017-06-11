@@ -27,7 +27,7 @@ namespace Owlicity
 
     public void Initialize()
     {
-      Anim = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Owliver_AttackFishingRod_Left);
+      Anim = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.OwlHealthIcon);
       Anim.State.NumLoopsToPlay = int.MaxValue;
       Spatial.Position = new Vector2(100, 40);
     }
