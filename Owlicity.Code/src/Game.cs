@@ -474,17 +474,23 @@ namespace Owlicity
         var mc = ActiveCamera.GetComponent<MovementComponent>();
         mc.MaxMovementSpeed = 5.0f;
 
-        ActiveCamera.AttachTo(Owliver);
+        var sac = ActiveCamera.GetComponent<SpringArmComponent>();
+        sac.Target = Owliver;
 
         AddGameObject(ActiveCamera);
       }
-      var testSlurp = GameObjectFactory.CreateKnown(GameObjectType.Slurp);
-      testSlurp.Spatial.Position += Global.ToMeters(500, 450);
-      AddGameObject(testSlurp);
 
-      var BackgroundMusic = Content.Load<Song>("snd/FiluAndDina_-_Video_Game_Background_-_Edit");
-      MediaPlayer.IsRepeating = true;
-      MediaPlayer.Play(BackgroundMusic);
+      {
+        var testSlurp = GameObjectFactory.CreateKnown(GameObjectType.Slurp);
+        testSlurp.Spatial.Position += Global.ToMeters(500, 450);
+        AddGameObject(testSlurp);
+      }
+
+      {
+        var BackgroundMusic = Content.Load<Song>("snd/FiluAndDina_-_Video_Game_Background_-_Edit");
+        MediaPlayer.IsRepeating = true;
+        MediaPlayer.Play(BackgroundMusic);
+      }
     }
 
     /// <summary>

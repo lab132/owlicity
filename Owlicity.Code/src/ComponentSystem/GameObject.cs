@@ -141,10 +141,15 @@ namespace Owlicity
       {
         case GameObjectType.Camera:
         {
+          var sac = new SpringArmComponent(go)
+          {
+          };
+          go.RootComponent = sac;
+
           var cc = new CameraComponent(go)
           {
           };
-          cc.AttachTo(go);
+          cc.AttachTo(sac);
 
           var mc = new MovementComponent(go)
           {

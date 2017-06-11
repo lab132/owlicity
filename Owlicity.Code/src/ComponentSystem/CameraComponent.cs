@@ -75,6 +75,8 @@ namespace Owlicity
     {
       base.Update(deltaSeconds);
 
+      Spatial.Position = Vector2.Zero;
+
       if(VisibilityBounds != null)
       {
         SpatialData worldSpatial = this.GetWorldSpatialData();

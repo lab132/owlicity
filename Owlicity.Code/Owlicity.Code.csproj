@@ -48,6 +48,7 @@
     <Compile Include="src\ComponentSystem\ComponentBase.cs" />
     <Compile Include="src\ComponentSystem\OwliverComponent.cs" />
     <Compile Include="src\ComponentSystem\ParticleEmitterComponent.cs" />
+    <Compile Include="src\ComponentSystem\SpringArmComponent.cs" />
     <Compile Include="src\ComponentSystem\SpriteAnimationComponent.cs" />
     <Compile Include="src\ComponentSystem\SpriteComponent.cs" />
     <Compile Include="src\ComponentSystem\SquashComponent.cs" />
