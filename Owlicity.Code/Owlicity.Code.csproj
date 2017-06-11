@@ -58,10 +58,12 @@
     <Compile Include="src\Game.cs" />
     <Compile Include="src\ComponentSystem\GameObject.cs" />
     <Compile Include="src\Global.cs" />
+    <Compile Include="src\Input.cs" />
     <Compile Include="src\Level.cs" />
     <Compile Include="src\Math.cs" />
     <Compile Include="src\Particle.cs" />
     <Compile Include="src\ParticleEmitter.cs" />
+    <Compile Include="src\Performance.cs" />
     <Compile Include="src\Screen.cs" />
     <Compile Include="src\Sprite.cs" />
     <Compile Include="src\SpriteAnimation.cs" />
