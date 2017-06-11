@@ -98,7 +98,7 @@ namespace Owlicity
       }
     }
 
-    public void Draw(Renderer renderer, SpatialData spatial, float depth, Vector2? additionalScale = null)
+    public void Draw(Renderer renderer, SpatialData spatial, float depth = 0.0f, Vector2? additionalScale = null, Color? tint = null)
     {
       if (Data.Frames.Count > 0)
       {
@@ -117,7 +117,7 @@ namespace Owlicity
           Data.TileSheet,
           State.Hotspot,
           new Rectangle { Location = frame.Offset, Size = Data.Config.TileDim },
-          Color.White,
+          tint ?? Color.White,
           State.SpriteEffects);
       }
     }

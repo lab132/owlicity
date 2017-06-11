@@ -220,7 +220,7 @@ namespace Owlicity
 
           var hc = new HealthComponent(go)
           {
-            MaxHealth = 3.0f,
+            MaxHealth = 3,
           };
         }
         break;

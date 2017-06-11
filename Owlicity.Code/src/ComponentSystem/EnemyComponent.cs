@@ -33,7 +33,7 @@ namespace Owlicity
     public bool IsHit => CurrentHitDuration > 0.0f;
 
     // The amount of damage caused by this enemy.
-    public float Damage = 1.0f;
+    public int Damage = 1;
 
     public EnemyComponent(GameObject owner) : base(owner)
     {

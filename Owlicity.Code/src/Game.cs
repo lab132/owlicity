@@ -27,6 +27,8 @@ namespace Owlicity
     public GameObject Owliver;
     public HealthComponent OwliverHealth;
     public SpatialData OwliverHealthAnchor = new SpatialData();
+    public Color OwliverFullHealthTint = Color.White;
+    public Color OwliverNoHealthTint = new Color(30, 30, 30);
 
     public void Initialize()
     {
@@ -41,12 +43,12 @@ namespace Owlicity
     public void Draw(Renderer renderer, float deltaSeconds)
     {
       Anim.Update(deltaSeconds);
-      int fullHP = (int)OwliverHealth.CurrentHealth;
-      float partialHP = OwliverHealth.CurrentHealth - fullHP;
+      int hp = OwliverHealth.MaxHealth;
       SpatialData spatial = OwliverHealthAnchor.GetWorldSpatialData();
-      for(int healthIndex = 0; healthIndex < fullHP; healthIndex++)
+      for(int healthIndex = 0; healthIndex < hp; healthIndex++)
       {
-        Anim.Draw(renderer, spatial.GetWorldSpatialData(), depth: 0.0f);
+        Color tint = healthIndex < OwliverHealth.CurrentHealth ? OwliverFullHealthTint : OwliverNoHealthTint;
+        Anim.Draw(renderer, spatial.GetWorldSpatialData(), tint: tint);
         spatial.Position.X += 40;
       }
     }

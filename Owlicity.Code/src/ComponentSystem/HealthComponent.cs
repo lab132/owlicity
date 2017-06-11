@@ -11,34 +11,36 @@ namespace Owlicity
     //
     // Initialization data.
     //
-    public float MaxHealth = 1.0f;
-    public float InitialHealth = -1.0f; // Will be MaxHealth if < 0.
+    public int MaxHealth = 1;
+    public int InitialHealth = -1; // Will be MaxHealth if < 0.
 
     //
     // Runtime data.
     //
-    private float _health;
-    public float CurrentHealth
+    private int _health;
+    public int CurrentHealth
     {
       get => _health;
       set
       {
-        float oldValue = _health;
+        int oldValue = CurrentHealth;
         _health = value;
-        if(_health > 0.0f)
+        if(_health > 0)
         {
-          OnDamageTaken?.Invoke(oldValue, _health);
+          OnDamageTaken?.Invoke(oldValue, value);
         }
         else
         {
-          OnDeath?.Invoke(oldValue, _health);
+          OnDeath?.Invoke(oldValue, value);
         }
       }
     }
 
+    public float CurrentHealthPercent => (float)_health / MaxHealth;
+
     // Only invoked when not dead.
-    public Action<float, float> OnDamageTaken;
-    public Action<float, float> OnDeath;
+    public Action<int, int> OnDamageTaken;
+    public Action<int, int> OnDeath;
 
     public HealthComponent(GameObject owner)
       : base(owner)
