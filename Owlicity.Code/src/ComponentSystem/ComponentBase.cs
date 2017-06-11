@@ -26,7 +26,7 @@ namespace Owlicity
     public virtual void PostInitialize() { } // TODO(manu): Maybe rename. BeginPlay?
     public virtual void PrePhysicsUpdate(float deltaSeconds) { }
     public virtual void Update(float deltaSeconds) { }
-    public virtual void Draw(SpriteBatch batch) { }
+    public virtual void Draw(Renderer renderer) { }
   }
 
   public class SpatialComponent : ComponentBase, ISpatial

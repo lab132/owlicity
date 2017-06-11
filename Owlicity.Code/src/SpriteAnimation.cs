@@ -98,7 +98,7 @@ namespace Owlicity
       }
     }
 
-    public void Draw(SpriteBatch spriteBatch, SpatialData spatial, float depth, Vector2? additionalScale = null)
+    public void Draw(Renderer renderer, SpatialData spatial, float depth, Vector2? additionalScale = null)
     {
       if (Data.Frames.Count > 0)
       {
@@ -109,7 +109,7 @@ namespace Owlicity
         int frameIndex = MathHelper.Clamp(State.CurrentFrameIndex, 0, Data.Frames.Count - 1);
         SpriteAnimationFrame frame = Data.Frames[frameIndex];
 
-        spriteBatch.OwlicityDraw(
+        renderer.DrawSprite(
           spatial.Position,
           spatial.Rotation,
           scale,

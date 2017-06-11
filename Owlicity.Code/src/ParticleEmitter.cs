@@ -91,7 +91,7 @@ namespace Owlicity
       }
     }
 
-    public void Draw(SpriteBatch spriteBatch)
+    public void Draw(Renderer renderer)
     {
       Global.Game.Perf.BeginSample(PerformanceSlots.Particles);
 
@@ -107,7 +107,7 @@ namespace Owlicity
           // TODO(manu): Proper depth for particles.
           float depth = 0.0f;
 
-          spriteBatch.OwlicityDraw(
+          renderer.DrawSprite(
             position: _particles[i].Position,
             rotation: new Angle { Radians = _particles[i].Rotation },
             scale: Vector2.One,

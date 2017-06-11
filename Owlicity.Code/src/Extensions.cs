@@ -179,26 +179,4 @@ namespace Owlicity
       return result;
     }
   }
-
-  public static class SpriteBatchExtensions
-  {
-    public static void OwlicityDraw(this SpriteBatch self,
-      Vector2 position, Angle rotation, Vector2 scale, float depth,
-      Texture2D texture, Vector2 hotspot, Rectangle? sourceRectangle,
-      Color tint, SpriteEffects spriteEffects)
-    {
-      self.Draw(
-        position: position,
-        scale: scale * Global.RenderScale,
-        rotation: rotation.Radians,
-        layerDepth: -1 + depth,
-
-        texture: texture,
-        origin: hotspot,
-        sourceRectangle: sourceRectangle,
-
-        color: tint,
-        effects: spriteEffects);
-    }
-  }
 }

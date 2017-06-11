@@ -93,12 +93,12 @@ namespace Owlicity
       });
     }
 
-    public override void Draw(SpriteBatch batch)
+    public override void Draw(Renderer renderer)
     {
-      base.Draw(batch);
+      base.Draw(renderer);
 
       SpatialData worldSpatial = this.GetWorldSpatialData();
-      ActiveAnimation.Draw(batch, worldSpatial, RenderDepth, AdditionalScale);
+      ActiveAnimation.Draw(renderer, worldSpatial, RenderDepth, AdditionalScale);
     }
   }
 }

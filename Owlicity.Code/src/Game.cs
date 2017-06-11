@@ -18,6 +18,27 @@ using VelcroPhysics.Shared;
 
 namespace Owlicity
 {
+  // Note(manu): Everything in here is in pixel-space,
+  // i.e. there is no need to convert to meters!
+  public class OwlHud
+  {
+    public SpriteAnimationInstance Anim;
+    public SpatialData Spatial = new SpatialData();
+
+    public void Initialize()
+    {
+      Anim = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Owliver_AttackFishingRod_Left);
+      Anim.State.NumLoopsToPlay = int.MaxValue;
+      Spatial.Position = new Vector2(100, 40);
+    }
+
+    public void Draw(Renderer renderer, float deltaSeconds)
+    {
+      Anim.Update(deltaSeconds);
+      Anim.Draw(renderer, Spatial, depth: 0.0f);
+    }
+  }
+
   public enum GameLayer
   {
     SomewhereInTheMiddle,
@@ -35,7 +56,9 @@ namespace Owlicity
   public class OwlGame : Game
   {
     GraphicsDeviceManager graphics;
-    SpriteBatch batch;
+
+    public Renderer WorldRenderer = new Renderer { BaseDepth = -1, BaseScale = Global.RenderScale, };
+    public Renderer UIRenderer = new Renderer { BaseDepth = 0, BaseScale = 1.0f, };
 
     public GameObject ActiveCamera;
     public Level CurrentLevel;
@@ -51,6 +74,9 @@ namespace Owlicity
     public List<DebugDrawCommand> DebugDrawCommands { get; } = new List<DebugDrawCommand>();
 
     public DebugView PhysicsDebugView { get; set; }
+
+    public bool HudEnabled = true;
+    public OwlHud Hud = new OwlHud();
 
     public int CurrentFrameIndex { get; private set; }
 
@@ -171,8 +197,8 @@ namespace Owlicity
     /// </summary>
     protected override void LoadContent()
     {
-      // Create a new SpriteBatch, which can be used to draw textures.
-      batch = new SpriteBatch(GraphicsDevice);
+      WorldRenderer.Initialize(GraphicsDevice);
+      UIRenderer.Initialize(GraphicsDevice);
 
       PhysicsDebugView.LoadContent(GraphicsDevice, Content);
 
@@ -233,6 +259,8 @@ namespace Owlicity
         MediaPlayer.IsRepeating = true;
         MediaPlayer.Play(BackgroundMusic);
       }
+
+      Hud.Initialize();
     }
 
     /// <summary>
@@ -364,6 +392,7 @@ namespace Owlicity
     /// <param name="gameTime">Provides a snapshot of timing values.</param>
     protected override void Draw(GameTime gameTime)
     {
+      float deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
       base.Draw(gameTime);
 
       GraphicsDevice.Clear(Color.CornflowerBlue);
@@ -371,14 +400,14 @@ namespace Owlicity
 
       if(MainDrawingEnabled)
       {
-        batch.Begin(sortMode: SpriteSortMode.BackToFront, effect: cam.Effect);
+        WorldRenderer.Begin(sortMode: SpriteSortMode.BackToFront, effect: cam.Effect);
 
         foreach(GameObject go in GameObjects)
         {
-          go.Draw(batch);
+          go.Draw(WorldRenderer);
         }
 
-        batch.End();
+        WorldRenderer.End();
       }
 
       if(DebugDrawingEnabled)
@@ -413,6 +442,13 @@ namespace Owlicity
       }
 
       PhysicsDebugView.RenderDebugData(ref cam.ProjectionMatrix, ref cam.ViewMatrix);
+
+      if(HudEnabled)
+      {
+        UIRenderer.Begin(SpriteSortMode.Texture);
+        Hud.Draw(UIRenderer, deltaSeconds);
+        UIRenderer.End();
+      }
     }
   }
 }

@@ -59,10 +59,10 @@ namespace Owlicity
       Emitter.Update(deltaSeconds);
     }
 
-    public override void Draw(SpriteBatch batch)
+    public override void Draw(Renderer renderer)
     {
-      base.Draw(batch);
-      Emitter.Draw(batch);
+      base.Draw(renderer);
+      Emitter.Draw(renderer);
     }
   }
 }

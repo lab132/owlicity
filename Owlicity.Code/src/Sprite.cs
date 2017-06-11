@@ -13,7 +13,7 @@ namespace Owlicity
     public Color Tint = Color.White;
     public SpriteEffects SpriteEffects;
 
-    public void Draw(SpriteBatch spriteBatch, SpatialData spatial, float depth)
+    public void Draw(Renderer renderer, SpatialData spatial, float depth)
     {
       Point textureDim = TextureDim;
       if(textureDim == Point.Zero)
@@ -25,7 +25,7 @@ namespace Owlicity
         Size = textureDim
       };
 
-      spriteBatch.OwlicityDraw(
+      renderer.DrawSprite(
         position: spatial.Position,
         rotation: spatial.Rotation,
         scale: Scale,

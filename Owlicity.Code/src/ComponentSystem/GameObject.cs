@@ -87,11 +87,11 @@ namespace Owlicity
       }
     }
 
-    public void Draw(SpriteBatch batch)
+    public void Draw(Renderer renderer)
     {
       foreach(ComponentBase component in Components.Where(c => c.IsDrawEnabled))
       {
-        component.Draw(batch);
+        component.Draw(renderer);
       }
     }
   }
