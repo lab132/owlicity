@@ -264,6 +264,9 @@ namespace Owlicity
 
       graphics = new GraphicsDeviceManager(this)
       {
+        HardwareModeSwitch = false, // Use "borderless fullscreen window"
+        IsFullScreen = true,
+        SynchronizeWithVerticalRetrace = true,
         PreferredBackBufferHeight = 1080,
         PreferredBackBufferWidth = 1920
       };
