@@ -367,11 +367,25 @@ namespace Owlicity
         AddGameObject(ActiveCamera);
       }
 
+#if true
       {
         var testSlurp = GameObjectFactory.CreateKnown(GameObjectType.Slurp);
         testSlurp.Spatial.Position += Global.ToMeters(500, 450);
         AddGameObject(testSlurp);
       }
+
+      {
+        var testBonbon = GameObjectFactory.CreateKnown(GameObjectType.Bonbon_Gold);
+        testBonbon.Spatial.Position += Global.ToMeters(500, 600);
+        AddGameObject(testBonbon);
+      }
+
+      {
+        var testKey = GameObjectFactory.CreateKnown(GameObjectType.Key_Gold);
+        testKey.Spatial.Position += Global.ToMeters(600, 500);
+        AddGameObject(testKey);
+      }
+#endif
 
       {
         var BackgroundMusic = Content.Load<Song>("snd/FiluAndDina_-_Video_Game_Background_-_Edit");

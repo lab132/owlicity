@@ -119,6 +119,10 @@ namespace Owlicity
     Tree_Orange,
     Bush,
 
+    // Pickups
+    Bonbon_Gold,
+    Key_Gold,
+
     // Random groups
     Random_FirTree,
     Random_FirTreeAlt,
@@ -375,6 +379,76 @@ namespace Owlicity
             sa.RenderDepth = Global.Game.CalcDepth(sa.GetWorldSpatialData(), go.Layer);
           };
           sa.AttachTo(go);
+        }
+        break;
+
+        case GameObjectType.Bonbon_Gold:
+        {
+          var mbc = new MoneyBagComponent(go)
+          {
+            InitialAmount = 10,
+          };
+
+          var bc = new BodyComponent(go)
+          {
+            InitMode = BodyComponentInitMode.Manual,
+          };
+
+          bc.BeforeInitialize += () =>
+          {
+            SpatialData s = bc.GetWorldSpatialData();
+            bc.Body = BodyFactory.CreateCircle(
+              world: Global.Game.World,
+              radius: 1.0f,
+              density: 0.01f,
+              position: s.Position,
+              userData: bc);
+            bc.Body.IsSensor = true;
+            bc.Body.CollidesWith = Global.OwliverCollisionCategory;
+          };
+
+          var sac = new SpriteAnimationComponent(go)
+          {
+            AnimationTypes = new List<SpriteAnimationType>
+            {
+              SpriteAnimationType.Bonbon_Gold,
+            }
+          };
+          sac.AttachTo(bc);
+        }
+        break;
+
+        case GameObjectType.Key_Gold:
+        {
+          var krc = new KeyRingComponent(go);
+          krc.InitialKeyAmounts[(int)KeyType.Gold] = 1;
+
+          var bc = new BodyComponent(go)
+          {
+            InitMode = BodyComponentInitMode.Manual,
+          };
+
+          bc.BeforeInitialize += () =>
+          {
+            SpatialData s = bc.GetWorldSpatialData();
+            bc.Body = BodyFactory.CreateCircle(
+              world: Global.Game.World,
+              radius: 1.0f,
+              density: 0.01f,
+              position: s.Position,
+              userData: bc);
+            bc.Body.IsSensor = true;
+            bc.Body.CollidesWith = Global.OwliverCollisionCategory;
+          };
+
+          var sac = new SpriteAnimationComponent(go)
+          {
+            AnimationTypes = new List<SpriteAnimationType>
+            {
+              SpriteAnimationType.Key_Gold,
+            }
+          };
+          sac.AttachTo(bc);
         }
         break;
 

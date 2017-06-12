@@ -15,6 +15,7 @@ namespace Owlicity
     public const Category OwliverCollisionCategory = Category.Cat2;
     public const Category OwliverWeaponCollisionCategory = Category.Cat3;
     public const Category EnemyCollisionCategory = Category.Cat4;
+    public const Category PickupCollisionCategory = Category.Cat5;
 
     public static readonly Color[] ConfettiRed = new[] { new Color(0xa3, 0x3b, 0x41), new Color(0xda, 0x67, 0x77), };
     public static readonly Color[] ConfettiPurple = new[] { new Color(0x73, 0x4c, 0x87) };

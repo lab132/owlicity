@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using VelcroPhysics.Dynamics;
 using VelcroPhysics.Shared;
+using VelcroPhysics.Collision.ContactSystem;
 
 namespace Owlicity
 {
@@ -64,6 +65,13 @@ namespace Owlicity
     private float _oldX;
 
     public SpriteAnimationComponent AnimationComponent { get; set; }
+
+    public BodyComponent BodyComponent { get; set; }
+    public Body Body => BodyComponent?.Body;
+
+    public MoneyBagComponent MoneyBagComponent { get; set; }
+
+    public KeyRingComponent KeyRingComponent { get; set; }
 
     public OwliverState CurrentState;
     public Action<OwliverState, OwliverState> OnStateChanged;
@@ -125,20 +133,6 @@ namespace Owlicity
       }
     }
 
-    public float WeaponScale
-    {
-      get
-      {
-        switch(CurrentState.WeaponType)
-        {
-          case OwliverWeaponType.Stick: return 1.0f;
-          case OwliverWeaponType.FishingRod: return 2.0f;
-        }
-
-        throw new ArgumentException("CurrentState.WeaponType");
-      }
-    }
-
     public GameInput ConsumeInput()
     {
       GameInput result = Input;
@@ -157,6 +151,55 @@ namespace Owlicity
       }
 
       AnimationComponent.OnAnimationPlaybackStateChanged += OnAnimationLoopFinished;
+
+      if(BodyComponent == null)
+      {
+        BodyComponent = Owner.GetComponent<BodyComponent>();
+        Debug.Assert(BodyComponent != null, "Owliver has no body component!");
+      }
+
+      Body.OnCollision += OnCollision;
+
+      if(MoneyBagComponent == null)
+      {
+        MoneyBagComponent = Owner.GetComponent<MoneyBagComponent>();
+      }
+
+      if(KeyRingComponent == null)
+      {
+        KeyRingComponent = Owner.GetComponent<KeyRingComponent>();
+      }
+    }
+
+    private void OnCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
+    {
+      Debug.Assert(fixtureA.Body == Body);
+
+      GameObject go = ((ComponentBase)fixtureB.UserData).Owner;
+
+      if(MoneyBagComponent != null)
+      {
+        foreach(MoneyBagComponent moneyBag in go.GetComponents<MoneyBagComponent>())
+        {
+          int amountStolen = moneyBag.CurrentAmount;
+          moneyBag.CurrentAmount = 0;
+
+          MoneyBagComponent.CurrentAmount += amountStolen;
+        }
+      }
+
+      if(KeyRingComponent != null)
+      {
+        foreach(KeyRingComponent keyRing in go.GetComponents<KeyRingComponent>())
+        {
+          for(int keyTypeIndex = 0; keyTypeIndex < (int)KeyType.COUNT; keyTypeIndex++)
+          {
+            int amountStolen = keyRing.CurrentKeyAmounts[keyTypeIndex];
+            keyRing.CurrentKeyAmounts[keyTypeIndex] = 0;
+            KeyRingComponent.CurrentKeyAmounts[keyTypeIndex] += amountStolen;
+          }
+        }
+      }
     }
 
     private void OnAnimationLoopFinished(SpriteAnimationType animType, SpriteAnimationPlaybackState oldPlaybackState, SpriteAnimationPlaybackState newPlaybackState)
