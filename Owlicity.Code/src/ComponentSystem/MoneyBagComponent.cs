@@ -12,7 +12,7 @@ namespace Owlicity
     Key,
   }
 
-  public class CurrencyComponent
+  public class MoneyBagComponent
     : ComponentBase
   {
     //
@@ -32,7 +32,7 @@ namespace Owlicity
     public float CurrentAmountPercent => (float)CurrentAmount / MaxAmount;
 
 
-    public CurrencyComponent(GameObject owner)
+    public MoneyBagComponent(GameObject owner)
       : base(owner)
     {
     }

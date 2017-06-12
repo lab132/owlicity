@@ -223,7 +223,7 @@ namespace Owlicity
             MaxHealth = 3,
           };
 
-          var cc = new CurrencyComponent(go)
+          var moc = new MoneyBagComponent(go)
           {
             InitialAmount = 210,
           };

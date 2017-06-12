@@ -33,9 +33,9 @@ namespace Owlicity
     public Color FullHealthTint = Color.White;
     public Color NoHealthTint = new Color(30, 30, 30);
 
-    public CurrencyComponent Currency;
-    public SpatialData CurrencyIconAnchor = new SpatialData();
-    public SpriteAnimationInstance CurrencyIconAnimation;
+    public MoneyBagComponent MoneyBag;
+    public SpatialData MoneyBagIconAnchor = new SpatialData();
+    public SpriteAnimationInstance MoneyBagIconAnimation;
 
     public SpriteAnimationInstance CrossAnimation;
     public SpriteAnimationInstance[] DigitAnimations;
@@ -51,12 +51,17 @@ namespace Owlicity
       HealthIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.OwlHealthIcon);
       HealthIconAnchor.Position = new Vector2(margin.Left, margin.Top) + 0.5f * HealthIconAnimation.ScaledDim;
 
-      CurrencyIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Bonbon_Gold);
-      CurrencyIconAnchor.Position = new Vector2(900, 40); // new Vector2(HudBounds.Right, HudBounds.Top) - CurrencyIconAnimation.ScaledDim;
+      MoneyBagIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Bonbon_Gold);
+      {
+        Vector2 offset = MoneyBagIconAnimation.ScaledDim;
+        offset.X = -offset.X;
+        offset.Y = 0.6f * offset.Y;
+        MoneyBagIconAnchor.Position = new Vector2(HudBounds.Right, HudBounds.Top) + offset;
+      }
 
       Owliver = Global.Game.Owliver;
       Health = Owliver.GetComponent<HealthComponent>();
-      Currency = Owliver.GetComponent<CurrencyComponent>();
+      MoneyBag = Owliver.GetComponent<MoneyBagComponent>();
 
       CrossAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Cross);
 
@@ -106,21 +111,21 @@ namespace Owlicity
         }
       }
 
-      if(Currency != null)
+      if(MoneyBag != null)
       {
-        CurrencyIconAnimation.Update(deltaSeconds);
+        MoneyBagIconAnimation.Update(deltaSeconds);
 
-        SpatialData spatial = CurrencyIconAnchor.GetWorldSpatialData();
-        CurrencyIconAnimation.Draw(renderer, CurrencyIconAnchor);
+        SpatialData spatial = MoneyBagIconAnchor.GetWorldSpatialData();
+        MoneyBagIconAnimation.Draw(renderer, MoneyBagIconAnchor);
 
         const float spacing = 3;
-        float previousAnimWidth = CurrencyIconAnimation.ScaledDim.X;
+        float previousAnimWidth = MoneyBagIconAnimation.ScaledDim.X;
 
         spatial.Position.X -= 0.5f * CrossAnimation.ScaledDim.X + 0.5f * previousAnimWidth + spacing;
         CrossAnimation.Draw(renderer, spatial);
         previousAnimWidth = CrossAnimation.ScaledDim.X;
 
-        int value = Currency.CurrentAmount;
+        int value = MoneyBag.CurrentAmount;
         while(true)
         {
           int digit = value % 10;
