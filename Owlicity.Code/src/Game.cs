@@ -215,10 +215,7 @@ namespace Owlicity
 
     public void AddGameObject(GameObject go)
     {
-      Debug.Assert(!GameObjects.Contains(go));
-      Debug.Assert(!GameObjectsPendingAdd.Contains(go));
-
-      if(!GameObjectsPendingRemove.Contains(go))
+      if(!GameObjectsPendingAdd.Contains(go))
       {
         GameObjectsPendingAdd.Add(go);
       }
@@ -226,10 +223,7 @@ namespace Owlicity
 
     public void RemoveGameObject(GameObject go)
     {
-      Debug.Assert(GameObjects.Contains(go));
-      Debug.Assert(GameObjectsPendingRemove.Contains(go));
-
-      if(!GameObjectsPendingAdd.Remove(go))
+      if(!GameObjectsPendingAdd.Remove(go) && !GameObjectsPendingRemove.Contains(go))
       {
         GameObjectsPendingRemove.Add(go);
       }
@@ -367,22 +361,29 @@ namespace Owlicity
         AddGameObject(ActiveCamera);
       }
 
-#if true
       {
         var testSlurp = GameObjectFactory.CreateKnown(GameObjectType.Slurp);
-        testSlurp.Spatial.Position += Global.ToMeters(500, 450);
+        testSlurp.Spatial.Position += Global.ToMeters(700, 350);
         AddGameObject(testSlurp);
       }
 
+#if true
       {
-        var testBonbon = GameObjectFactory.CreateKnown(GameObjectType.Bonbon_Gold);
-        testBonbon.Spatial.Position += Global.ToMeters(500, 600);
-        AddGameObject(testBonbon);
+        const int numBonbons = 10;
+        Vector2 spawnPosition = Global.ToMeters(600, 650);
+        for(int bonbonIndex = 0; bonbonIndex < numBonbons; bonbonIndex++)
+        {
+          var testBonbon = GameObjectFactory.CreateKnown(GameObjectType.Bonbon_Gold);
+          testBonbon.Spatial.Position += spawnPosition;
+          AddGameObject(testBonbon);
+
+          spawnPosition.X += Global.ToMeters(64);
+        }
       }
 
       {
         var testKey = GameObjectFactory.CreateKnown(GameObjectType.Key_Gold);
-        testKey.Spatial.Position += Global.ToMeters(600, 500);
+        testKey.Spatial.Position += Global.ToMeters(700, 720);
         AddGameObject(testKey);
       }
 #endif
@@ -508,11 +509,10 @@ namespace Owlicity
 
       // Remove pending game objects.
       GameObjects.RemoveAll(go => GameObjectsPendingRemove.Contains(go));
-      // TODO(manu): Deinitialize game object?
-      //foreach(GameObject go in GameObjectsPendingRemove)
-      //{
-      //  go.Deinitialize();
-      //}
+      foreach(GameObject go in GameObjectsPendingRemove)
+      {
+        go.Destroy();
+      }
       GameObjectsPendingRemove.Clear();
 
       base.Update(gameTime);

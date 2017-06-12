@@ -75,6 +75,7 @@ namespace Owlicity
     {
       foreach(ComponentBase component in Components.Where(c => c.IsPrePhysicsUpdateEnabled))
       {
+        component.BeforePrePhysicsUpdate?.Invoke();
         component.PrePhysicsUpdate(deltaSeconds);
       }
     }
@@ -83,6 +84,7 @@ namespace Owlicity
     {
       foreach(ComponentBase component in Components.Where(c => c.IsUpdateEnabled))
       {
+        component.BeforeUpdate?.Invoke();
         component.Update(deltaSeconds);
       }
     }
@@ -91,7 +93,17 @@ namespace Owlicity
     {
       foreach(ComponentBase component in Components.Where(c => c.IsDrawEnabled))
       {
+        component.BeforeDraw?.Invoke();
         component.Draw(renderer);
+      }
+    }
+
+    public void Destroy()
+    {
+      foreach(ComponentBase component in Components)
+      {
+        component.BeforeDestroy?.Invoke();
+        component.Destroy();
       }
     }
   }
@@ -229,7 +241,7 @@ namespace Owlicity
 
           var moc = new MoneyBagComponent(go)
           {
-            InitialAmount = 210,
+            InitialAmount = 0,
           };
 
           var kc = new KeyRingComponent(go);
@@ -384,11 +396,6 @@ namespace Owlicity
 
         case GameObjectType.Bonbon_Gold:
         {
-          var mbc = new MoneyBagComponent(go)
-          {
-            InitialAmount = 10,
-          };
-
           var bc = new BodyComponent(go)
           {
             InitMode = BodyComponentInitMode.Manual,
@@ -399,13 +406,15 @@ namespace Owlicity
             SpatialData s = bc.GetWorldSpatialData();
             bc.Body = BodyFactory.CreateCircle(
               world: Global.Game.World,
-              radius: 1.0f,
+              radius: 0.5f,
               density: 0.01f,
               position: s.Position,
               userData: bc);
             bc.Body.IsSensor = true;
             bc.Body.CollidesWith = Global.OwliverCollisionCategory;
           };
+
+          go.RootComponent = bc;
 
           var sac = new SpriteAnimationComponent(go)
           {
@@ -415,14 +424,18 @@ namespace Owlicity
             }
           };
           sac.AttachTo(bc);
+
+          var mbc = new MoneyBagComponent(go)
+          {
+            InitialAmount = 10,
+          };
+
+          var puc = new PickupComponent(go);
         }
         break;
 
         case GameObjectType.Key_Gold:
         {
-          var krc = new KeyRingComponent(go);
-          krc.InitialKeyAmounts[(int)KeyType.Gold] = 1;
-
           var bc = new BodyComponent(go)
           {
             InitMode = BodyComponentInitMode.Manual,
@@ -433,13 +446,15 @@ namespace Owlicity
             SpatialData s = bc.GetWorldSpatialData();
             bc.Body = BodyFactory.CreateCircle(
               world: Global.Game.World,
-              radius: 1.0f,
+              radius: 0.5f,
               density: 0.01f,
               position: s.Position,
               userData: bc);
             bc.Body.IsSensor = true;
             bc.Body.CollidesWith = Global.OwliverCollisionCategory;
           };
+
+          go.RootComponent = bc;
 
           var sac = new SpriteAnimationComponent(go)
           {
@@ -449,6 +464,11 @@ namespace Owlicity
             }
           };
           sac.AttachTo(bc);
+
+          var krc = new KeyRingComponent(go);
+          krc.InitialKeyAmounts[(int)KeyType.Gold] = 1;
+
+          var puc = new PickupComponent(go);
         }
         break;
 

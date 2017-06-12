@@ -60,6 +60,13 @@ namespace Owlicity
       }
     }
 
+    public override void Destroy()
+    {
+      base.Destroy();
+
+      Global.Game.World.RemoveBody(Body);
+    }
+
     public override void Update(float deltaSeconds)
     {
       base.Update(deltaSeconds);

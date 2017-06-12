@@ -15,6 +15,10 @@ namespace Owlicity
 
     public Action BeforeInitialize;
     public Action BeforePostInitialize;
+    public Action BeforePrePhysicsUpdate;
+    public Action BeforeUpdate;
+    public Action BeforeDraw;
+    public Action BeforeDestroy;
 
     public ComponentBase(GameObject owner)
     {
@@ -27,6 +31,7 @@ namespace Owlicity
     public virtual void PrePhysicsUpdate(float deltaSeconds) { }
     public virtual void Update(float deltaSeconds) { }
     public virtual void Draw(Renderer renderer) { }
+    public virtual void Destroy() { }
   }
 
   public class SpatialComponent : ComponentBase, ISpatial

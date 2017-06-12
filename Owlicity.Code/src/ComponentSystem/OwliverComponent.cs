@@ -175,7 +175,7 @@ namespace Owlicity
     {
       Debug.Assert(fixtureA.Body == Body);
 
-      GameObject go = ((ComponentBase)fixtureB.UserData).Owner;
+      GameObject go = ((ComponentBase)fixtureB.Body.UserData).Owner;
 
       if(MoneyBagComponent != null)
       {
