@@ -64,8 +64,9 @@ namespace Owlicity
   public class SpriteAnimationInstance
   {
     public SpriteAnimationData Data;
-    public SpriteAnimationState State;
+    public Vector2 ScaledDim => State.Scale * Data.Config.TileDim.ToVector2();
 
+    public SpriteAnimationState State;
     public bool IsPlaying { get => State.PlaybackState == SpriteAnimationPlaybackState.Playing; }
     public bool IsPaused { get => State.PlaybackState == SpriteAnimationPlaybackState.Paused; }
     public bool IsStopped { get => State.PlaybackState == SpriteAnimationPlaybackState.Stopped; }
@@ -230,6 +231,22 @@ namespace Owlicity
     Orange_Idle,
 
     Bush_Idle,
+
+    BonbonGold,
+    BonbonRed,
+
+    Cross,
+
+    Digit0,
+    Digit1,
+    Digit2,
+    Digit3,
+    Digit4,
+    Digit5,
+    Digit6,
+    Digit7,
+    Digit8,
+    Digit9,
 
     OwlHealthIcon,
   }
@@ -467,6 +484,54 @@ namespace Owlicity
           {
             config.TileSheetName = "bush_spritesheet";
             config.Hotspot = new Vector2(130, 212);
+          }
+          break;
+
+          case SpriteAnimationType.BonbonGold:
+          {
+            config.TileSheetName = "bonbon_gold";
+            config.TileDim = new Point(64);
+            config.Hotspot = new Vector2(32, 32);
+          }
+          break;
+
+          case SpriteAnimationType.BonbonRed:
+          {
+            config.TileSheetName = "bonbon_red";
+            config.TileDim = new Point(64);
+            config.Hotspot = new Vector2(32);
+          }
+          break;
+
+          case SpriteAnimationType.Cross:
+          {
+            config.TileSheetName = "cross";
+            config.TileDim = new Point(64);
+            config.Hotspot = new Vector2(32);
+            config.Scale = new Vector2(0.5f);
+          }
+          break;
+
+          case SpriteAnimationType.Digit0:
+          case SpriteAnimationType.Digit1:
+          case SpriteAnimationType.Digit2:
+          case SpriteAnimationType.Digit3:
+          case SpriteAnimationType.Digit4:
+          case SpriteAnimationType.Digit5:
+          case SpriteAnimationType.Digit6:
+          case SpriteAnimationType.Digit7:
+          case SpriteAnimationType.Digit8:
+          case SpriteAnimationType.Digit9:
+          {
+            int digit = animType - SpriteAnimationType.Digit0;
+            config.TileSheetName = $"digits/{digit}";
+            config.TileDim = new Point(64);
+            config.Hotspot = new Vector2(32);
+
+            config.Scale = new Vector2(0.5f);
+            // TODO(manu): Remove this once we have all digits.
+            if(digit > 2)
+              config.TileSheetName = $"cross";
           }
           break;
 

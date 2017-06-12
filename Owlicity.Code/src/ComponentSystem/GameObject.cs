@@ -222,6 +222,11 @@ namespace Owlicity
           {
             MaxHealth = 3,
           };
+
+          var cc = new CurrencyComponent(go)
+          {
+            InitialAmount = 210,
+          };
         }
         break;
 

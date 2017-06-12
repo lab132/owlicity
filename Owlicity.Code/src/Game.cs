@@ -22,34 +22,105 @@ namespace Owlicity
   // i.e. there is no need to convert to meters!
   public class OwlHud
   {
-    public SpriteAnimationInstance Anim;
+    public Rectangle HudBounds;
 
     public GameObject Owliver;
-    public HealthComponent OwliverHealth;
-    public SpatialData OwliverHealthAnchor = new SpatialData();
-    public Color OwliverFullHealthTint = Color.White;
-    public Color OwliverNoHealthTint = new Color(30, 30, 30);
+
+    public HealthComponent Health;
+    public SpatialData HealthIconAnchor = new SpatialData();
+    public SpriteAnimationInstance HealthIconAnimation;
+
+    public Color FullHealthTint = Color.White;
+    public Color NoHealthTint = new Color(30, 30, 30);
+
+    public CurrencyComponent Currency;
+    public SpatialData CurrencyIconAnchor = new SpatialData();
+    public SpriteAnimationInstance CurrencyIconAnimation;
+
+    public SpriteAnimationInstance CrossAnimation;
+    public SpriteAnimationInstance[] DigitAnimations;
 
     public void Initialize()
     {
-      Anim = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.OwlHealthIcon);
-      Anim.State.NumLoopsToPlay = int.MaxValue;
-      OwliverHealthAnchor.Position = new Vector2(40, 40);
+      Rectangle margin = new Rectangle { X = 8, Y = 8, Width = HudBounds.Width - 16, Height = HudBounds.Bottom - 16 };
+      HealthIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.OwlHealthIcon);
+      HealthIconAnchor.Position = new Vector2(margin.Left, margin.Top) + 0.5f * HealthIconAnimation.ScaledDim;
+
+      CurrencyIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.BonbonGold);
+      CurrencyIconAnchor.Position = new Vector2(900, 40); // new Vector2(HudBounds.Right, HudBounds.Top) - CurrencyIconAnimation.ScaledDim;
 
       Owliver = Global.Game.Owliver;
-      OwliverHealth = Owliver.GetComponent<HealthComponent>();
+      Health = Owliver.GetComponent<HealthComponent>();
+      Currency = Owliver.GetComponent<CurrencyComponent>();
+
+      CrossAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Cross);
+
+      DigitAnimations = new[]
+      {
+        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit0),
+        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit1),
+        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit2),
+        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit3),
+        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit4),
+        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit5),
+        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit6),
+        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit7),
+        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit8),
+        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit9),
+      };
     }
 
     public void Draw(Renderer renderer, float deltaSeconds)
     {
-      Anim.Update(deltaSeconds);
-      int hp = OwliverHealth.MaxHealth;
-      SpatialData spatial = OwliverHealthAnchor.GetWorldSpatialData();
-      for(int healthIndex = 0; healthIndex < hp; healthIndex++)
+      CrossAnimation.Update(deltaSeconds);
+      foreach(SpriteAnimationInstance anim in DigitAnimations)
       {
-        Color tint = healthIndex < OwliverHealth.CurrentHealth ? OwliverFullHealthTint : OwliverNoHealthTint;
-        Anim.Draw(renderer, spatial.GetWorldSpatialData(), tint: tint);
-        spatial.Position.X += 40;
+        anim.Update(deltaSeconds);
+      }
+
+      if(HealthIconAnimation != null)
+      {
+        HealthIconAnimation.Update(deltaSeconds);
+        int hp = Health.MaxHealth;
+        SpatialData spatial = HealthIconAnchor.GetWorldSpatialData();
+        const float spacing = 3;
+        for(int healthIndex = 0; healthIndex < hp; healthIndex++)
+        {
+          Color tint = healthIndex < Health.CurrentHealth ? FullHealthTint : NoHealthTint;
+          HealthIconAnimation.Draw(renderer, spatial.GetWorldSpatialData(), tint: tint);
+          spatial.Position.X += HealthIconAnimation.ScaledDim.X + spacing;
+        }
+      }
+
+      if(Currency != null)
+      {
+        CurrencyIconAnimation.Update(deltaSeconds);
+
+        SpatialData spatial = CurrencyIconAnchor.GetWorldSpatialData();
+        CurrencyIconAnimation.Draw(renderer, CurrencyIconAnchor);
+
+        const float spacing = 3;
+        float previousAnimWidth = CurrencyIconAnimation.ScaledDim.X;
+
+        spatial.Position.X -= 0.5f * CrossAnimation.ScaledDim.X + 0.5f * previousAnimWidth + spacing;
+        CrossAnimation.Draw(renderer, spatial);
+        previousAnimWidth = CrossAnimation.ScaledDim.X;
+
+        int value = Currency.CurrentAmount;
+        while(true)
+        {
+          int digit = value % 10;
+          SpriteAnimationInstance digitAnim = DigitAnimations[digit];
+
+          spatial.Position.X -= 0.5f * previousAnimWidth + 0.5f * digitAnim.ScaledDim.X + spacing;
+          digitAnim.Draw(renderer, spatial);
+
+          value /= 10;
+          if(value == 0)
+            break;
+
+          previousAnimWidth = digitAnim.ScaledDim.X;
+        }
       }
     }
   }
@@ -270,6 +341,7 @@ namespace Owlicity
         MediaPlayer.Play(BackgroundMusic);
       }
 
+      Hud.HudBounds = GraphicsDevice.Viewport.Bounds;
       Hud.Initialize();
     }
 
