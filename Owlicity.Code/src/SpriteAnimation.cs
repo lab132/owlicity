@@ -232,8 +232,10 @@ namespace Owlicity
 
     Bush_Idle,
 
-    BonbonGold,
-    BonbonRed,
+    Key_Gold,
+
+    Bonbon_Gold,
+    Bonbon_Red,
 
     Cross,
 
@@ -487,15 +489,24 @@ namespace Owlicity
           }
           break;
 
-          case SpriteAnimationType.BonbonGold:
+          case SpriteAnimationType.Key_Gold:
           {
-            config.TileSheetName = "bonbon_gold";
-            config.TileDim = new Point(64);
-            config.Hotspot = new Vector2(32, 32);
+            config.TileSheetName = "key_spritesheet";
+            config.TileDim = new Point(128);
+            config.Hotspot = 0.5f * config.TileDim.ToVector2();
+            config.Scale = new Vector2(0.5f);
           }
           break;
 
-          case SpriteAnimationType.BonbonRed:
+          case SpriteAnimationType.Bonbon_Gold:
+          {
+            config.TileSheetName = "bonbon_gold";
+            config.TileDim = new Point(64);
+            config.Hotspot = new Vector2(32);
+          }
+          break;
+
+          case SpriteAnimationType.Bonbon_Red:
           {
             config.TileSheetName = "bonbon_red";
             config.TileDim = new Point(64);

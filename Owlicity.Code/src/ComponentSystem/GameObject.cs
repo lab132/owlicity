@@ -227,6 +227,8 @@ namespace Owlicity
           {
             InitialAmount = 210,
           };
+
+          var kc = new KeyRingComponent(go);
         }
         break;
 

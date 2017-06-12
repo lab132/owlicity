@@ -40,13 +40,18 @@ namespace Owlicity
     public SpriteAnimationInstance CrossAnimation;
     public SpriteAnimationInstance[] DigitAnimations;
 
+    public KeyRingComponent KeyRing;
+    public SpatialData KeyRingAnchor = new SpatialData();
+
+    public SpriteAnimationInstance[] KeyAnimations;
+
     public void Initialize()
     {
       Rectangle margin = new Rectangle { X = 8, Y = 8, Width = HudBounds.Width - 16, Height = HudBounds.Bottom - 16 };
       HealthIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.OwlHealthIcon);
       HealthIconAnchor.Position = new Vector2(margin.Left, margin.Top) + 0.5f * HealthIconAnimation.ScaledDim;
 
-      CurrencyIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.BonbonGold);
+      CurrencyIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Bonbon_Gold);
       CurrencyIconAnchor.Position = new Vector2(900, 40); // new Vector2(HudBounds.Right, HudBounds.Top) - CurrencyIconAnimation.ScaledDim;
 
       Owliver = Global.Game.Owliver;
@@ -55,25 +60,34 @@ namespace Owlicity
 
       CrossAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Cross);
 
-      DigitAnimations = new[]
+      DigitAnimations = new SpriteAnimationInstance[10];
+      for(int digit = 0; digit < DigitAnimations.Length; digit++)
       {
-        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit0),
-        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit1),
-        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit2),
-        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit3),
-        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit4),
-        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit5),
-        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit6),
-        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit7),
-        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit8),
-        SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Digit9),
-      };
+        SpriteAnimationType animType = SpriteAnimationType.Digit0 + digit;
+        DigitAnimations[digit] = SpriteAnimationFactory.CreateAnimationInstance(animType);
+      }
+
+      KeyRing = Owliver.GetComponent<KeyRingComponent>();
+      KeyRingAnchor.AttachTo(HealthIconAnchor);
+      KeyRingAnchor.Position.Y += 64;
+
+      KeyAnimations = new SpriteAnimationInstance[(int)KeyType.COUNT];
+      for(int keyIndex = 0; keyIndex < KeyAnimations.Length; keyIndex++)
+      {
+        SpriteAnimationType animType = SpriteAnimationType.Key_Gold + keyIndex;
+        KeyAnimations[keyIndex] = SpriteAnimationFactory.CreateAnimationInstance(animType);
+      }
     }
 
     public void Draw(Renderer renderer, float deltaSeconds)
     {
       CrossAnimation.Update(deltaSeconds);
       foreach(SpriteAnimationInstance anim in DigitAnimations)
+      {
+        anim.Update(deltaSeconds);
+      }
+
+      foreach(SpriteAnimationInstance anim in KeyAnimations)
       {
         anim.Update(deltaSeconds);
       }
@@ -120,6 +134,25 @@ namespace Owlicity
             break;
 
           previousAnimWidth = digitAnim.ScaledDim.X;
+        }
+      }
+
+      if(KeyRing != null)
+      {
+        SpatialData anchor = KeyRingAnchor.GetWorldSpatialData();
+        for(int keyTypeIndex = 0; keyTypeIndex < KeyRing.CurrentKeyAmounts.Length; keyTypeIndex++)
+        {
+          KeyType keyType = (KeyType)keyTypeIndex;
+          int keyAmount = KeyRing.CurrentKeyAmounts[keyTypeIndex];
+          SpriteAnimationInstance keyAnim = KeyAnimations[keyTypeIndex];
+          SpatialData spatial = anchor.GetWorldSpatialData();
+          for(int keyIndex = 0; keyIndex < keyAmount; keyIndex++)
+          {
+            keyAnim.Draw(renderer, spatial);
+            spatial.Position.X += 0.6f * keyAnim.ScaledDim.X;
+          }
+
+          anchor.Position.Y += 0.8f * keyAnim.ScaledDim.Y;
         }
       }
     }
