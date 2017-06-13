@@ -8,18 +8,17 @@ namespace Owlicity
     //
     // Init data
     //
+    public bool ManualInputProcessing;
     public float MaxMovementSpeed = 1.5f;
     public float MovementDamping = 0.15f; // Loss of linear velocity per frame.
 
     //
     // Runtime data
     //
-    public BodyComponent ControlledBodyComponent { get; set; }
+    public BodyComponent BodyComponent { get; set; }
+    public Body MyBody => BodyComponent?.Body;
 
-    public Body ControlledBody
-    {
-      get => ControlledBodyComponent?.Body;
-    }
+    public bool IsMovementEnabled = true;
 
     // Set this from the outside to make this component perform some movement.
     public Vector2 MovementVector;
@@ -39,9 +38,9 @@ namespace Owlicity
     {
       base.Initialize();
 
-      if(ControlledBodyComponent == null)
+      if(BodyComponent == null)
       {
-        ControlledBodyComponent = Owner.GetComponent<BodyComponent>();
+        BodyComponent = Owner.GetComponent<BodyComponent>();
       }
     }
 
@@ -49,15 +48,18 @@ namespace Owlicity
     {
       base.PrePhysicsUpdate(deltaSeconds);
 
-      Vector2 movementVector = ConsumeMovementVector();
-      PerformMovement(movementVector, deltaSeconds);
+      if(!ManualInputProcessing)
+      {
+        Vector2 movementVector = ConsumeMovementVector();
+        PerformMovement(movementVector, deltaSeconds);
+      }
     }
 
     public void PerformMovement(Vector2 movementVector, float deltaSeconds)
     {
       if(movementVector != Vector2.Zero)
       {
-        Body body = ControlledBody;
+        Body body = MyBody;
         if(body != null)
         {
           Vector2 impulse = movementVector;
@@ -75,7 +77,7 @@ namespace Owlicity
     {
       base.Update(deltaSeconds);
 
-      Body body = ControlledBody;
+      Body body = MyBody;
       if(body != null && MovementDamping > 0.0f)
       {
         float preserved = 1 - MovementDamping;

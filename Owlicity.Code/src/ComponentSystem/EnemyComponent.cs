@@ -10,9 +10,13 @@ namespace Owlicity
 {
   public class EnemyComponent : ComponentBase
   {
+    //
+    // Initialization data.
+    //
     public GameObjectType EnemyType { get; set; }
+    public float HitDuration = 0.25f;
 
-    // Only start chasing of Owliver is closer than this.
+    // Only start chasing if Owliver is closer than this.
     public float DetectionDistance { get; set; } = 2.5f;
 
     // Don't get closer than this.
@@ -21,19 +25,24 @@ namespace Owlicity
     // Chase owliver at this speed.
     public float ChasingSpeed { get; set; } = 0.01f;
 
-    public bool IsChasing;
-
-    public MovementComponent MovementComponent { get; set; }
-    public SquashComponent SquashComponent { get; set; }
-
-    public float DefaultHitDuration = 0.25f;
-    public float CurrentHitDuration;
-    public float CurrentHitTime;
-
-    public bool IsHit => CurrentHitDuration > 0.0f;
-
     // The amount of damage caused by this enemy.
     public int Damage = 1;
+
+    //
+    // Runtime data.
+    //
+    public bool IsChasing;
+
+    public BodyComponent BodyComponent;
+    public MovementComponent Movement;
+    public HealthComponent Health;
+
+    //
+    // Optional components
+    //
+    public SquashComponent Squasher;
+
+    public Body MyBody => BodyComponent.Body;
 
     public EnemyComponent(GameObject owner) : base(owner)
     {
@@ -43,63 +52,143 @@ namespace Owlicity
     {
       base.Initialize();
 
-      if(MovementComponent == null)
+      if(BodyComponent == null)
       {
-        MovementComponent = Owner.GetComponent<MovementComponent>();
+        BodyComponent = Owner.GetComponent<BodyComponent>();
+      }
+      Debug.Assert(BodyComponent != null);
+
+      if (Movement == null)
+      {
+        Movement = Owner.GetComponent<MovementComponent>();
+      }
+      Debug.Assert(Movement != null);
+
+      if(Squasher == null)
+      {
+        Squasher = Owner.GetComponent<SquashComponent>();
       }
 
-      if(SquashComponent == null)
+      if(Health == null)
       {
-        SquashComponent = Owner.GetComponent<SquashComponent>();
+        Health = Owner.GetComponent<HealthComponent>();
       }
-
-      switch(EnemyType)
-      {
-        case GameObjectType.Slurp:
-        {
-          MovementComponent.MaxMovementSpeed = 0.5f;
-        }
-        break;
-
-        default: throw new NotImplementedException();
-      }
+      Debug.Assert(Health != null);
     }
 
     public override void PostInitialize()
     {
       base.PostInitialize();
 
-      var bc = Owner.GetComponent<BodyComponent>();
-      var pec = Owner.GetComponent<ParticleEmitterComponent>();
-
-      var owliverBC = Global.Game.Owliver.GetComponent<BodyComponent>();
-      var owliverSqc = Global.Game.Owliver.GetComponent<SquashComponent>();
-      var owliverHc = Global.Game.Owliver.GetComponent<HealthComponent>();
-      bc.Body.OnCollision += delegate (Fixture fixtureA, Fixture fixtureB, Contact contact)
+      switch (EnemyType)
       {
-        Debug.Assert(fixtureA.UserData != owliverBC);
-        Debug.Assert(fixtureA.UserData == bc);
-
-        if(fixtureB.UserData == owliverBC)
+        case GameObjectType.Slurp:
         {
-          Vector2 contactWorldPosition = fixtureB.Body.Position + contact.Manifold.LocalPoint;
-          pec.Emit(contactWorldPosition, 40);
-
-          owliverSqc.SetupDefaultSquashData(0.25f);
-          owliverSqc.StartSquashing();
-
-          owliverHc.CurrentHealth -= Damage;
+          Movement.MaxMovementSpeed = 0.5f;
+          Body body = BodyComponent.Body;
+          body.OnCollision += OnCollisionWithOwliver;
         }
+        break;
+
+        default: throw new NotImplementedException();
+      }
+
+      Health.OnHit += (damage) =>
+      {
+        Health.MakeInvincible(HitDuration);
       };
+
+      Health.OnDeath += (damage) =>
+      {
+        Global.Game.RemoveGameObject(Owner);
+
+        const float particleTime = 1.0f;
+        var go = new GameObject();
+        Owner.Spatial.CopyTo(go.Spatial);
+        var pec = new ParticleEmitterComponent(go)
+        {
+          NumParticles = 512,
+
+          TextureContentNames = new[]
+          {
+            "confetti/confetti_01",
+            "confetti/confetti_02",
+            "confetti/confetti_03",
+            "confetti/confetti_04",
+            "confetti/confetti_05",
+            "confetti/confetti_06",
+            "confetti/confetti_07",
+          },
+
+          AvailableColors = Global.AllConfettiColors,
+        };
+
+        pec.BeforePostInitialize += delegate ()
+        {
+          pec.Emitter.MaxTTL = particleTime;
+          pec.Emitter.MaxParticleSpread = 0.05f;
+          pec.Emitter.MaxParticleSpeed = 5f;
+          pec.Emit(go.GetWorldSpatialData().Position);
+        };
+
+        new AutoDestructComponent(go)
+        {
+          SecondsUntilDestruction = particleTime,
+        };
+
+        Global.Game.AddGameObject(go);
+      };
+
+      if (Squasher != null)
+      {
+        Squasher.SetupDefaultSquashData(HitDuration);
+        Health.OnHit += (damage) =>
+        {
+          Squasher.StartSquashing();
+        };
+      }
+    }
+
+    private void OnCollisionWithOwliver(Fixture fixtureA, Fixture fixtureB, Contact contact)
+    {
+      Debug.Assert(((BodyComponent)fixtureA.UserData).Owner == Owner);
+
+      Body hitBody = fixtureB.Body;
+
+      GameObject go = ((BodyComponent)hitBody.UserData).Owner;
+      bool sendItToHell = true;
+
+      // Handle health component
+      HealthComponent hc = go.GetComponent<HealthComponent>();
+      if (hc != null)
+      {
+        if (!hc.IsInvincible)
+        {
+          hc.Hit(Damage);
+        }
+        else
+        {
+          sendItToHell = false;
+        }
+      }
+
+      if (sendItToHell)
+      {
+        // Apply impulse
+        const float force = 0.1f;
+        Vector2 deltaPosition = hitBody.Position - BodyComponent.Body.Position;
+        deltaPosition.GetDirectionAndLength(out Vector2 dir, out float distance);
+        Vector2 impulse = force * dir;
+        hitBody.ApplyLinearImpulse(impulse);
+      }
     }
 
     public override void PrePhysicsUpdate(float deltaSeconds)
     {
-      Vector2 movementVector = MovementComponent.ConsumeMovementVector();
       base.PrePhysicsUpdate(deltaSeconds);
 
       // Only move when not being hit.
-      if(!IsHit)
+      if(!Health.IsInvincible)
       {
         Vector2 owliverPosition = Global.Game.Owliver.GetWorldSpatialData().Position;
         Vector2 myPosition = Owner.GetWorldSpatialData().Position;
@@ -107,6 +196,7 @@ namespace Owlicity
         Vector2 deltaVector = owliverPosition - myPosition;
         deltaVector.GetDirectionAndLength(out Vector2 owliverDir, out float owliverDistance);
 
+        Vector2 movementVector = Movement.ConsumeMovementVector();
         switch(EnemyType)
         {
           case GameObjectType.Slurp:
@@ -127,7 +217,7 @@ namespace Owlicity
         }
 
 #if true
-        MovementComponent.PerformMovement(movementVector, deltaSeconds);
+        Movement.PerformMovement(movementVector, deltaSeconds);
 #endif
       }
     }
@@ -136,35 +226,11 @@ namespace Owlicity
     {
       base.Update(deltaSeconds);
 
-      if(IsHit)
-      {
-        CurrentHitTime += deltaSeconds;
-        if(CurrentHitTime >= CurrentHitDuration)
-        {
-          CurrentHitDuration = 0.0f;
-        }
-        else
-        {
-          // TODO(manu): Do something while being hit?
-        }
-      }
-
       Global.Game.DebugDrawCommands.Add(view =>
       {
-        Color color = IsHit ? Color.Red : IsChasing ? Color.Yellow : Color.Green;
+        Color color = Health.IsInvincible ? Color.Red : IsChasing ? Color.Yellow : Color.Green;
         view.DrawCircle(Owner.GetWorldSpatialData().Position, DetectionDistance, color);
       });
-    }
-
-    public void Hit(float strength)
-    {
-      CurrentHitDuration = strength * DefaultHitDuration;
-      CurrentHitTime = 0.0f;
-
-      SquashComponent.SetupDefaultSquashData(CurrentHitDuration);
-      SquashComponent.StartSquashing();
-
-      // TODO(manu): Particle effects!
     }
   }
 }

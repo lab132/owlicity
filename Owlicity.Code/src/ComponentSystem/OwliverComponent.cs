@@ -60,18 +60,19 @@ namespace Owlicity
     }
   }
 
-  public class OwliverComponent : MovementComponent
+  public class OwliverComponent : ComponentBase
   {
-    private float _oldX;
+    public SpriteAnimationComponent Animation;
 
-    public SpriteAnimationComponent AnimationComponent { get; set; }
+    public BodyComponent BodyComponent;
+    public Body MyBody => BodyComponent?.Body;
 
-    public BodyComponent BodyComponent { get; set; }
-    public Body Body => BodyComponent?.Body;
+    public MovementComponent Movement;
+    public HealthComponent Health;
+    public MoneyBagComponent MoneyBag;
+    public KeyRingComponent KeyRing;
 
-    public MoneyBagComponent MoneyBagComponent { get; set; }
-
-    public KeyRingComponent KeyRingComponent { get; set; }
+    public SquashComponent Squasher;
 
     public OwliverState CurrentState;
     public Action<OwliverState, OwliverState> OnStateChanged;
@@ -140,63 +141,32 @@ namespace Owlicity
       return result;
     }
 
-    public override void Initialize()
-    {
-      base.Initialize();
-
-      if(AnimationComponent == null)
-      {
-        AnimationComponent = Owner.GetComponent<SpriteAnimationComponent>();
-        Debug.Assert(AnimationComponent != null, "Owliver has no animation component!");
-      }
-
-      AnimationComponent.OnAnimationPlaybackStateChanged += OnAnimationLoopFinished;
-
-      if(BodyComponent == null)
-      {
-        BodyComponent = Owner.GetComponent<BodyComponent>();
-        Debug.Assert(BodyComponent != null, "Owliver has no body component!");
-      }
-
-      Body.OnCollision += OnCollision;
-
-      if(MoneyBagComponent == null)
-      {
-        MoneyBagComponent = Owner.GetComponent<MoneyBagComponent>();
-      }
-
-      if(KeyRingComponent == null)
-      {
-        KeyRingComponent = Owner.GetComponent<KeyRingComponent>();
-      }
-    }
-
     private void OnCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
     {
-      Debug.Assert(fixtureA.Body == Body);
+      Debug.Assert(fixtureA.Body == MyBody);
 
       GameObject go = ((ComponentBase)fixtureB.Body.UserData).Owner;
 
-      if(MoneyBagComponent != null)
+      if (MoneyBag != null)
       {
-        foreach(MoneyBagComponent moneyBag in go.GetComponents<MoneyBagComponent>())
+        foreach (MoneyBagComponent moneyBag in go.GetComponents<MoneyBagComponent>())
         {
           int amountStolen = moneyBag.CurrentAmount;
           moneyBag.CurrentAmount = 0;
 
-          MoneyBagComponent.CurrentAmount += amountStolen;
+          MoneyBag.CurrentAmount += amountStolen;
         }
       }
 
-      if(KeyRingComponent != null)
+      if (KeyRing != null)
       {
-        foreach(KeyRingComponent keyRing in go.GetComponents<KeyRingComponent>())
+        foreach (KeyRingComponent keyRing in go.GetComponents<KeyRingComponent>())
         {
-          for(int keyTypeIndex = 0; keyTypeIndex < (int)KeyType.COUNT; keyTypeIndex++)
+          for (int keyTypeIndex = 0; keyTypeIndex < (int)KeyType.COUNT; keyTypeIndex++)
           {
             int amountStolen = keyRing.CurrentKeyAmounts[keyTypeIndex];
             keyRing.CurrentKeyAmounts[keyTypeIndex] = 0;
-            KeyRingComponent.CurrentKeyAmounts[keyTypeIndex] += amountStolen;
+            KeyRing.CurrentKeyAmounts[keyTypeIndex] += amountStolen;
           }
         }
       }
@@ -205,9 +175,9 @@ namespace Owlicity
     private void OnAnimationLoopFinished(SpriteAnimationType animType, SpriteAnimationPlaybackState oldPlaybackState, SpriteAnimationPlaybackState newPlaybackState)
     {
       bool isAttackAnimation = _attackAnimations.Contains(animType);
-      if(isAttackAnimation)
+      if (isAttackAnimation)
       {
-        if(oldPlaybackState == SpriteAnimationPlaybackState.Playing && newPlaybackState != SpriteAnimationPlaybackState.Playing)
+        if (oldPlaybackState == SpriteAnimationPlaybackState.Playing && newPlaybackState != SpriteAnimationPlaybackState.Playing)
         {
           OwliverState newState = CurrentState;
           newState.MovementMode = OwliverMovementMode.Walking;
@@ -216,27 +186,72 @@ namespace Owlicity
       }
     }
 
+    public override void Initialize()
+    {
+      base.Initialize();
+
+      if(Animation == null)
+      {
+        Animation = Owner.GetComponent<SpriteAnimationComponent>();
+        Debug.Assert(Animation != null, "Owliver has no animation component!");
+      }
+
+      if(BodyComponent == null)
+      {
+        BodyComponent = Owner.GetComponent<BodyComponent>();
+        Debug.Assert(BodyComponent != null, "Owliver has no body component!");
+      }
+
+      if(Movement == null)
+      {
+        Movement = Owner.GetComponent<MovementComponent>();
+      }
+
+      if(Health == null)
+      {
+        Health = Owner.GetComponent<HealthComponent>();
+        Debug.Assert(Health != null, "Owliver has no health component!");
+      }
+
+      if(MoneyBag == null)
+      {
+        MoneyBag = Owner.GetComponent<MoneyBagComponent>();
+      }
+
+      if(KeyRing == null)
+      {
+        KeyRing = Owner.GetComponent<KeyRingComponent>();
+      }
+    }
+
     public override void PostInitialize()
     {
       base.PostInitialize();
-    }
 
-    public override void PrePhysicsUpdate(float deltaSeconds)
-    {
-      float x = ControlledBody.LinearVelocity.X;
-      if(Math.Abs(x) > float.Epsilon)
+      Animation.OnAnimationPlaybackStateChanged += OnAnimationLoopFinished;
+
+      MyBody.OnCollision += OnCollision;
+
+      Health.OnHit += (damage) =>
       {
-        _oldX = x;
-      }
+        Health.MakeInvincible(0.25f);
+      };
 
-      base.PrePhysicsUpdate(deltaSeconds);
+      if (Squasher != null)
+      {
+        Squasher.SetupDefaultSquashData(0.25f);
+        Health.OnHit += (damage) =>
+        {
+          Squasher.StartSquashing();
+        };
+      }
     }
 
     public override void Update(float deltaSeconds)
     {
       base.Update(deltaSeconds);
 
-      Vector2 dp = ControlledBody.LinearVelocity;
+      Vector2 dp = MyBody.LinearVelocity;
       float movementSpeed = dp.Length();
 
       OwliverState newState = CurrentState;
@@ -292,45 +307,50 @@ namespace Owlicity
       if(CurrentState.MovementMode == OwliverMovementMode.Attacking)
       {
         List<Fixture> fixtures = Global.Game.World.QueryAABB(ref weaponAABB);
-        Body owliverBody = ControlledBody;
-        foreach(Body enemy in fixtures.Where(f => f.CollidesWith.HasFlag(Global.OwliverWeaponCollisionCategory))
+        foreach(Body hitBody in fixtures.Where(f => f.CollidesWith.HasFlag(Global.OwliverWeaponCollisionCategory))
                                       .Select(f => f.Body)
                                       .Distinct())
         {
-          bool performHit = true;
-          BodyComponent bc = (BodyComponent)enemy.UserData;
-          EnemyComponent ec = bc.Owner.GetComponent<EnemyComponent>();
-          if(ec != null)
+          const int damage = 1;
+          const float force = 0.1f * damage;
+
+          GameObject go = ((BodyComponent)hitBody.UserData).Owner;
+          bool sendItToHell = true;
+
+          // Handle health component
+          HealthComponent hc = go.GetComponent<HealthComponent>();
+          if(hc != null)
           {
-            if(ec.IsHit)
+            if(!hc.IsInvincible)
             {
-              performHit = false;
+              hc.Hit(damage);
+            }
+            else
+            {
+              sendItToHell = false;
             }
           }
 
-          if(performHit)
+          if(sendItToHell)
           {
-            const float strength = 1.0f;
-            const float impulseFactor = strength * 0.1f;
-            Vector2 impulse = impulseFactor * (enemy.Position - owliverBody.Position);
-#if true
-            enemy.ApplyLinearImpulse(impulse);
-#endif
-
-            if(ec != null)
-            {
-              ec.Hit(strength);
-            }
-
-            AABB aabb = enemy.ComputeAABB();
-            Global.Game.DebugDrawCommands.Add(view =>
-            {
-              view.DrawAABB(ref aabb, Color.Cyan);
-            });
+            // Apply impulse
+            Vector2 deltaPosition = hitBody.Position - MyBody.Position;
+            deltaPosition.GetDirectionAndLength(out Vector2 dir, out float distance);
+            Vector2 impulse = force * dir;
+            hitBody.ApplyLinearImpulse(impulse);
           }
         }
       }
+      else
+      {
+        if(!Health.IsInvincible)
+        {
+          Vector2 movementVector = Movement.ConsumeMovementVector();
+          Movement.PerformMovement(movementVector, deltaSeconds);
+        }
+      }
 
+      // Debug drawing.
       {
         Color color = CurrentState.MovementMode == OwliverMovementMode.Attacking ? Color.Navy : Color.Gray;
         Global.Game.DebugDrawCommands.Add(view =>
@@ -356,11 +376,11 @@ namespace Owlicity
         {
           if(newState.FacingDirection == OwliverFacingDirection.Right)
           {
-            AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_Idle_Right, transferAnimationState);
+            Animation.ChangeActiveAnimation(SpriteAnimationType.Owliver_Idle_Right, transferAnimationState);
           }
           else if(newState.FacingDirection == OwliverFacingDirection.Left)
           {
-            AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_Idle_Left, transferAnimationState);
+            Animation.ChangeActiveAnimation(SpriteAnimationType.Owliver_Idle_Left, transferAnimationState);
           }
         }
         break;
@@ -369,11 +389,11 @@ namespace Owlicity
         {
           if(newState.FacingDirection == OwliverFacingDirection.Right)
           {
-            AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_Walk_Right, transferAnimationState);
+            Animation.ChangeActiveAnimation(SpriteAnimationType.Owliver_Walk_Right, transferAnimationState);
           }
           else if(newState.FacingDirection == OwliverFacingDirection.Left)
           {
-            AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_Walk_Left, transferAnimationState);
+            Animation.ChangeActiveAnimation(SpriteAnimationType.Owliver_Walk_Left, transferAnimationState);
           }
         }
         break;
@@ -386,11 +406,11 @@ namespace Owlicity
             {
               if(newState.FacingDirection == OwliverFacingDirection.Right)
               {
-                AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackStick_Right, transferAnimationState);
+                Animation.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackStick_Right, transferAnimationState);
               }
               else if(newState.FacingDirection == OwliverFacingDirection.Left)
               {
-                AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackStick_Left, transferAnimationState);
+                Animation.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackStick_Left, transferAnimationState);
               }
             }
             break;
@@ -399,11 +419,11 @@ namespace Owlicity
             {
               if(newState.FacingDirection == OwliverFacingDirection.Right)
               {
-                AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackFishingRod_Right, transferAnimationState);
+                Animation.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackFishingRod_Right, transferAnimationState);
               }
               else if(newState.FacingDirection == OwliverFacingDirection.Left)
               {
-                AnimationComponent.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackFishingRod_Left, transferAnimationState);
+                Animation.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackFishingRod_Left, transferAnimationState);
               }
             }
             break;

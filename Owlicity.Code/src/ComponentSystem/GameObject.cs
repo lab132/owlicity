@@ -190,7 +190,7 @@ namespace Owlicity
               userdata: bc);
 
             float radius = Global.ToMeters(50 * Global.OwliverScale.X);
-            float density = 1; // ??
+            float density = 0.01f; // TODO(manu)
             FixtureFactory.AttachCircle(
               radius: radius,
               density: density,
@@ -213,6 +213,12 @@ namespace Owlicity
 
           var oc = new OwliverComponent(go)
           {
+          };
+
+          var mc = new MovementComponent(go)
+          {
+            ManualInputProcessing = true,
+            MaxMovementSpeed = 2.0f,
           };
 
           var sqc = new SquashComponent(go);
@@ -266,7 +272,7 @@ namespace Owlicity
               userdata: bc);
 
             float radius = Global.ToMeters(80 * Global.SlurpScale.X);
-            float density = 0.01f; // ??
+            float density = 0.01f; // TODO(manu)
             FixtureFactory.AttachCircle(
               radius: radius,
               density: density,
@@ -294,38 +300,19 @@ namespace Owlicity
           };
           sa.AttachTo(bc);
 
+          var mc = new MovementComponent(go)
+          {
+            ManualInputProcessing = true,
+          };
+
           var sqc = new SquashComponent(go)
           {
           };
 
-          var mc = new MovementComponent(go)
+          var hc = new HealthComponent(go)
           {
+            MaxHealth = 3,
           };
-
-          var pec = new ParticleEmitterComponent(go)
-          {
-            NumParticles = 512,
-
-            TextureContentNames = new[]
-            {
-              "confetti/confetti_01",
-              "confetti/confetti_02",
-              "confetti/confetti_03",
-              "confetti/confetti_04",
-              "confetti/confetti_05",
-              "confetti/confetti_06",
-              "confetti/confetti_07",
-            },
-
-            AvailableColors = Global.AllConfettiColors,
-          };
-
-          pec.BeforePostInitialize += delegate ()
-          {
-            pec.Emitter.MaxParticleSpread = 0.1f;
-            pec.Emitter.MaxParticleSpeed = 5f;
-          };
-          pec.AttachTo(bc);
 
           var ec = new EnemyComponent(go)
           {
@@ -447,7 +434,7 @@ namespace Owlicity
             bc.Body = BodyFactory.CreateCircle(
               world: Global.Game.World,
               radius: 0.5f,
-              density: 0.01f,
+              density: 0.01f, // TODO(manu)
               position: s.Position,
               userData: bc);
             bc.Body.IsSensor = true;

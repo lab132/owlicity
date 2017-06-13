@@ -49,6 +49,14 @@ namespace Owlicity
       UpperBound = LocalAABB.UpperBound + Position
     };
 
+    public void CopyTo(SpatialData other)
+    {
+      other.Parent = Parent;
+      other.Position = Position;
+      other.Rotation = Rotation;
+      other.LocalAABB = LocalAABB;
+    }
+
     public override string ToString()
     {
       return $"{Position}|{Rotation.Degrees}°";

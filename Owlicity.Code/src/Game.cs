@@ -271,12 +271,12 @@ namespace Owlicity
         PreferredBackBufferWidth = 1920
       };
 
-#if DEBUG
-      if(Environment.UserName == "manu")
+#if true
+      // Note(manu): Can't debug properly in fullscreen.
       {
-        // Note(manu): Because I have a really tiny screen...
-        graphics.PreferredBackBufferHeight = (int)(0.5f * 1080);
-        graphics.PreferredBackBufferWidth = (int)(0.5f * 1920);
+        graphics.IsFullScreen = false;
+        graphics.PreferredBackBufferHeight = graphics.PreferredBackBufferHeight / 2;
+        graphics.PreferredBackBufferWidth = graphics.PreferredBackBufferWidth / 2;
       }
 #endif
 
@@ -366,7 +366,7 @@ namespace Owlicity
 
       {
         var testSlurp = GameObjectFactory.CreateKnown(GameObjectType.Slurp);
-        testSlurp.Spatial.Position += Global.ToMeters(700, 350);
+        testSlurp.Spatial.Position += Global.ToMeters(600, 450);
         AddGameObject(testSlurp);
       }
 
@@ -471,9 +471,13 @@ namespace Owlicity
       }
 #endif
 
-      OwliverComponent oc = Owliver.GetComponent<OwliverComponent>();
-      oc.MovementVector = Input.CharacterMovement;
-      oc.Input = Input.CharacterInput;
+      {
+        var mc = Owliver.GetComponent<MovementComponent>();
+        mc.MovementVector = Input.CharacterMovement;
+
+        var oc = Owliver.GetComponent<OwliverComponent>();
+        oc.Input = Input.CharacterInput;
+      }
 
       // TODO(manu): Make use of `Input.CompationInput`!
 
