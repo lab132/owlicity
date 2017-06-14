@@ -179,4 +179,12 @@ namespace Owlicity
       return result;
     }
   }
+
+  public static class DebugViewExtensions
+  {
+    public static void DrawAABB(this VelcroPhysics.DebugViews.MonoGame.DebugView self, AABB aabb, Color color)
+    {
+      self.DrawAABB(ref aabb, color);
+    }
+  }
 }

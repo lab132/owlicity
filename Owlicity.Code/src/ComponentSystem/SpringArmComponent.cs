@@ -12,7 +12,7 @@ namespace Owlicity
     public float MaxDistanceToTarget = 1.5f;
     public float DistanceWeight = 5.0f;
 
-    public bool DebugDrawingEnabled = true;
+    public bool DebugDrawingEnabled = false;
 
     public SpringArmComponent(GameObject owner)
       : base(owner)

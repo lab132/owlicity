@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using VelcroPhysics.Shared;
 
 namespace Owlicity
 {
@@ -35,6 +36,17 @@ namespace Owlicity
         sourceRectangle: sourceRect,
         tint: Tint,
         spriteEffects: SpriteEffects);
+    }
+
+    public AABB CalcAABB()
+    {
+      AABB result = new AABB
+      {
+        LowerBound = Scale * (-Hotspot),
+        UpperBound = Scale * (-Hotspot + TextureDim.ToVector2()),
+      };
+
+      return result;
     }
   }
 }

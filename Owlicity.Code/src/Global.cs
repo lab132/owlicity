@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using VelcroPhysics.Collision.Filtering;
+using VelcroPhysics.Shared;
 
 namespace Owlicity
 {
@@ -10,6 +11,9 @@ namespace Owlicity
     public static readonly Vector2 OwliverScale = new Vector2(0.5f);
     public static readonly Vector2 BonbonScale = new Vector2(0.6f);
     public static readonly Vector2 SlurpScale = new Vector2(0.5f);
+    public static readonly Vector2 TanktonScale = new Vector2(0.5f);
+
+    public static readonly float OwliverDensity = 0.01f;
 
     public const Category LevelCollisionCategory = Category.Cat1;
     public const Category OwliverCollisionCategory = Category.Cat2;
@@ -29,5 +33,15 @@ namespace Owlicity
       ConfettiGreen[0], ConfettiGreen[0],
       ConfettiYellow[0], ConfettiYellow[0],
     };
+
+    // TODO(manu): Better name for this one?
+    public static AABB CreateInvalidAABB()
+    {
+      return new AABB
+      {
+        LowerBound = new Vector2(float.MaxValue),
+        UpperBound = new Vector2(float.MinValue),
+      };
+    }
   }
 }

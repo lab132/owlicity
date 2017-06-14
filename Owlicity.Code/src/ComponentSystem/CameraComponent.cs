@@ -80,7 +80,7 @@ namespace Owlicity
       if(VisibilityBounds != null)
       {
         SpatialData worldSpatial = this.GetWorldSpatialData();
-        AABB aabb = worldSpatial.WorldAABB;
+        AABB aabb = worldSpatial.AbsoluteAABB;
         Vector2 delta = Vector2.Zero;
 
         // Left edge
@@ -119,7 +119,7 @@ namespace Owlicity
 
         // Translation
         SpatialData worldSpatial = this.GetWorldSpatialData();
-        AABB worldAABB = worldSpatial.WorldAABB;
+        AABB worldAABB = worldSpatial.AbsoluteAABB;
         Vector2 upperLeftCorner = worldAABB.LowerBound;
         mat.Translation = new Vector3(upperLeftCorner, 0.0f);
 

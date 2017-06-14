@@ -23,6 +23,8 @@ namespace Owlicity
     public int CurrentHealth { get; private set; }
 
     public float CurrentHealthPercent => (float)CurrentHealth / MaxHealth;
+    public bool IsAlive => CurrentHealth > 0;
+    public bool IsDead => !IsAlive;
 
     // Is zero when not invincible.
     public float CurrentInvincibilityDuration { get; private set; }

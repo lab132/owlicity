@@ -58,6 +58,7 @@
     <Compile Include="src\ComponentSystem\SpriteAnimationComponent.cs" />
     <Compile Include="src\ComponentSystem\SpriteComponent.cs" />
     <Compile Include="src\ComponentSystem\SquashComponent.cs" />
+    <Compile Include="src\ComponentSystem\TanktonComponent.cs" />
     <Compile Include="src\Conversion.cs" />
     <Compile Include="src\Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

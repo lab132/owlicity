@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using VelcroPhysics.Shared;
 
 namespace Owlicity
 {
@@ -203,6 +204,20 @@ namespace Owlicity
       State.CurrentFrameIndex = 0;
       State.PlaybackState = SpriteAnimationPlaybackState.Stopped;
     }
+
+    public AABB CalcAABB()
+    {
+      Vector2 scale = State.Scale;
+      Vector2 hotspot = State.Hotspot;
+      Vector2 dim = Data.Config.TileDim.ToVector2();
+      AABB result = new AABB
+      {
+        LowerBound = scale * (-hotspot),
+        UpperBound = scale * (-hotspot + dim),
+      };
+
+      return result;
+    }
   }
 
   public enum SpriteAnimationType
@@ -219,6 +234,9 @@ namespace Owlicity
     Owliver_AttackFishingRod_Right,
 
     Slurp_Idle,
+
+    Tankton_Idle_Left,
+    Tankton_Idle_Right,
 
     Fir_Idle,
     FirAlt_Idle,
@@ -439,6 +457,22 @@ namespace Owlicity
             config.TileDim = new Point(210, 270);
             config.Hotspot = 0.5f * config.TileDim.ToVector2();
             config.Scale = Global.SlurpScale;
+          }
+          break;
+
+          case SpriteAnimationType.Tankton_Idle_Left:
+          {
+            config.SpriteEffects = SpriteEffects.FlipHorizontally;
+          }
+          goto case SpriteAnimationType.Tankton_Idle_Right;
+
+          case SpriteAnimationType.Tankton_Idle_Right:
+          {
+            config.TileSheetName = "boss_spritesheet";
+            config.TileDim = new Point(512);
+            config.Hotspot = new Vector2(256);
+            config.Scale = Global.TanktonScale;
+            config.PingPong = false;
           }
           break;
 

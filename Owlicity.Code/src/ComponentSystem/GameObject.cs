@@ -121,6 +121,9 @@ namespace Owlicity
     // Mobs
     Slurp,
 
+    // Bosses
+    Tankton,
+
     // Static stuff
     BackgroundScreen,
     Tree_Fir,
@@ -190,7 +193,7 @@ namespace Owlicity
               userdata: bc);
 
             float radius = Global.ToMeters(50 * Global.OwliverScale.X);
-            float density = 0.01f; // TODO(manu)
+            float density = Global.OwliverDensity;
             FixtureFactory.AttachCircle(
               radius: radius,
               density: density,
@@ -272,7 +275,7 @@ namespace Owlicity
               userdata: bc);
 
             float radius = Global.ToMeters(80 * Global.SlurpScale.X);
-            float density = 0.01f; // TODO(manu)
+            float density = Global.OwliverDensity;
             FixtureFactory.AttachCircle(
               radius: radius,
               density: density,
@@ -302,13 +305,10 @@ namespace Owlicity
 
           var hdc = new HealthDisplayComponent(go)
           {
+            InitialDisplayOrigin = HealthDisplayComponent.DisplayOrigin.Bottom,
             HealthIcon = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Cross),
           };
-          hdc.BeforePostInitialize += () =>
-          {
-            hdc.Spatial.Position.Y += Global.ToMeters(0.5f * (sa.ActiveAnimation.ScaledDim.Y + hdc.HealthIcon.ScaledDim.Y));
-            hdc.AttachTo(sa);
-          };
+          hdc.AttachTo(sa);
 
           var mc = new MovementComponent(go)
           {
@@ -328,6 +328,62 @@ namespace Owlicity
           {
             EnemyType = type,
           };
+        }
+        break;
+
+        case GameObjectType.Tankton:
+        {
+          var tankton = new TanktonComponent(go);
+
+          var bc = new BodyComponent(go)
+          {
+            InitMode = BodyComponentInitMode.Manual,
+          };
+          bc.BeforeInitialize += () =>
+          {
+            SpatialData s = go.GetWorldSpatialData();
+            bc.Body = BodyFactory.CreateRectangle(
+              world: Global.Game.World,
+              position: s.Position,
+              rotation: s.Rotation.Radians,
+              width: Global.ToMeters(500 * Global.TanktonScale.X),
+              height: Global.ToMeters(500 * Global.TanktonScale.Y),
+              density: 10 * Global.OwliverDensity,
+              bodyType: BodyType.Dynamic,
+              userData: bc
+            );
+
+            bc.Body.FixedRotation = true;
+          };
+          go.RootComponent = bc;
+
+          var mc = new MovementComponent(go)
+          {
+            ManualInputProcessing = true,
+          };
+
+          var sa = new SpriteAnimationComponent(go)
+          {
+            AnimationTypes = new List<SpriteAnimationType>
+            {
+              SpriteAnimationType.Tankton_Idle_Left,
+              SpriteAnimationType.Tankton_Idle_Right,
+            },
+          };
+          sa.AttachTo(bc);
+
+          var hc = new HealthComponent(go)
+          {
+            MaxHealth = 20,
+          };
+
+          var hdc = new HealthDisplayComponent(go)
+          {
+            HealthIcon = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Cross),
+            InitialDisplayOrigin = HealthDisplayComponent.DisplayOrigin.Bottom,
+            NumIconsPerRow = 5,
+          };
+          hdc.AttachTo(sa);
         }
         break;
 
@@ -403,8 +459,8 @@ namespace Owlicity
             SpatialData s = bc.GetWorldSpatialData();
             bc.Body = BodyFactory.CreateCircle(
               world: Global.Game.World,
-              radius: 0.5f,
-              density: 0.01f,
+              radius: 0.2f,
+              density: 0.5f * Global.OwliverDensity,
               position: s.Position,
               userData: bc);
             bc.Body.IsSensor = true;
@@ -443,8 +499,8 @@ namespace Owlicity
             SpatialData s = bc.GetWorldSpatialData();
             bc.Body = BodyFactory.CreateCircle(
               world: Global.Game.World,
-              radius: 0.5f,
-              density: 0.01f, // TODO(manu)
+              radius: 0.2f,
+              density: 2 * Global.OwliverDensity,
               position: s.Position,
               userData: bc);
             bc.Body.IsSensor = true;

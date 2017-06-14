@@ -43,7 +43,7 @@ namespace Owlicity
 
     public Transform Transform_ => new Transform { p = Position, q = new Rot(Rotation.Radians), };
 
-    public AABB WorldAABB => new AABB
+    public AABB AbsoluteAABB => new AABB
     {
       LowerBound = LocalAABB.LowerBound + Position,
       UpperBound = LocalAABB.UpperBound + Position

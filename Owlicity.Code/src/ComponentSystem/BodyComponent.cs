@@ -82,9 +82,9 @@ namespace Owlicity
         Global.Game.DebugDrawCommands.Add(view =>
         {
           view.DrawArrow(start, end,
-            length: 0.1f,
-            width: 0.1f,
-            drawStartIndicator: true,
+            length: 0.1f, // arrow "head"
+            width: 0.05f, // arrow "head"
+            drawStartIndicator: false, // Note(manu): This one doesn't seem to work.
             color: Color.LimeGreen);
         });
       }

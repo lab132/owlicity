@@ -370,6 +370,12 @@ namespace Owlicity
         AddGameObject(testSlurp);
       }
 
+      {
+        var testTankton = GameObjectFactory.CreateKnown(GameObjectType.Tankton);
+        testTankton.Spatial.Position += Global.ToMeters(900, 550);
+        AddGameObject(testTankton);
+      }
+
 #if true
       {
         const int numBonbons = 10;
@@ -394,7 +400,9 @@ namespace Owlicity
       {
         var BackgroundMusic = Content.Load<Song>("snd/FiluAndDina_-_Video_Game_Background_-_Edit");
         MediaPlayer.IsRepeating = true;
+#if false
         MediaPlayer.Play(BackgroundMusic);
+#endif
       }
 
       Hud.HudBounds = GraphicsDevice.Viewport.Bounds;
@@ -512,6 +520,15 @@ namespace Owlicity
       foreach(GameObject go in GameObjects)
       {
         go.Update(deltaSeconds);
+
+        AABB aabb = Global.CreateInvalidAABB();
+        foreach(SpatialComponent sc in go.GetComponents<SpatialComponent>())
+        {
+          AABB other = sc.GetWorldSpatialData().AbsoluteAABB;
+          aabb.Combine(ref other);
+        }
+
+        DebugDrawCommands.Add(view => view.DrawAABB(ref aabb, Color.Lime));
       }
 
       // Remove pending game objects.
