@@ -473,6 +473,7 @@ namespace Owlicity
             config.Hotspot = new Vector2(256);
             config.Scale = Global.TanktonScale;
             config.PingPong = false;
+            config.SecondsPerFrame *= 2;
           }
           break;
 

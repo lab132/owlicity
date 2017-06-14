@@ -355,11 +355,8 @@ namespace Owlicity
         };
         cc.VisibilityBounds = CurrentLevel.LevelBounds;
 
-        var mc = ActiveCamera.GetComponent<MovementComponent>();
-        mc.MaxMovementSpeed = 5.0f;
-
-        var sac = ActiveCamera.GetComponent<SpringArmComponent>();
-        sac.Target = Owliver;
+        var chc = ActiveCamera.GetComponent<ChaserComponent>();
+        chc.Target = Owliver;
 
         AddGameObject(ActiveCamera);
       }
@@ -447,7 +444,6 @@ namespace Owlicity
 
       {
         var mv = ActiveCamera.GetComponent<MovementComponent>();
-        //mv.Input = Input.DebugInput;
         mv.MovementVector = Input.DebugMovement;
       }
 

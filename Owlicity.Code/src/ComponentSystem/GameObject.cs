@@ -160,19 +160,27 @@ namespace Owlicity
       {
         case GameObjectType.Camera:
         {
-          var sac = new SpringArmComponent(go)
+          var chc = new ChaserComponent(go)
           {
+            MaxDistanceToTarget = float.MaxValue,
+            OutOfReachResponse = ChaserOutOfReachResponse.SnapToTargetAtMaxDistance,
+
+            //MinDistanceToTarget = 0.1f,
+            DistanceWeight = 5.0f,
           };
-          go.RootComponent = sac;
+          go.RootComponent = chc;
 
           var cc = new CameraComponent(go)
           {
           };
-          cc.AttachTo(sac);
+          cc.AttachTo(chc);
 
+#if DEBUG
           var mc = new MovementComponent(go)
           {
+            MaxMovementSpeed = 5.0f,
           };
+#endif
         }
         break;
 
