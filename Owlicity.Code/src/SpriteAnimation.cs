@@ -265,6 +265,8 @@ namespace Owlicity
     public int? NumLoopsToPlay;
     public Vector2 Hotspot;
 
+    public Vector2 ScaledTileDim => Scale * TileDim.ToVector2();
+
     public static readonly SpriteAnimationConfig Default = new SpriteAnimationConfig
     {
       TileCount = 3,

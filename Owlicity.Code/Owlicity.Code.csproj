@@ -43,6 +43,7 @@
     <Compile Include="src\Camera.cs" />
     <Compile Include="src\ComponentSystem\AutoDestructComponent.cs" />
     <Compile Include="src\ComponentSystem\BodyComponent.cs" />
+    <Compile Include="src\ComponentSystem\HealthDisplayComponent.cs" />
     <Compile Include="src\ComponentSystem\MoneyBagComponent.cs" />
     <Compile Include="src\ComponentSystem\EnemyComponent.cs" />
     <Compile Include="src\ComponentSystem\CameraComponent.cs" />

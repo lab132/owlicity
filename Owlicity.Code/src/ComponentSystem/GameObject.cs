@@ -300,6 +300,16 @@ namespace Owlicity
           };
           sa.AttachTo(bc);
 
+          var hdc = new HealthDisplayComponent(go)
+          {
+            HealthIcon = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Cross),
+          };
+          hdc.BeforePostInitialize += () =>
+          {
+            hdc.Spatial.Position.Y += Global.ToMeters(0.5f * (sa.ActiveAnimation.ScaledDim.Y + hdc.HealthIcon.ScaledDim.Y));
+            hdc.AttachTo(sa);
+          };
+
           var mc = new MovementComponent(go)
           {
             ManualInputProcessing = true,

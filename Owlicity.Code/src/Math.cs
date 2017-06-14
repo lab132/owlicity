@@ -57,6 +57,13 @@ namespace Owlicity
       other.LocalAABB = LocalAABB;
     }
 
+    public SpatialData GetCopy()
+    {
+      SpatialData result = new SpatialData();
+      CopyTo(result);
+      return result;
+    }
+
     public override string ToString()
     {
       return $"{Position}|{Rotation.Degrees}°";
@@ -146,20 +153,27 @@ namespace Owlicity
       }
     }
 
-    public static void AttachWithOffsetTo(this ISpatial self, ISpatial newParent,
+    /// <summary>
+    /// Returns the SpatialData instance representing the offset.
+    /// </summary>
+    public static SpatialData AttachWithOffsetTo(this ISpatial self, ISpatial newParent,
       Vector2 positionOffset, Angle rotationOffset)
     {
+      SpatialData result = null;
+
       if(newParent != self)
       {
-        SpatialData offset = new SpatialData()
+        result = new SpatialData()
         {
           Position = positionOffset,
           Rotation = rotationOffset
         };
 
-        offset.AttachTo(newParent);
-        self.AttachTo(offset);
+        result.AttachTo(newParent);
+        self.AttachTo(result);
       }
+
+      return result;
     }
   }
 }
