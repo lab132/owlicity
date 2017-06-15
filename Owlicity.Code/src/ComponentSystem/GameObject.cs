@@ -124,6 +124,9 @@ namespace Owlicity
     // Bosses
     Tankton,
 
+    // Particles
+    DeathConfetti,
+
     // Static stuff
     BackgroundScreen,
     Tree_Fir,
@@ -259,6 +262,10 @@ namespace Owlicity
             MaxMovementSpeed = 2.0f,
           };
 
+          var abp = new AutoBrakeComponent(go)
+          {
+          };
+
           var sqc = new SquashComponent(go);
 
           var sa = new SpriteAnimationComponent(go)
@@ -280,7 +287,11 @@ namespace Owlicity
 
           var hc = new HealthComponent(go)
           {
-            MaxHealth = 3,
+            MaxHealth = 10,
+          };
+          hc.OnHit += (damage) =>
+          {
+            hc.MakeInvincible(oc.HitDuration);
           };
 
           CreateOnHitSquasher(go, hc).SetDefaultCurves(oc.HitDuration);
@@ -333,6 +344,10 @@ namespace Owlicity
 
           go.RootComponent = bc;
 
+          var abp = new AutoBrakeComponent(go)
+          {
+          };
+
           var sa = new SpriteAnimationComponent(go)
           {
             AnimationTypes = new List<SpriteAnimationType>
@@ -343,21 +358,8 @@ namespace Owlicity
           };
           sa.AttachTo(bc);
 
-          var hdc = new HealthDisplayComponent(go)
-          {
-            InitialDisplayOrigin = HealthDisplayComponent.DisplayOrigin.Bottom,
-            HealthIcon = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Cross),
-          };
-          hdc.AttachTo(sa);
-
-          var mc = new MovementComponent(go)
-          {
-            ManualInputProcessing = true,
-          };
-
           var ec = new EnemyComponent(go)
           {
-            EnemyType = type,
             AnimationType_Idle_Left = SpriteAnimationType.Slurp_Idle_Left,
             AnimationType_Idle_Right = SpriteAnimationType.Slurp_Idle_Right,
           };
@@ -366,6 +368,26 @@ namespace Owlicity
           {
             MaxHealth = 3,
           };
+          hc.OnHit += (damage) =>
+          {
+            hc.MakeInvincible(ec.HitDuration);
+          };
+          hc.OnDeath += (damage) =>
+          {
+            Global.Game.RemoveGameObject(go);
+
+            var confetti = CreateKnown(GameObjectType.DeathConfetti);
+            confetti.Spatial.CopyFrom(go.Spatial);
+            confetti.GetComponent<AutoDestructComponent>().SecondsUntilDestruction = 1.0f;
+            Global.Game.AddGameObject(confetti);
+          };
+
+          var hdc = new HealthDisplayComponent(go)
+          {
+            InitialDisplayOrigin = HealthDisplayComponent.DisplayOrigin.Bottom,
+            HealthIcon = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Cross),
+          };
+          hdc.AttachTo(sa);
 
           CreateOnHitSquasher(go, hc).SetDefaultCurves(ec.HitDuration);
 
@@ -420,6 +442,10 @@ namespace Owlicity
             ManualInputProcessing = true,
           };
 
+          var abp = new AutoBrakeComponent(go)
+          {
+          };
+
           var sa = new SpriteAnimationComponent(go)
           {
             AnimationTypes = new List<SpriteAnimationType>
@@ -435,6 +461,26 @@ namespace Owlicity
           {
             MaxHealth = 20,
           };
+          hc.OnHit += (damage) =>
+          {
+            hc.MakeInvincible(tankton.HitDuration);
+          };
+          hc.OnDeath += (damage) =>
+          {
+            Global.Game.RemoveGameObject(go);
+
+            var confetti = CreateKnown(GameObjectType.DeathConfetti);
+            confetti.Spatial.CopyFrom(go.Spatial);
+            confetti.GetComponent<AutoDestructComponent>().SecondsUntilDestruction = 5.0f;
+            ParticleEmitterComponent deathEmitter = confetti.GetComponent<ParticleEmitterComponent>();
+            deathEmitter.NumParticles = 4096;
+            deathEmitter.BeforePostInitialize += () =>
+            {
+              // TODO(manu): Somehow, this doesn't work...
+              deathEmitter.Emitter.MaxParticleSpeed = 200.0f;
+            };
+            Global.Game.AddGameObject(confetti);
+          };
 
           var hdc = new HealthDisplayComponent(go)
           {
@@ -449,6 +495,41 @@ namespace Owlicity
             extremeScale: new Vector2(0.9f, 1.1f));
 
           CreateOnHitBlinkingSequence(go, hc).SetDefaultCurves(tankton.HitDuration);
+        }
+        break;
+
+        case GameObjectType.DeathConfetti:
+        {
+          var adc = new AutoDestructComponent(go)
+          {
+            SecondsUntilDestruction = 1.0f,
+          };
+
+          var pec = new ParticleEmitterComponent(go)
+          {
+            NumParticles = 64,
+
+            TextureContentNames = new[]
+            {
+              "confetti/confetti_01",
+              "confetti/confetti_02",
+              "confetti/confetti_03",
+              "confetti/confetti_04",
+              "confetti/confetti_05",
+              "confetti/confetti_06",
+              "confetti/confetti_07",
+            },
+
+            AvailableColors = Global.AllConfettiColors,
+          };
+
+          pec.BeforePostInitialize += delegate ()
+          {
+            pec.Emitter.MaxTTL = 0.8f * adc.SecondsUntilDestruction;
+            pec.Emitter.MaxParticleSpread = 0.05f;
+            pec.Emitter.MaxParticleSpeed = 5f;
+            pec.Emit(go.GetWorldSpatialData().Position);
+          };
         }
         break;
 

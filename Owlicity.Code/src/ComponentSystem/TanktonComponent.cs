@@ -43,16 +43,6 @@ namespace Owlicity
       }
     }
 
-    public override void PostInitialize()
-    {
-      base.PostInitialize();
-
-      Health.OnHit += (damage) =>
-      {
-        Health.MakeInvincible(HitDuration);
-      };
-    }
-
     public override void Update(float deltaSeconds)
     {
       base.Update(deltaSeconds);

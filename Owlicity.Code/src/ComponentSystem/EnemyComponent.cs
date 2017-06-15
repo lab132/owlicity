@@ -13,34 +13,16 @@ namespace Owlicity
     //
     // Initialization data.
     //
-    public GameObjectType EnemyType { get; set; }
     public float HitDuration = 0.25f;
-
-    // Only start chasing if Owliver is closer than this.
-    public float DetectionDistance { get; set; } = 2.5f;
-
-    // Don't get closer than this.
-    public float MinimumDistance { get; set; } = 0.01f;
-
-    // Chase owliver at this speed.
-    public float ChasingSpeed { get; set; } = 0.01f;
-
-    // The amount of damage caused by this enemy.
     public int Damage = 1;
-
-    // Weight of the impulse when hitting owliver.
     public float ForceOnImpact = 0.05f;
-
     public SpriteAnimationType AnimationType_Idle_Left;
     public SpriteAnimationType AnimationType_Idle_Right;
 
     //
     // Runtime data.
     //
-    public bool IsChasing;
-
     public BodyComponent BodyComponent;
-    public MovementComponent Movement;
     public HealthComponent Health;
     public SpriteAnimationComponent Animation;
 
@@ -65,12 +47,6 @@ namespace Owlicity
         Debug.Assert(BodyComponent != null);
       }
 
-      if(Movement == null)
-      {
-        Movement = Owner.GetComponent<MovementComponent>();
-        Debug.Assert(Movement != null);
-      }
-
       if(Chaser == null)
       {
         Chaser = Owner.GetComponent<ChaserComponent>();
@@ -93,64 +69,7 @@ namespace Owlicity
     {
       base.PostInitialize();
 
-      switch (EnemyType)
-      {
-        case GameObjectType.Slurp:
-        {
-          Movement.MaxMovementSpeed = 0.5f;
-          Body body = BodyComponent.Body;
-          body.OnCollision += OnCollisionWithOwliver;
-        }
-        break;
-
-        default: throw new NotImplementedException();
-      }
-
-      Health.OnHit += (damage) =>
-      {
-        Health.MakeInvincible(HitDuration);
-      };
-
-      Health.OnDeath += (damage) =>
-      {
-        Global.Game.RemoveGameObject(Owner);
-
-        var go = new GameObject();
-        Owner.Spatial.CopyTo(go.Spatial);
-
-        var adc = new AutoDestructComponent(go)
-        {
-          SecondsUntilDestruction = 1.0f,
-        };
-
-        var pec = new ParticleEmitterComponent(go)
-        {
-          NumParticles = 512,
-
-          TextureContentNames = new[]
-          {
-            "confetti/confetti_01",
-            "confetti/confetti_02",
-            "confetti/confetti_03",
-            "confetti/confetti_04",
-            "confetti/confetti_05",
-            "confetti/confetti_06",
-            "confetti/confetti_07",
-          },
-
-          AvailableColors = Global.AllConfettiColors,
-        };
-
-        pec.BeforePostInitialize += delegate ()
-        {
-          pec.Emitter.MaxTTL = 0.8f * adc.SecondsUntilDestruction;
-          pec.Emitter.MaxParticleSpread = 0.05f;
-          pec.Emitter.MaxParticleSpeed = 5f;
-          pec.Emit(go.GetWorldSpatialData().Position);
-        };
-
-        Global.Game.AddGameObject(go);
-      };
+      BodyComponent.Body.OnCollision += OnCollisionWithOwliver;
 
       if(Chaser != null)
       {
@@ -176,39 +95,14 @@ namespace Owlicity
       Debug.Assert(((BodyComponent)fixtureA.UserData).Owner == Owner);
 
       Body hitBody = fixtureB.Body;
-
-      GameObject go = ((BodyComponent)hitBody.UserData).Owner;
-      bool sendItToHell = true;
-
-      // Handle health component
-      HealthComponent hc = go.GetComponent<HealthComponent>();
-      if (hc != null)
-      {
-        if (!hc.IsInvincible)
-        {
-          hc.Hit(Damage);
-        }
-        else
-        {
-          sendItToHell = false;
-        }
-      }
-
-      if (sendItToHell)
-      {
-        // Apply impulse
-        Vector2 deltaPosition = hitBody.Position - BodyComponent.Body.Position;
-        deltaPosition.GetDirectionAndLength(out Vector2 dir, out float distance);
-        Vector2 impulse = ForceOnImpact * dir;
-        hitBody.ApplyLinearImpulse(impulse);
-      }
+      Global.HandleDefaultHit(hitBody, MyBody.Position, Damage, ForceOnImpact);
     }
 
     public override void Update(float deltaSeconds)
     {
       base.Update(deltaSeconds);
 
-      if(Chaser.IsChasing)
+      if(Chaser != null && Chaser.IsChasing)
       {
         // Change the facing direction to the target.
         Vector2 myPosition = Owner.GetWorldSpatialData().Position;
@@ -222,12 +116,6 @@ namespace Owlicity
           Animation.ChangeActiveAnimation(AnimationType_Idle_Right);
         }
       }
-
-      Global.Game.DebugDrawCommands.Add(view =>
-      {
-        Color color = Health.IsInvincible ? Color.Red : IsChasing ? Color.Yellow : Color.Green;
-        view.DrawCircle(Owner.GetWorldSpatialData().Position, DetectionDistance, color);
-      });
     }
   }
 }

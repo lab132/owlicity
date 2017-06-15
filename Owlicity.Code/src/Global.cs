@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using VelcroPhysics.Collision.Filtering;
+using VelcroPhysics.Dynamics;
 using VelcroPhysics.Shared;
 
 namespace Owlicity
@@ -58,6 +59,35 @@ namespace Owlicity
         Game.AddGameObject(go);
 
         localPosition = localPosition.GetRotated(angle);
+      }
+    }
+
+    public static void HandleDefaultHit(Body hitBody, Vector2 hitterPosition, int damage, float force)
+    {
+      GameObject go = ((BodyComponent)hitBody.UserData).Owner;
+      bool sendItToHell = true;
+
+      // Handle health component
+      HealthComponent hc = go.GetComponent<HealthComponent>();
+      if(hc != null)
+      {
+        if(!hc.IsInvincible)
+        {
+          hc.Hit(damage);
+        }
+        else
+        {
+          sendItToHell = false;
+        }
+      }
+
+      if(sendItToHell)
+      {
+        // Apply impulse
+        Vector2 deltaPosition = hitBody.Position - hitterPosition;
+        deltaPosition.GetDirectionAndLength(out Vector2 dir, out float distance);
+        Vector2 impulse = force * dir;
+        hitBody.ApplyLinearImpulse(impulse);
       }
     }
   }

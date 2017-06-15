@@ -230,17 +230,6 @@ namespace Owlicity
       Animation.OnAnimationPlaybackStateChanged += OnAnimationLoopFinished;
 
       MyBody.OnCollision += OnCollision;
-
-      Health.OnHit += (damage) =>
-      {
-        Health.MakeInvincible(HitDuration);
-#if DEBUG
-        if(Health.CurrentHealth <= 1)
-        {
-          Health.Heal(damage);
-        }
-#endif
-      };
     }
 
     public override void Update(float deltaSeconds)
@@ -307,34 +296,7 @@ namespace Owlicity
                                       .Select(f => f.Body)
                                       .Distinct())
         {
-          const int damage = 1;
-          const float force = 0.1f * damage;
-
-          GameObject go = ((BodyComponent)hitBody.UserData).Owner;
-          bool sendItToHell = true;
-
-          // Handle health component
-          HealthComponent hc = go.GetComponent<HealthComponent>();
-          if(hc != null)
-          {
-            if(!hc.IsInvincible)
-            {
-              hc.Hit(damage);
-            }
-            else
-            {
-              sendItToHell = false;
-            }
-          }
-
-          if(sendItToHell)
-          {
-            // Apply impulse
-            Vector2 deltaPosition = hitBody.Position - MyBody.Position;
-            deltaPosition.GetDirectionAndLength(out Vector2 dir, out float distance);
-            Vector2 impulse = force * dir;
-            hitBody.ApplyLinearImpulse(impulse);
-          }
+          Global.HandleDefaultHit(hitBody, MyBody.Position, damage: 1, force: 0.1f);
         }
       }
       else

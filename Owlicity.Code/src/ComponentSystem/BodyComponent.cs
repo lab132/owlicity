@@ -21,6 +21,8 @@ namespace Owlicity
     public BodyType BodyType;
     public string ShapeContentName;
 
+    public bool AllowDebugDrawing = true;
+
     //
     // Runtime data
     //
@@ -76,6 +78,7 @@ namespace Owlicity
         Spatial.Rotation.Radians = Body.Rotation;
       }
 
+      if(AllowDebugDrawing)
       {
         Vector2 start = this.GetWorldSpatialData().Position;
         Vector2 end = start + Body.LinearVelocity;
