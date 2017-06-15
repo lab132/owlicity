@@ -47,7 +47,6 @@ namespace Owlicity
     //
     // Optional components
     //
-    public SquashComponent Squasher;
     public ChaserComponent Chaser;
 
     public Body MyBody => BodyComponent.Body;
@@ -66,15 +65,10 @@ namespace Owlicity
         Debug.Assert(BodyComponent != null);
       }
 
-      if (Movement == null)
+      if(Movement == null)
       {
         Movement = Owner.GetComponent<MovementComponent>();
         Debug.Assert(Movement != null);
-      }
-
-      if(Squasher == null)
-      {
-        Squasher = Owner.GetComponent<SquashComponent>();
       }
 
       if(Chaser == null)
@@ -158,15 +152,6 @@ namespace Owlicity
         Global.Game.AddGameObject(go);
       };
 
-      if (Squasher != null)
-      {
-        Squasher.SetupDefaultSquashData(HitDuration);
-        Health.OnHit += (damage) =>
-        {
-          Squasher.StartSquashing();
-        };
-      }
-
       if(Chaser != null)
       {
         // Disable chasing when we are invincible.
@@ -219,59 +204,20 @@ namespace Owlicity
       }
     }
 
-    public override void PrePhysicsUpdate(float deltaSeconds)
-    {
-      base.PrePhysicsUpdate(deltaSeconds);
-
-      // Only move when not being hit.
-      if(!Health.IsInvincible)
-      {
-        Vector2 owliverPosition = Global.Game.Owliver.GetWorldSpatialData().Position;
-        Vector2 myPosition = Owner.GetWorldSpatialData().Position;
-
-        Vector2 deltaVector = owliverPosition - myPosition;
-        deltaVector.GetDirectionAndLength(out Vector2 owliverDir, out float owliverDistance);
-
-        Vector2 movementVector = Movement.ConsumeMovementVector();
-        switch(EnemyType)
-        {
-          case GameObjectType.Slurp:
-          {
-            if(owliverDistance > MinimumDistance && owliverDistance < DetectionDistance)
-            {
-              movementVector += owliverDir * ChasingSpeed;
-              IsChasing = true;
-            }
-            else
-            {
-              IsChasing = false;
-            }
-          }
-          break;
-
-          default: throw new NotImplementedException();
-        }
-
-#if false
-        Movement.PerformMovement(movementVector, deltaSeconds);
-#endif
-      }
-    }
-
     public override void Update(float deltaSeconds)
     {
       base.Update(deltaSeconds);
 
-      Vector2 myPosition = Owner.GetWorldSpatialData().Position;
-      Vector2 owliverPosition = Global.Game.Owliver.GetWorldSpatialData().Position;
-
       if(Chaser.IsChasing)
       {
-        if(owliverPosition.X < myPosition.X)
+        // Change the facing direction to the target.
+        Vector2 myPosition = Owner.GetWorldSpatialData().Position;
+        Vector2 targetPosition = Chaser.Target.GetWorldSpatialData().Position;
+        if(targetPosition.X < myPosition.X)
         {
           Animation.ChangeActiveAnimation(AnimationType_Idle_Left);
         }
-        else if(owliverPosition.X > myPosition.X)
+        else if(targetPosition.X > myPosition.X)
         {
           Animation.ChangeActiveAnimation(AnimationType_Idle_Right);
         }

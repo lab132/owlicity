@@ -154,6 +154,28 @@ namespace Owlicity
       _random = new Random();
     }
 
+    public static SquashComponent CreateOnHitSquasher(GameObject go, HealthComponent health)
+    {
+      var result = new SquashComponent(go);
+      health.OnHit += (damage) =>
+      {
+        result.StartSequence();
+      };
+
+      return result;
+    }
+
+    public static BlinkingSequenceComponent CreateOnHitBlinkingSequence(GameObject go, HealthComponent health)
+    {
+      var result = new BlinkingSequenceComponent(go);
+      health.OnHit += (damage) =>
+      {
+        result.StartSequence();
+      };
+
+      return result;
+    }
+
     public static GameObject CreateKnown(GameObjectType type)
     {
       GameObject go = new GameObject();
@@ -261,6 +283,10 @@ namespace Owlicity
             MaxHealth = 3,
           };
 
+          CreateOnHitSquasher(go, hc).SetDefaultCurves(oc.HitDuration);
+
+          CreateOnHitBlinkingSequence(go, hc).SetDefaultCurves(oc.HitDuration);
+
           var moc = new MoneyBagComponent(go)
           {
             InitialAmount = 0,
@@ -329,15 +355,6 @@ namespace Owlicity
             ManualInputProcessing = true,
           };
 
-          var sqc = new SquashComponent(go)
-          {
-          };
-
-          var hc = new HealthComponent(go)
-          {
-            MaxHealth = 3,
-          };
-
           var ec = new EnemyComponent(go)
           {
             EnemyType = type,
@@ -345,12 +362,21 @@ namespace Owlicity
             AnimationType_Idle_Right = SpriteAnimationType.Slurp_Idle_Right,
           };
 
+          var hc = new HealthComponent(go)
+          {
+            MaxHealth = 3,
+          };
+
+          CreateOnHitSquasher(go, hc).SetDefaultCurves(ec.HitDuration);
+
+          CreateOnHitBlinkingSequence(go, hc).SetDefaultCurves(ec.HitDuration);
+
           var chc = new ChaserComponent(go)
           {
             Target = Global.Game.Owliver,
             TargetRange = 2.0f,
 
-            Speed = 0.01f,
+            Speed = 0.5f,
 
             DebugDrawingEnabled = true,
           };
@@ -417,6 +443,12 @@ namespace Owlicity
             NumIconsPerRow = 5,
           };
           hdc.AttachTo(sa);
+
+          CreateOnHitSquasher(go, hc).SetDefaultCurves(
+            duration: tankton.HitDuration,
+            extremeScale: new Vector2(0.9f, 1.1f));
+
+          CreateOnHitBlinkingSequence(go, hc).SetDefaultCurves(tankton.HitDuration);
         }
         break;
 
@@ -531,7 +563,7 @@ namespace Owlicity
           {
             Target = Global.Game.Owliver,
             TargetRange = 1.0f,
-            Speed = 0.05f,
+            Speed = 3.0f,
 
             DebugDrawingEnabled = true,
           };
@@ -579,7 +611,7 @@ namespace Owlicity
           {
             Target = Global.Game.Owliver,
             TargetRange = 1.0f,
-            Speed = 0.05f,
+            Speed = 3.0f,
 
             DebugDrawingEnabled = true,
           };

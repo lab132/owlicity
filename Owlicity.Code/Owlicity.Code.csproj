@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="src\Camera.cs" />
     <Compile Include="src\ComponentSystem\AutoDestructComponent.cs" />
+    <Compile Include="src\ComponentSystem\BlinkingSequenceComponent.cs" />
     <Compile Include="src\ComponentSystem\BodyComponent.cs" />
     <Compile Include="src\ComponentSystem\HealthDisplayComponent.cs" />
     <Compile Include="src\ComponentSystem\MoneyBagComponent.cs" />

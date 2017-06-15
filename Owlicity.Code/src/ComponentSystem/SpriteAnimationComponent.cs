@@ -29,6 +29,7 @@ namespace Owlicity
       new Dictionary<SpriteAnimationType, SpriteAnimationInstance>();
 
     public Vector2? AdditionalScale;
+    public Color? Tint;
 
     public SpriteAnimationComponent(GameObject owner) : base(owner)
     {
@@ -103,7 +104,11 @@ namespace Owlicity
       base.Draw(renderer);
 
       SpatialData worldSpatial = this.GetWorldSpatialData();
-      ActiveAnimation.Draw(renderer, worldSpatial, RenderDepth, AdditionalScale);
+      if(Tint != null && Tint != Color.White)
+      {
+        Console.WriteLine();
+      }
+      ActiveAnimation.Draw(renderer, worldSpatial, RenderDepth, AdditionalScale, Tint);
     }
   }
 }

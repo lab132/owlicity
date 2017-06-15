@@ -63,6 +63,7 @@ namespace Owlicity
   public class OwliverComponent : ComponentBase
   {
     public SpriteAnimationComponent Animation;
+    public float HitDuration = 0.25f;
 
     public BodyComponent BodyComponent;
     public Body MyBody => BodyComponent?.Body;
@@ -71,8 +72,6 @@ namespace Owlicity
     public HealthComponent Health;
     public MoneyBagComponent MoneyBag;
     public KeyRingComponent KeyRing;
-
-    public SquashComponent Squasher;
 
     public OwliverState CurrentState;
     public Action<OwliverState, OwliverState> OnStateChanged;
@@ -232,10 +231,9 @@ namespace Owlicity
 
       MyBody.OnCollision += OnCollision;
 
-      const float hitDuration = 0.25f;
       Health.OnHit += (damage) =>
       {
-        Health.MakeInvincible(hitDuration);
+        Health.MakeInvincible(HitDuration);
 #if DEBUG
         if(Health.CurrentHealth <= 1)
         {
@@ -243,15 +241,6 @@ namespace Owlicity
         }
 #endif
       };
-
-      if (Squasher != null)
-      {
-        Squasher.SetupDefaultSquashData(hitDuration);
-        Health.OnHit += (damage) =>
-        {
-          Squasher.StartSquashing();
-        };
-      }
     }
 
     public override void Update(float deltaSeconds)

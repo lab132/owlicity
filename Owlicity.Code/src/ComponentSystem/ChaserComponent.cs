@@ -39,7 +39,12 @@ namespace Owlicity
     public BodyComponent BodyComponent;
     public Body MyBody;
 
-    public bool IsChasing;
+    bool _isChasing;
+    public bool IsChasing
+    {
+      get => _isChasing && Target != null;
+      set => _isChasing = value;
+    }
 
     public bool DebugDrawingEnabled = false;
 
@@ -98,12 +103,11 @@ namespace Owlicity
 
     public void PerformChase(float deltaSeconds)
     {
+      IsChasing = false;
       Body body = MyBody;
 
       if(Target != null)
       {
-        IsChasing = false;
-
         SpatialData worldSpatial = this.GetWorldSpatialData();
         SpatialData targetSpatial = Target.GetWorldSpatialData();
         Vector2 targetDelta = targetSpatial.Position - worldSpatial.Position;
@@ -145,25 +149,26 @@ namespace Owlicity
         {
           IsChasing = true;
 
-          Vector2 velocity;
           switch(MovementType)
           {
             case ChaserMovementType.Constant:
             {
-              Vector2 deltaPosition = targetDir * Speed;
+              Vector2 velocity = targetDir * Speed;
               if(body != null)
               {
                 if(body.BodyType == BodyType.Static)
                 {
+                  Vector2 deltaPosition = velocity * deltaSeconds;
                   body.Position += deltaPosition;
                 }
                 else
                 {
-                  body.LinearVelocity = deltaPosition / deltaSeconds;
+                  body.LinearVelocity = velocity;
                 }
               }
               else
               {
+                Vector2 deltaPosition = velocity * deltaSeconds;
                 Vector2 newPosition = worldSpatial.Position + deltaPosition;
                 Spatial.SetWorldPosition(newPosition);
               }
@@ -174,7 +179,7 @@ namespace Owlicity
             {
               float relevantTargetDistance = targetDistance - TargetInnerRange;
               float weightedDistance = relevantTargetDistance * Speed;
-              velocity = targetDir * weightedDistance;
+              Vector2 velocity = targetDir * weightedDistance;
 
               if(body != null)
               {
