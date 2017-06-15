@@ -566,6 +566,11 @@ namespace Owlicity
 
               var confettiPec = confetti.GetComponent<ParticleEmitterComponent>();
               confettiPec.NumParticles = 16;
+              Vector2 g = -2.5f * bc.Body.LinearVelocity;
+              confettiPec.BeforePostInitialize += () =>
+              {
+                confettiPec.Emitter.Gravity = g;
+              };
 
               Global.Game.AddGameObject(confetti);
             };
