@@ -385,19 +385,6 @@ namespace Owlicity
               yRadius: 0.5f,
               density: 2 * Global.OwliverDensity,
               segments: 0);
-            /*
-            bc.Body = BodyFactory.CreateRectangle(
-              world: Global.Game.World,
-              position: s.Position,
-              rotation: s.Rotation.Radians,
-              width: Global.ToMeters(350 * Global.TanktonScale.X),
-              height: Global.ToMeters(400 * Global.TanktonScale.Y),
-              density: 2 * Global.OwliverDensity,
-              bodyType: BodyType.Dynamic,
-              userData: bc
-            );
-            */
-
             bc.Body.FixedRotation = true;
           };
           go.RootComponent = bc;

@@ -29,7 +29,7 @@ namespace Owlicity
     public SpriteAnimationInstance HealthIconAnimation;
 
     public Color FullHealthTint = Color.White;
-    public Color NoHealthTint = new Color(30, 30, 30);
+    public Color NoHealthTint = new Color(60, 60, 60);
 
     public MoneyBagComponent MoneyBag;
     public SpatialData MoneyBagIconAnchor = new SpatialData();
