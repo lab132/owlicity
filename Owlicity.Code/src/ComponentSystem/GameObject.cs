@@ -127,6 +127,8 @@ namespace Owlicity
     // Particles
     DeathConfetti,
 
+    Projectile,
+
     // Static stuff
     BackgroundScreen,
     Tree_Fir,
@@ -530,6 +532,57 @@ namespace Owlicity
             pec.Emitter.MaxParticleSpeed = 5f;
             pec.Emit(go.GetWorldSpatialData().Position);
           };
+        }
+        break;
+
+        case GameObjectType.Projectile:
+        {
+          var bc = new BodyComponent(go)
+          {
+            InitMode = BodyComponentInitMode.Manual,
+          };
+          bc.BeforePostInitialize += () =>
+          {
+            SpatialData s = go.GetWorldSpatialData();
+            bc.Body = BodyFactory.CreateCapsule(
+              world: Global.Game.World,
+              endRadius: Global.ToMeters(9),
+              height: Global.ToMeters(50),
+              userData: bc,
+              position: s.Position,
+              rotation: s.Rotation.Radians + new Angle { Degrees = 90.0f + new Random().NextBilateralFloat() * 2 }.Radians,
+              density: 10 * Global.OwliverDensity,
+              bodyType: BodyType.Dynamic);
+            bc.Body.OnCollision += (fixtureA, fixtureB, contact) =>
+            {
+              Global.HandleDefaultHit(fixtureB.Body, bc.Body.Position, 1, 0.1f);
+
+              Global.Game.RemoveGameObject(go);
+
+              var confetti = CreateKnown(GameObjectType.DeathConfetti);
+              confetti.Spatial.CopyFrom(go.Spatial);
+
+              confetti.GetComponent<AutoDestructComponent>().SecondsUntilDestruction = 0.25f;
+
+              var confettiPec = confetti.GetComponent<ParticleEmitterComponent>();
+              confettiPec.NumParticles = 16;
+
+              Global.Game.AddGameObject(confetti);
+            };
+          };
+          go.RootComponent = bc;
+
+          var sac = new SpriteAnimationComponent(go)
+          {
+            AnimationTypes = new List<SpriteAnimationType>
+            {
+              SpriteAnimationType.Bonbon_Red,
+            },
+          };
+          sac.Spatial.Rotation.Degrees -= 45.0f;
+          sac.AttachTo(bc);
+
+          var adc = new AutoDestructComponent(go);
         }
         break;
 

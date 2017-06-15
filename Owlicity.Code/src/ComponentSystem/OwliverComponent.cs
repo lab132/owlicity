@@ -277,7 +277,6 @@ namespace Owlicity
 
       if(input.WantsAttack)
       {
-        // TODO(manu)
         newState.MovementMode = OwliverMovementMode.Attacking;
       }
 
@@ -289,7 +288,7 @@ namespace Owlicity
       ChangeState(ref newState);
 
       AABB weaponAABB = WeaponAABB;
-      if(CurrentState.MovementMode == OwliverMovementMode.Attacking)
+      if(input.WantsAttack && CurrentState.MovementMode == OwliverMovementMode.Attacking)
       {
         List<Fixture> fixtures = Global.Game.World.QueryAABB(ref weaponAABB);
         foreach(Body hitBody in fixtures.Where(f => f.CollidesWith.HasFlag(Global.OwliverWeaponCollisionCategory))
@@ -297,6 +296,21 @@ namespace Owlicity
                                       .Distinct())
         {
           Global.HandleDefaultHit(hitBody, MyBody.Position, damage: 1, force: 0.1f);
+        }
+
+        {
+          float sign = CurrentState.FacingDirection == OwliverFacingDirection.Left ? -1.0f : 1.0f;
+          GameObject projectile = GameObjectFactory.CreateKnown(GameObjectType.Projectile);
+          projectile.Spatial.CopyFrom(Owner.GetWorldSpatialData());
+          projectile.Spatial.Position.X += sign * 0.1f;
+          projectile.GetComponent<AutoDestructComponent>().SecondsUntilDestruction = 2.0f;
+          var bc = projectile.GetComponent<BodyComponent>();
+          bc.BeforePostInitialize += () =>
+          {
+            bc.Body.CollidesWith = ~Global.OwliverCollisionCategory;
+            bc.Body.LinearVelocity = sign * new Vector2(10.0f, 0.0f);
+          };
+          Global.Game.AddGameObject(projectile);
         }
       }
       else
