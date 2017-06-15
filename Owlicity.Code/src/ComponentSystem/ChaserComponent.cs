@@ -39,6 +39,8 @@ namespace Owlicity
     public BodyComponent BodyComponent;
     public Body MyBody;
 
+    public bool IsChasing;
+
     public bool DebugDrawingEnabled = false;
 
     public ChaserComponent(GameObject owner)
@@ -100,6 +102,8 @@ namespace Owlicity
 
       if(Target != null)
       {
+        IsChasing = false;
+
         SpatialData worldSpatial = this.GetWorldSpatialData();
         SpatialData targetSpatial = Target.GetWorldSpatialData();
         Vector2 targetDelta = targetSpatial.Position - worldSpatial.Position;
@@ -117,6 +121,8 @@ namespace Owlicity
 
             case ChaserOutOfReachResponse.SnapToTargetAtMaximumRange:
             {
+              IsChasing = true;
+
               // Note(manu): Without this value the target would always be out of range until it has _completely_ stopped.
               const float compensationForSlowMovement = 0.01f;
               Vector2 newPosition = targetSpatial.Position - (targetDir * (TargetRange - compensationForSlowMovement));
@@ -137,6 +143,8 @@ namespace Owlicity
         }
         else if(targetDistance > TargetInnerRange)
         {
+          IsChasing = true;
+
           Vector2 velocity;
           switch(MovementType)
           {

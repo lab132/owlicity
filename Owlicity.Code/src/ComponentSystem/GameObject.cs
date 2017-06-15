@@ -311,7 +311,8 @@ namespace Owlicity
           {
             AnimationTypes = new List<SpriteAnimationType>
             {
-              SpriteAnimationType.Slurp_Idle,
+              SpriteAnimationType.Slurp_Idle_Left,
+              SpriteAnimationType.Slurp_Idle_Right,
             }
           };
           sa.AttachTo(bc);
@@ -340,6 +341,8 @@ namespace Owlicity
           var ec = new EnemyComponent(go)
           {
             EnemyType = type,
+            AnimationType_Idle_Left = SpriteAnimationType.Slurp_Idle_Left,
+            AnimationType_Idle_Right = SpriteAnimationType.Slurp_Idle_Right,
           };
 
           var chc = new ChaserComponent(go)

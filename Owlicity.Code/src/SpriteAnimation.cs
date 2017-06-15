@@ -233,7 +233,8 @@ namespace Owlicity
     Owliver_AttackFishingRod_Left,
     Owliver_AttackFishingRod_Right,
 
-    Slurp_Idle,
+    Slurp_Idle_Left,
+    Slurp_Idle_Right,
 
     Tankton_Idle_Left,
     Tankton_Idle_Right,
@@ -450,7 +451,7 @@ namespace Owlicity
           }
           break;
 
-          case SpriteAnimationType.Slurp_Idle:
+          case SpriteAnimationType.Slurp_Idle_Left:
           {
             config.TileSheetName = "slurp_spritesheet";
             config.TileCount = 7;
@@ -459,6 +460,12 @@ namespace Owlicity
             config.Scale = Global.SlurpScale;
           }
           break;
+
+          case SpriteAnimationType.Slurp_Idle_Right:
+          {
+            config.SpriteEffects = SpriteEffects.FlipHorizontally;
+          }
+          goto case SpriteAnimationType.Slurp_Idle_Left;
 
           case SpriteAnimationType.Tankton_Idle_Left:
           {

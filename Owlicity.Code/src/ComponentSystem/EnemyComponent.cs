@@ -31,6 +31,9 @@ namespace Owlicity
     // Weight of the impulse when hitting owliver.
     public float ForceOnImpact = 0.05f;
 
+    public SpriteAnimationType AnimationType_Idle_Left;
+    public SpriteAnimationType AnimationType_Idle_Right;
+
     //
     // Runtime data.
     //
@@ -39,6 +42,7 @@ namespace Owlicity
     public BodyComponent BodyComponent;
     public MovementComponent Movement;
     public HealthComponent Health;
+    public SpriteAnimationComponent Animation;
 
     //
     // Optional components
@@ -82,6 +86,12 @@ namespace Owlicity
       {
         Health = Owner.GetComponent<HealthComponent>();
         Debug.Assert(Health != null);
+      }
+
+      if(Animation == null)
+      {
+        Animation = Owner.GetComponent<SpriteAnimationComponent>();
+        Debug.Assert(Animation != null);
       }
     }
 
@@ -251,6 +261,21 @@ namespace Owlicity
     public override void Update(float deltaSeconds)
     {
       base.Update(deltaSeconds);
+
+      Vector2 myPosition = Owner.GetWorldSpatialData().Position;
+      Vector2 owliverPosition = Global.Game.Owliver.GetWorldSpatialData().Position;
+
+      if(Chaser.IsChasing)
+      {
+        if(owliverPosition.X < myPosition.X)
+        {
+          Animation.ChangeActiveAnimation(AnimationType_Idle_Left);
+        }
+        else if(owliverPosition.X > myPosition.X)
+        {
+          Animation.ChangeActiveAnimation(AnimationType_Idle_Right);
+        }
+      }
 
       Global.Game.DebugDrawCommands.Add(view =>
       {
