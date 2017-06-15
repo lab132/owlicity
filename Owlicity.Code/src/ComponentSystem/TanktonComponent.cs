@@ -13,7 +13,7 @@ namespace Owlicity
     //
     // Initialization data.
     //
-    public float HitDuration = 0.5f;
+    public float HitDuration;
 
     //
     // Runtime data.

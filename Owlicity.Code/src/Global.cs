@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using VelcroPhysics.Collision.Filtering;
 using VelcroPhysics.Shared;
 
@@ -42,6 +43,22 @@ namespace Owlicity
         LowerBound = new Vector2(float.MaxValue),
         UpperBound = new Vector2(float.MinValue),
       };
+    }
+
+    public static void SpawnGameObjectsInRingFormation(Vector2 center, float radius, int numToSpawn, Random rand,
+                                                       params GameObjectType[] types)
+    {
+      Vector2 localPosition = new Vector2(radius, 0.0f);
+      Angle angle = new Angle { Radians = MathHelper.TwoPi / numToSpawn };
+      for(int bonbonIndex = 0; bonbonIndex < numToSpawn; bonbonIndex++)
+      {
+        GameObjectType type = rand.Choose(types);
+        GameObject go = GameObjectFactory.CreateKnown(type);
+        go.SetWorldPosition(center + localPosition);
+        Game.AddGameObject(go);
+
+        localPosition = localPosition.GetRotated(angle);
+      }
     }
   }
 }

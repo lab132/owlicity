@@ -136,6 +136,7 @@ namespace Owlicity
 
     // Pickups
     Bonbon_Gold,
+    Bonbon_Red,
     Key_Gold,
 
     // Random groups
@@ -162,11 +163,14 @@ namespace Owlicity
         {
           var chc = new ChaserComponent(go)
           {
-            MaxDistanceToTarget = float.MaxValue,
-            OutOfReachResponse = ChaserOutOfReachResponse.SnapToTargetAtMaxDistance,
+            TargetInnerRange = 0.2f,
+            TargetRange = float.MaxValue,
+            OutOfReachResponse = ChaserOutOfReachResponse.SnapToTargetAtMaximumRange,
+            MovementType = ChaserMovementType.SmoothProximity,
 
-            //MinDistanceToTarget = 0.1f,
-            DistanceWeight = 5.0f,
+            Speed = 5,
+
+            DebugDrawingEnabled = false,
           };
           go.RootComponent = chc;
 
@@ -336,12 +340,26 @@ namespace Owlicity
           {
             EnemyType = type,
           };
+
+          var chc = new ChaserComponent(go)
+          {
+            Target = Global.Game.Owliver,
+            TargetRange = 2.0f,
+
+            Speed = 0.01f,
+
+            DebugDrawingEnabled = true,
+          };
+          chc.AttachTo(bc);
         }
         break;
 
         case GameObjectType.Tankton:
         {
-          var tankton = new TanktonComponent(go);
+          var tankton = new TanktonComponent(go)
+          {
+            HitDuration = 0.25f,
+          };
 
           var bc = new BodyComponent(go)
           {
@@ -350,16 +368,31 @@ namespace Owlicity
           bc.BeforeInitialize += () =>
           {
             SpatialData s = go.GetWorldSpatialData();
+            Vector2 dim = Global.ToMeters(350, 400) * Global.TanktonScale;
+            bc.Body = BodyFactory.CreateRoundedRectangle(
+              world: Global.Game.World,
+              position: s.Position,
+              rotation: s.Rotation.Radians,
+              bodyType: BodyType.Dynamic,
+              userData: bc,
+              width: dim.X,
+              height: dim.Y,
+              xRadius: 0.5f,
+              yRadius: 0.5f,
+              density: 2 * Global.OwliverDensity,
+              segments: 0);
+            /*
             bc.Body = BodyFactory.CreateRectangle(
               world: Global.Game.World,
               position: s.Position,
               rotation: s.Rotation.Radians,
-              width: Global.ToMeters(500 * Global.TanktonScale.X),
-              height: Global.ToMeters(500 * Global.TanktonScale.Y),
-              density: 10 * Global.OwliverDensity,
+              width: Global.ToMeters(350 * Global.TanktonScale.X),
+              height: Global.ToMeters(400 * Global.TanktonScale.Y),
+              density: 2 * Global.OwliverDensity,
               bodyType: BodyType.Dynamic,
               userData: bc
             );
+            */
 
             bc.Body.FixedRotation = true;
           };
@@ -378,6 +411,7 @@ namespace Owlicity
               SpriteAnimationType.Tankton_Idle_Right,
             },
           };
+          sa.Spatial.Position.Y += Global.ToMeters(100);
           sa.AttachTo(bc);
 
           var hc = new HealthComponent(go)
@@ -456,7 +490,16 @@ namespace Owlicity
         break;
 
         case GameObjectType.Bonbon_Gold:
+        case GameObjectType.Bonbon_Red:
         {
+          SpriteAnimationType animType;
+          switch(type)
+          {
+            case GameObjectType.Bonbon_Gold: animType = SpriteAnimationType.Bonbon_Gold; break;
+            case GameObjectType.Bonbon_Red: animType = SpriteAnimationType.Bonbon_Red; break;
+            default: throw new InvalidProgramException();
+          }
+
           var bc = new BodyComponent(go)
           {
             InitMode = BodyComponentInitMode.Manual,
@@ -481,7 +524,7 @@ namespace Owlicity
           {
             AnimationTypes = new List<SpriteAnimationType>
             {
-              SpriteAnimationType.Bonbon_Gold,
+              animType,
             }
           };
           sac.AttachTo(bc);
@@ -492,6 +535,16 @@ namespace Owlicity
           };
 
           var puc = new PickupComponent(go);
+
+          var chc = new ChaserComponent(go)
+          {
+            Target = Global.Game.Owliver,
+            TargetRange = 1.0f,
+            Speed = 0.05f,
+
+            DebugDrawingEnabled = true,
+          };
+          chc.AttachTo(bc);
         }
         break;
 
@@ -530,6 +583,16 @@ namespace Owlicity
           krc.InitialKeyAmounts[(int)KeyType.Gold] = 1;
 
           var puc = new PickupComponent(go);
+
+          var chc = new ChaserComponent(go)
+          {
+            Target = Global.Game.Owliver,
+            TargetRange = 1.0f,
+            Speed = 0.05f,
+
+            DebugDrawingEnabled = true,
+          };
+          chc.AttachTo(bc);
         }
         break;
 

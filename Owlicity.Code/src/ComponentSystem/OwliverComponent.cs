@@ -232,14 +232,21 @@ namespace Owlicity
 
       MyBody.OnCollision += OnCollision;
 
+      const float hitDuration = 0.25f;
       Health.OnHit += (damage) =>
       {
-        Health.MakeInvincible(0.25f);
+        Health.MakeInvincible(hitDuration);
+#if DEBUG
+        if(Health.CurrentHealth <= 1)
+        {
+          Health.Heal(damage);
+        }
+#endif
       };
 
       if (Squasher != null)
       {
-        Squasher.SetupDefaultSquashData(0.25f);
+        Squasher.SetupDefaultSquashData(hitDuration);
         Health.OnHit += (damage) =>
         {
           Squasher.StartSquashing();

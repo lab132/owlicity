@@ -470,7 +470,7 @@ namespace Owlicity
           {
             config.TileSheetName = "boss_spritesheet";
             config.TileDim = new Point(512);
-            config.Hotspot = new Vector2(256);
+            config.Hotspot = new Vector2(256, 450);
             config.Scale = Global.TanktonScale;
             config.PingPong = false;
             config.SecondsPerFrame *= 2;

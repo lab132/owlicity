@@ -363,28 +363,33 @@ namespace Owlicity
 
       {
         var testSlurp = GameObjectFactory.CreateKnown(GameObjectType.Slurp);
-        testSlurp.Spatial.Position += Global.ToMeters(600, 450);
+        testSlurp.Spatial.Position += Global.ToMeters(300, 250);
         AddGameObject(testSlurp);
       }
 
       {
         var testTankton = GameObjectFactory.CreateKnown(GameObjectType.Tankton);
-        testTankton.Spatial.Position += Global.ToMeters(900, 550);
+        testTankton.Spatial.Position += Global.ToMeters(900, 350);
         AddGameObject(testTankton);
       }
 
 #if true
       {
-        const int numBonbons = 10;
-        Vector2 spawnPosition = Global.ToMeters(600, 650);
-        for(int bonbonIndex = 0; bonbonIndex < numBonbons; bonbonIndex++)
-        {
-          var testBonbon = GameObjectFactory.CreateKnown(GameObjectType.Bonbon_Gold);
-          testBonbon.Spatial.Position += spawnPosition;
-          AddGameObject(testBonbon);
+        Random rand = new Random();
 
-          spawnPosition.X += Global.ToMeters(64);
-        }
+        Global.SpawnGameObjectsInRingFormation(
+          center: Global.ToMeters(1400, 500),
+          radius: 2.5f,
+          numToSpawn: 15,
+          rand: rand,
+          types: new[] { GameObjectType.Bonbon_Gold, GameObjectType.Bonbon_Red });
+
+        Global.SpawnGameObjectsInRingFormation(
+          center: Global.ToMeters(1400, 500),
+          radius: 1.0f,
+          numToSpawn: 5,
+          rand: rand,
+          types: new[] { GameObjectType.Bonbon_Gold, GameObjectType.Bonbon_Red });
       }
 
       {
@@ -467,6 +472,16 @@ namespace Owlicity
         {
           cc.VisibilityBounds = null;
         }
+
+        var chc = ActiveCamera.GetComponent<ChaserComponent>();
+        if(chc.Target == null)
+        {
+          chc.Target = Owliver;
+        }
+        else
+        {
+          chc.Target = null;
+        }
       }
 
       if(Input.DebugInput.ResetCameraPosition)
@@ -475,7 +490,7 @@ namespace Owlicity
       }
 #endif
 
-      {
+        {
         var mc = Owliver.GetComponent<MovementComponent>();
         mc.MovementVector = Input.CharacterMovement;
 

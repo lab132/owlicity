@@ -53,6 +53,12 @@ namespace Owlicity
       }
     }
 
+    public void Heal(int amount)
+    {
+      // TODO(manu): Callbacks for this one?
+      CurrentHealth += amount;
+    }
+
     public Action OnInvincibilityGained;
     public Action OnInvincibilityLost;
 

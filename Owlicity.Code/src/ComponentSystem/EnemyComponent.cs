@@ -28,6 +28,9 @@ namespace Owlicity
     // The amount of damage caused by this enemy.
     public int Damage = 1;
 
+    // Weight of the impulse when hitting owliver.
+    public float ForceOnImpact = 0.05f;
+
     //
     // Runtime data.
     //
@@ -41,6 +44,7 @@ namespace Owlicity
     // Optional components
     //
     public SquashComponent Squasher;
+    public ChaserComponent Chaser;
 
     public Body MyBody => BodyComponent.Body;
 
@@ -55,25 +59,30 @@ namespace Owlicity
       if(BodyComponent == null)
       {
         BodyComponent = Owner.GetComponent<BodyComponent>();
+        Debug.Assert(BodyComponent != null);
       }
-      Debug.Assert(BodyComponent != null);
 
       if (Movement == null)
       {
         Movement = Owner.GetComponent<MovementComponent>();
+        Debug.Assert(Movement != null);
       }
-      Debug.Assert(Movement != null);
 
       if(Squasher == null)
       {
         Squasher = Owner.GetComponent<SquashComponent>();
       }
 
+      if(Chaser == null)
+      {
+        Chaser = Owner.GetComponent<ChaserComponent>();
+      }
+
       if(Health == null)
       {
         Health = Owner.GetComponent<HealthComponent>();
+        Debug.Assert(Health != null);
       }
-      Debug.Assert(Health != null);
     }
 
     public override void PostInitialize()
@@ -102,9 +111,14 @@ namespace Owlicity
       {
         Global.Game.RemoveGameObject(Owner);
 
-        const float particleTime = 1.0f;
         var go = new GameObject();
         Owner.Spatial.CopyTo(go.Spatial);
+
+        var adc = new AutoDestructComponent(go)
+        {
+          SecondsUntilDestruction = 1.0f,
+        };
+
         var pec = new ParticleEmitterComponent(go)
         {
           NumParticles = 512,
@@ -125,15 +139,10 @@ namespace Owlicity
 
         pec.BeforePostInitialize += delegate ()
         {
-          pec.Emitter.MaxTTL = particleTime;
+          pec.Emitter.MaxTTL = 0.8f * adc.SecondsUntilDestruction;
           pec.Emitter.MaxParticleSpread = 0.05f;
           pec.Emitter.MaxParticleSpeed = 5f;
           pec.Emit(go.GetWorldSpatialData().Position);
-        };
-
-        new AutoDestructComponent(go)
-        {
-          SecondsUntilDestruction = particleTime,
         };
 
         Global.Game.AddGameObject(go);
@@ -145,6 +154,24 @@ namespace Owlicity
         Health.OnHit += (damage) =>
         {
           Squasher.StartSquashing();
+        };
+      }
+
+      if(Chaser != null)
+      {
+        // Disable chasing when we are invincible.
+        ISpatial previousTarget = null;
+        Health.OnInvincibilityGained += () =>
+        {
+          Debug.Assert(previousTarget == null);
+          previousTarget = Chaser.Target;
+          Chaser.Target = null;
+        };
+
+        Health.OnInvincibilityLost += () =>
+        {
+          Chaser.Target = previousTarget;
+          previousTarget = null;
         };
       }
     }
@@ -175,10 +202,9 @@ namespace Owlicity
       if (sendItToHell)
       {
         // Apply impulse
-        const float force = 0.1f;
         Vector2 deltaPosition = hitBody.Position - BodyComponent.Body.Position;
         deltaPosition.GetDirectionAndLength(out Vector2 dir, out float distance);
-        Vector2 impulse = force * dir;
+        Vector2 impulse = ForceOnImpact * dir;
         hitBody.ApplyLinearImpulse(impulse);
       }
     }
@@ -216,7 +242,7 @@ namespace Owlicity
           default: throw new NotImplementedException();
         }
 
-#if true
+#if false
         Movement.PerformMovement(movementVector, deltaSeconds);
 #endif
       }
