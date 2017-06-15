@@ -22,8 +22,6 @@ namespace Owlicity
   // i.e. there is no need to convert to meters!
   public class OwlHud
   {
-    public Rectangle HudBounds;
-
     public GameObject Owliver;
 
     public HealthComponent Health;
@@ -45,19 +43,25 @@ namespace Owlicity
 
     public SpriteAnimationInstance[] KeyAnimations;
 
-    public void Initialize()
+    public void ResetLayout(Rectangle bounds)
     {
-      Rectangle margin = new Rectangle { X = 8, Y = 8, Width = HudBounds.Width - 16, Height = HudBounds.Bottom - 16 };
-      HealthIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.OwlHealthIcon);
+      Rectangle margin = new Rectangle { X = 8, Y = 8, Width = bounds.Width - 16, Height = bounds.Bottom - 16 };
+
       HealthIconAnchor.Position = new Vector2(margin.Left, margin.Top) + 0.5f * HealthIconAnimation.ScaledDim;
 
-      MoneyBagIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Bonbon_Gold);
       {
         Vector2 offset = MoneyBagIconAnimation.ScaledDim;
         offset.X = -offset.X;
         offset.Y = 0.6f * offset.Y;
-        MoneyBagIconAnchor.Position = new Vector2(HudBounds.Right, HudBounds.Top) + offset;
+        MoneyBagIconAnchor.Position = new Vector2(bounds.Right, bounds.Top) + offset;
       }
+    }
+
+    public void Initialize()
+    {
+      HealthIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.OwlHealthIcon);
+
+      MoneyBagIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Bonbon_Gold);
 
       Owliver = Global.Game.Owliver;
       Health = Owliver.GetComponent<HealthComponent>();
@@ -180,6 +184,8 @@ namespace Owlicity
   public class OwlGame : Game
   {
     GraphicsDeviceManager graphics;
+    public static readonly Point FullHD = new Point(1920, 1080);
+    public static readonly Point DebugResolution = (0.8f * FullHD.ToVector2()).ToPoint();
 
     public Renderer WorldRenderer = new Renderer { BaseDepth = -1, BaseScale = Global.RenderScale, };
     public Renderer UIRenderer = new Renderer { BaseDepth = 0, BaseScale = 1.0f, };
@@ -264,21 +270,20 @@ namespace Owlicity
 
       graphics = new GraphicsDeviceManager(this)
       {
-        HardwareModeSwitch = false, // Use "borderless fullscreen window"
-        IsFullScreen = true,
+        HardwareModeSwitch = false, // Use "borderless fullscreen window" (I guess?)
         SynchronizeWithVerticalRetrace = true,
-        PreferredBackBufferHeight = 1080,
-        PreferredBackBufferWidth = 1920
-      };
 
-#if true
-      // Note(manu): Can't debug properly in fullscreen.
-      {
-        graphics.IsFullScreen = false;
-        graphics.PreferredBackBufferHeight = graphics.PreferredBackBufferHeight / 2;
-        graphics.PreferredBackBufferWidth = graphics.PreferredBackBufferWidth / 2;
-      }
+#if DEBUG
+        // Note(manu): Can't debug properly in fullscreen.
+        IsFullScreen = false,
+        PreferredBackBufferWidth = DebugResolution.X,
+        PreferredBackBufferHeight = DebugResolution.Y,
+#else
+        IsFullScreen = true,
+        PreferredBackBufferWidth = FullHD.X,
+        PreferredBackBufferHeight = FullHD.Y,
 #endif
+      };
 
       Content.RootDirectory = "content";
     }
@@ -305,6 +310,10 @@ namespace Owlicity
       };
 
       base.Initialize();
+
+#if DEBUG
+      Window.AllowUserResizing = true;
+#endif
     }
 
     /// <summary>
@@ -347,16 +356,12 @@ namespace Owlicity
         ActiveCamera = GameObjectFactory.CreateKnown(GameObjectType.Camera);
 
         var cc = ActiveCamera.GetComponent<CameraComponent>();
-        Vector2 camExtents = 0.5f * Global.ToMeters(GraphicsDevice.Viewport.Bounds.Size.ToVector2());
-        cc.Spatial.LocalAABB = new AABB
-        {
-          LowerBound = -camExtents,
-          UpperBound = camExtents,
-        };
         cc.VisibilityBounds = CurrentLevel.LevelBounds;
-
-        var chc = ActiveCamera.GetComponent<ChaserComponent>();
-        chc.Target = Owliver;
+        cc.OnGraphicsDeviceReset(GraphicsDevice);
+        Window.ClientSizeChanged += (o, e) =>
+        {
+          cc.OnGraphicsDeviceReset(GraphicsDevice);
+        };
 
         AddGameObject(ActiveCamera);
       }
@@ -407,8 +412,12 @@ namespace Owlicity
 #endif
       }
 
-      Hud.HudBounds = GraphicsDevice.Viewport.Bounds;
       Hud.Initialize();
+      Hud.ResetLayout(GraphicsDevice.Viewport.Bounds);
+      Window.ClientSizeChanged += (o, e) =>
+      {
+        Hud.ResetLayout(GraphicsDevice.Viewport.Bounds);
+      };
     }
 
     /// <summary>
@@ -442,6 +451,11 @@ namespace Owlicity
       if(Input.PlatformInput.WantsExit)
       {
         Exit();
+      }
+
+      if(Input.PlatformInput.ToggleFullscreen)
+      {
+        graphics.ToggleFullScreen();
       }
 
 #if DEBUG
@@ -566,6 +580,8 @@ namespace Owlicity
 
       GraphicsDevice.Clear(Color.CornflowerBlue);
       Camera cam = ActiveCamera.GetComponent<CameraComponent>().Camera;
+      Matrix viewMatrix = cam.Effect.View;
+      Matrix projectionMatrix = cam.Effect.Projection;
 
       if(MainDrawingEnabled)
       {
@@ -588,7 +604,7 @@ namespace Owlicity
 
       if(DebugDrawingEnabled)
       {
-        PhysicsDebugView.BeginCustomDraw(ref cam.ProjectionMatrix, ref cam.ViewMatrix);
+        PhysicsDebugView.BeginCustomDraw(ref projectionMatrix, ref viewMatrix);
 
         foreach(DebugDrawCommand drawCommand in DebugDrawCommands)
         {
@@ -617,7 +633,7 @@ namespace Owlicity
         PhysicsDebugView.EndCustomDraw();
       }
 
-      PhysicsDebugView.RenderDebugData(ref cam.ProjectionMatrix, ref cam.ViewMatrix);
+      PhysicsDebugView.RenderDebugData(ref projectionMatrix, ref viewMatrix);
     }
   }
 }

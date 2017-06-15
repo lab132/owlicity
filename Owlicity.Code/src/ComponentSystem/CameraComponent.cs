@@ -23,8 +23,6 @@ namespace Owlicity
     //
     // Runtime data
     //
-    public BodyComponent CameraBodyComponent;
-    public Body CameraBody => CameraBodyComponent?.Body;
     public Camera Camera = new Camera();
 
     public CameraComponent(GameObject owner)
@@ -32,13 +30,11 @@ namespace Owlicity
     {
     }
 
-    public override void Initialize()
+    public void OnGraphicsDeviceReset(GraphicsDevice device)
     {
-      base.Initialize();
-
-      float width = Global.ToPixels(Spatial.LocalAABB.Width);
-      float height = Global.ToPixels(Spatial.LocalAABB.Height);
-      Matrix projection = Matrix.CreateOrthographicOffCenter(
+      int width = device.Viewport.Width;
+      int height = device.Viewport.Height;
+      Matrix baseProjection = Matrix.CreateOrthographicOffCenter(
         left: 0,
         right: width,
         bottom: height,
@@ -48,27 +44,15 @@ namespace Owlicity
 
       // See: https://gamedev.stackexchange.com/a/18511
       Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
-      Camera.ProjectionMatrix = halfPixelOffset * projection;
+      Matrix projection = halfPixelOffset * baseProjection;
 
-      // We need to change the basis ("world") to compensate
-      // for inconsistent coordinate systems with XNA and DirectX.
-      // See: https://gamedev.stackexchange.com/a/69757
-      Camera.WorldMatrix = Matrix.CreateWorld(
-        position: Vector3.Zero,
-        forward: new Vector3(0, 0, -1),
-        up: new Vector3(0, 1, 0));
+      Matrix view = Camera.Effect?.View ?? Matrix.Identity;
 
-      Camera.Effect = new BasicEffect(Global.Game.GraphicsDevice)
-      {
-        View = Camera.ViewMatrix,
-        Projection = Camera.ProjectionMatrix,
-        World = Camera.WorldMatrix,
+      Camera.Reset(device, ref projection, ref view);
 
-        VertexColorEnabled = true,
-        TextureEnabled = true,
-      };
-
-      CameraBodyComponent = Owner.GetComponent<BodyComponent>();
+      Vector2 screenSizeInMeters = Global.ToMeters(Camera.Viewport.Bounds.Size.ToVector2());
+      Spatial.LocalAABB.LowerBound = -0.5f * screenSizeInMeters;
+      Spatial.LocalAABB.UpperBound = 0.5f * screenSizeInMeters;
     }
 
     public override void Update(float deltaSeconds)
@@ -77,6 +61,7 @@ namespace Owlicity
 
       Spatial.Position = Vector2.Zero;
 
+      // Constrain the camera to the visibility bounds.
       if(VisibilityBounds != null)
       {
         SpatialData worldSpatial = this.GetWorldSpatialData();
@@ -129,10 +114,7 @@ namespace Owlicity
         Vector2 scale2D = new Vector2(_invZoom, _invZoom) * Global.RenderScale;
         mat.Scale = new Vector3(scale2D, 1.0f);
 
-        Matrix.Invert(ref mat, out Camera.ViewMatrix);
-
-        // Update the effect as well.
-        ((IEffectMatrices)Camera.Effect).View = Camera.ViewMatrix;
+        Camera.Effect.View = Matrix.Invert(mat);
       }
     }
   }

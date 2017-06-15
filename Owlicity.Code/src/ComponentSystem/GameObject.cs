@@ -163,6 +163,7 @@ namespace Owlicity
         {
           var chc = new ChaserComponent(go)
           {
+            Target = Global.Game.Owliver,
             TargetInnerRange = 0.2f,
             TargetRange = float.MaxValue,
             OutOfReachResponse = ChaserOutOfReachResponse.SnapToTargetAtMaximumRange,

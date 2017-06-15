@@ -36,6 +36,7 @@ namespace Owlicity
   public struct PlatformInput
   {
     public bool WantsExit;
+    public bool ToggleFullscreen;
 
     public void Reset()
     {
@@ -190,11 +191,17 @@ namespace Owlicity
       //
       PlatformInput.Reset();
 
+      bool isAltDown = newKeyboard.IsKeyDown(Keys.LeftAlt) || newKeyboard.IsKeyDown(Keys.RightAlt);
+
       if(newKeyboard.WasKeyPressed(Keys.Escape, ref _prevKeyboard)) PlatformInput.WantsExit = true;
-      if((newKeyboard.IsKeyDown(Keys.LeftAlt) || newKeyboard.IsKeyDown(Keys.RightAlt)) &&
-        newKeyboard.WasKeyPressed(Keys.F4, ref _prevKeyboard))
+      if(isAltDown && newKeyboard.WasKeyPressed(Keys.F4, ref _prevKeyboard))
       {
         PlatformInput.WantsExit = true;
+      }
+
+      if(isAltDown && newKeyboard.WasKeyPressed(Keys.Enter, ref _prevKeyboard))
+      {
+        PlatformInput.ToggleFullscreen = true;
       }
 
 

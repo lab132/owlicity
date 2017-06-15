@@ -110,7 +110,7 @@ namespace Owlicity
           renderer.DrawSprite(
             position: _particles[i].Position,
             rotation: new Angle { Radians = _particles[i].Rotation },
-            scale: 0.5f * Vector2.One,
+            scale: Vector2.One,
             depth: depth,
             sourceRectangle: null,
             texture: _particles[i].Texture,
