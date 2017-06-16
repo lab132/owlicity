@@ -131,6 +131,7 @@ namespace Owlicity
 
     // Static stuff
     BackgroundScreen,
+    Gate,
     Tree_Fir,
     Tree_FirAlt, // is "upside down"
     Tree_Conifer,
@@ -612,6 +613,98 @@ namespace Owlicity
             RenderDepth = 1.0f,
           };
           sc.AttachTo(bc);
+        }
+        break;
+
+        case GameObjectType.Gate:
+        {
+          float outerLeft = Global.ToMeters(310);
+          float innerLeft = Global.ToMeters(79);
+          float inner = Global.ToMeters(80);
+          float innerRight = Global.ToMeters(79);
+          float outerRight = Global.ToMeters(222);
+          float width = Global.ToMeters(768);
+          float height = Global.ToMeters(128);
+          float barrierHeight = Global.ToMeters(20);
+          float density = Global.OwliverDensity;
+
+          var leftEdge = new SpatialComponent(go);
+          {
+            SpriteAnimationData anim = SpriteAnimationFactory.GetAnimation(SpriteAnimationType.Gate_Closed);
+            Vector2 hotspot = anim.Config.Hotspot * anim.Config.Scale;
+            float offset = Global.ToMeters(hotspot.X - 128);
+            leftEdge.Spatial.Position.X -= offset;
+          }
+          leftEdge.AttachTo(go);
+
+          var bcInner = new BodyComponent(go)
+          {
+            InitMode = BodyComponentInitMode.Manual,
+          };
+          bcInner.BeforePostInitialize += () =>
+          {
+            SpatialData s = bcInner.GetWorldSpatialData();
+            bcInner.Body = BodyFactory.CreateRectangle(
+              world: Global.Game.World,
+              width: innerLeft + inner + innerRight,
+              height: barrierHeight,
+              density: density,
+              position: s.Position + new Vector2(outerLeft + innerLeft + 0.5f * inner, 0.0f),
+              rotation: s.Rotation.Radians,
+              bodyType: BodyType.Static,
+              userData: bcInner);
+          };
+          bcInner.AttachTo(leftEdge);
+
+          var bcOuter = new BodyComponent(go)
+          {
+            InitMode = BodyComponentInitMode.Manual,
+          };
+          bcOuter.BeforePostInitialize += () =>
+          {
+            SpatialData s = bcOuter.GetWorldSpatialData();
+            bcOuter.Body = BodyFactory.CreateBody(
+              world: Global.Game.World,
+              position: s.Position,
+              rotation: s.Rotation.Radians,
+              bodyType: BodyType.Static,
+              userData: bcOuter);
+
+            Vector2 offsetRight = Global.ToMeters(300, 0);
+            FixtureFactory.AttachRectangle(
+              body: bcOuter.Body,
+              width: outerLeft,
+              height: barrierHeight,
+              offset: new Vector2(0.5f * outerLeft, 0.0f),
+              density: density,
+              userData: bcOuter);
+            FixtureFactory.AttachRectangle(
+              body: bcOuter.Body,
+              width: outerRight,
+              height: barrierHeight,
+              offset: new Vector2(width - 0.5f * outerRight, 0.0f),
+              density: density,
+              userData: bcOuter);
+          };
+          bcOuter.AttachTo(leftEdge);
+
+          var sac = new SpriteAnimationComponent(go)
+          {
+            AnimationTypes = new List<SpriteAnimationType>
+            {
+               SpriteAnimationType.Gate_Closed,
+               SpriteAnimationType.Gate_Open,
+            },
+          };
+          sac.AttachTo(go);
+
+          var gac = new GateComponent(go)
+          {
+            Dimensions = Global.ToMeters(60, 130),
+            UnlockableBlockade = bcInner,
+          };
+          gac.Spatial.Position.Y -= Global.ToMeters((0.5f * 128) - 20);
+          gac.AttachTo(go);
         }
         break;
 

@@ -236,6 +236,9 @@ namespace Owlicity
     Slurp_Idle_Left,
     Slurp_Idle_Right,
 
+    Gate_Closed,
+    Gate_Open,
+
     Tankton_Idle_Left,
     Tankton_Idle_Right,
 
@@ -466,6 +469,22 @@ namespace Owlicity
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
           }
           goto case SpriteAnimationType.Slurp_Idle_Left;
+
+          case SpriteAnimationType.Gate_Closed:
+          {
+            config.TileSheetName = "gate_spritesheet";
+            config.TileDim = new Point(1024);
+            config.Hotspot = new Vector2(560);
+          }
+          break;
+
+          case SpriteAnimationType.Gate_Open:
+          {
+            config.TileSheetName = "gate_open_spritesheet";
+            config.TileDim = new Point(1024);
+            config.Hotspot = new Vector2(560);
+          }
+          break;
 
           case SpriteAnimationType.Tankton_Idle_Left:
           {

@@ -366,6 +366,7 @@ namespace Owlicity
         AddGameObject(ActiveCamera);
       }
 
+#if true
       {
         var testSlurp = GameObjectFactory.CreateKnown(GameObjectType.Slurp);
         testSlurp.Spatial.Position += Global.ToMeters(300, 250);
@@ -378,7 +379,6 @@ namespace Owlicity
         AddGameObject(testTankton);
       }
 
-#if true
       {
         Random rand = new Random();
 
@@ -401,6 +401,13 @@ namespace Owlicity
         var testKey = GameObjectFactory.CreateKnown(GameObjectType.Key_Gold);
         testKey.Spatial.Position += Global.ToMeters(700, 720);
         AddGameObject(testKey);
+      }
+
+      {
+        var testGate = GameObjectFactory.CreateKnown(GameObjectType.Gate);
+        testGate.Spatial.Position += Global.ToMeters(2300, 1100);
+        //testGate.Spatial.Position += Global.ToMeters(1300, 600);
+        AddGameObject(testGate);
       }
 #endif
 
@@ -553,6 +560,7 @@ namespace Owlicity
           aabb.Combine(ref other);
         }
 
+        DebugDrawCommands.Add(view => view.DrawPoint(aabb.Center, Global.ToMeters(3), Color.MonoGameOrange));
         DebugDrawCommands.Add(view => view.DrawAABB(ref aabb, Color.Lime));
       }
 

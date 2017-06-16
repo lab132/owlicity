@@ -66,30 +66,34 @@ namespace Owlicity
     {
       base.Destroy();
 
-      Global.Game.World.RemoveBody(Body);
+      if(Body != null)
+      {
+        Global.Game.World.RemoveBody(Body);
+      }
     }
 
     public override void Update(float deltaSeconds)
     {
       base.Update(deltaSeconds);
+
       if(Body != null)
       {
         Spatial.Position = Body.Position;
         Spatial.Rotation.Radians = Body.Rotation;
-      }
 
-      if(AllowDebugDrawing)
-      {
-        Vector2 start = this.GetWorldSpatialData().Position;
-        Vector2 end = start + Body.LinearVelocity;
-        Global.Game.DebugDrawCommands.Add(view =>
+        if(AllowDebugDrawing)
         {
-          view.DrawArrow(start, end,
-            length: 0.1f, // arrow "head"
-            width: 0.05f, // arrow "head"
-            drawStartIndicator: false, // Note(manu): This one doesn't seem to work.
-            color: Color.LimeGreen);
-        });
+          Vector2 start = this.GetWorldSpatialData().Position;
+          Vector2 end = start + Body.LinearVelocity;
+          Global.Game.DebugDrawCommands.Add(view =>
+          {
+            view.DrawArrow(start, end,
+              length: 0.1f, // arrow "head"
+              width: 0.05f, // arrow "head"
+              drawStartIndicator: false, // Note(manu): This one doesn't seem to work.
+              color: Color.LimeGreen);
+          });
+        }
       }
     }
   }
