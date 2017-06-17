@@ -413,6 +413,18 @@ namespace Owlicity
         var testShop = GameObjectFactory.CreateKnown(GameObjectType.Shop);
         testShop.Spatial.Position += Global.ToMeters(1300, 500);
         AddGameObject(testShop);
+
+        var testFruitBowl = GameObjectFactory.CreateKnown(GameObjectType.ShopItem_FruitBowl);
+        testFruitBowl.GetComponent<ShopItemComponent>().Price = ShopItemPriceType._20;
+        testFruitBowl.AttachTo(testShop);
+        testFruitBowl.Spatial.Position += Global.ToMeters(-110.0f, -90.0f);
+        AddGameObject(testFruitBowl);
+
+        var testRod = GameObjectFactory.CreateKnown(GameObjectType.ShopItem_FishingRod);
+        testRod.GetComponent<ShopItemComponent>().Price = ShopItemPriceType._100;
+        testRod.AttachTo(testShop);
+        testRod.Spatial.Position += Global.ToMeters(128.0f, -80.0f);
+        AddGameObject(testRod);
       }
 #endif
 

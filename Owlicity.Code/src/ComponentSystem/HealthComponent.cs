@@ -56,7 +56,20 @@ namespace Owlicity
     public void Heal(int amount)
     {
       // TODO(manu): Callbacks for this one?
-      CurrentHealth += amount;
+
+      long hp = (long)CurrentHealth + amount;
+
+      if(hp > MaxHealth)
+      {
+        hp = MaxHealth;
+      }
+
+      if(hp < 0)
+      {
+        hp = 0;
+      }
+
+      CurrentHealth = (int)hp;
     }
 
     public Action OnInvincibilityGained;

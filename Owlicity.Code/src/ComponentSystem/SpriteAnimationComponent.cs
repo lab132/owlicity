@@ -48,9 +48,10 @@ namespace Owlicity
       ChangeActiveAnimation(AnimationTypes[0]);
     }
 
-    public void ChangeActiveAnimation(SpriteAnimationType newAnimationType, bool transferState = false)
+    public bool ChangeActiveAnimation(SpriteAnimationType newAnimationType, bool transferState = false)
     {
       Debug.Assert(newAnimationType != SpriteAnimationType.Unknown);
+      bool result = false;
 
       if(newAnimationType != ActiveAnimationType)
       {
@@ -75,7 +76,11 @@ namespace Owlicity
         }
 
         Spatial.LocalAABB = Global.ToMeters(ActiveAnimation.CalcAABB());
+
+        result = true;
       }
+
+      return result;
     }
 
     public override void Update(float deltaSeconds)
@@ -94,7 +99,6 @@ namespace Owlicity
       Global.Game.DebugDrawCommands.Add(view =>
       {
         SpatialData worldSpatial = this.GetWorldSpatialData();
-        //view.DrawCircle(worldSpatial.Position, Global.ToMeters(10), new Color(0xdd, 0x99, 0x44));
         view.DrawAABB(worldSpatial.AbsoluteAABB, new Color(0xdd, 0x99, 0x44));
       });
     }

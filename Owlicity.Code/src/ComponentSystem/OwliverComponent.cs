@@ -11,21 +11,21 @@ namespace Owlicity
 {
   public enum OwliverMovementMode
   {
-    Idle,
-    Walking,
-    Attacking,
+    Idle = 0,
+    Walking = 2,
+    Attacking = 4,
   }
 
   public enum OwliverFacingDirection
   {
-    Right,
-    Left,
+    Right = 1,
+    Left = 0,
   }
 
   public enum OwliverWeaponType
   {
-    Stick,
-    FishingRod,
+    Stick = 0,
+    FishingRod = 6,
   }
 
   public struct OwliverState
@@ -68,6 +68,8 @@ namespace Owlicity
     public BodyComponent BodyComponent;
     public Body MyBody => BodyComponent?.Body;
 
+    public HashSet<ShopItemComponent> ConnectedShopItems = new HashSet<ShopItemComponent>();
+
     public MovementComponent Movement;
     public HealthComponent Health;
     public MoneyBagComponent MoneyBag;
@@ -80,10 +82,10 @@ namespace Owlicity
 
     private List<SpriteAnimationType> _attackAnimations = new List<SpriteAnimationType>
     {
-      SpriteAnimationType.Owliver_AttackStick_Left,
-      SpriteAnimationType.Owliver_AttackStick_Right,
-      SpriteAnimationType.Owliver_AttackFishingRod_Left,
-      SpriteAnimationType.Owliver_AttackFishingRod_Right,
+      SpriteAnimationType.Owliver_Attack_Stick_Left,
+      SpriteAnimationType.Owliver_Attack_Stick_Right,
+      SpriteAnimationType.Owliver_Attack_FishingRod_Left,
+      SpriteAnimationType.Owliver_Attack_FishingRod_Right,
     };
 
     public OwliverComponent(GameObject owner) : base(owner)
@@ -102,16 +104,24 @@ namespace Owlicity
           switch(CurrentState.WeaponType)
           {
             case OwliverWeaponType.Stick:
-            local = new AABB
             {
-              LowerBound = Global.ToMeters(0, -50) + offset,
-              UpperBound = Global.ToMeters(150, 70) + offset,
-            };
+              local = new AABB
+              {
+                LowerBound = Global.ToMeters(0, -50) + offset,
+                UpperBound = Global.ToMeters(150, 70) + offset,
+              };
+            }
             break;
 
             case OwliverWeaponType.FishingRod:
-            throw new NotImplementedException();
-            //break;
+            {
+              local = new AABB
+              {
+                LowerBound = Global.ToMeters(0, -50) + offset,
+                UpperBound = Global.ToMeters(150, 70) + offset,
+              };
+            }
+            break;
 
             default: throw new ArgumentException();
           }
@@ -131,6 +141,23 @@ namespace Owlicity
           LowerBound = Global.OwliverScale * local.LowerBound + worldPosition,
           UpperBound = Global.OwliverScale * local.UpperBound + worldPosition,
         };
+
+        return result;
+      }
+    }
+
+    public int Damage
+    {
+      get
+      {
+        int result;
+        switch(CurrentState.WeaponType)
+        {
+          case OwliverWeaponType.Stick: result = 1; break;
+          case OwliverWeaponType.FishingRod: result = 2; break;
+
+          default: throw new ArgumentException(nameof(CurrentState.WeaponType));
+        }
 
         return result;
       }
@@ -171,6 +198,24 @@ namespace Owlicity
             KeyRing.CurrentKeyAmounts[keyTypeIndex] += amountStolen;
           }
         }
+      }
+
+      foreach(ShopItemComponent shopItem in go.GetComponents<ShopItemComponent>())
+      {
+        ConnectedShopItems.Add(shopItem);
+        shopItem.IsSelected = true;
+        shopItem.IsAffordable = MoneyBag.CurrentAmount >= shopItem.PriceValue;
+      }
+    }
+
+    private void OnSeparation(Fixture fixtureA, Fixture fixtureB, Contact contact)
+    {
+      GameObject go = ((ComponentBase)fixtureB.Body.UserData).Owner;
+
+      foreach(ShopItemComponent shopItem in go.GetComponents<ShopItemComponent>())
+      {
+        shopItem.IsSelected = false;
+        ConnectedShopItems.Remove(shopItem);
       }
     }
 
@@ -233,6 +278,7 @@ namespace Owlicity
       Animation.OnAnimationPlaybackStateChanged += OnAnimationLoopFinished;
 
       MyBody.OnCollision += OnCollision;
+      MyBody.OnSeparation += OnSeparation;
     }
 
     public override void Update(float deltaSeconds)
@@ -285,7 +331,67 @@ namespace Owlicity
 
       if(input.WantsInteraction)
       {
-        // TODO(manu)
+        foreach(ShopItemComponent shopItem in ConnectedShopItems)
+        {
+          bool purchase = false;
+          bool removeIfPurchased = true;
+
+          int price = shopItem.PriceValue;
+          if(MoneyBag.CurrentAmount >= price)
+          {
+            switch(shopItem.ItemType)
+            {
+              case ShopItemType.FruitBowl:
+              {
+                purchase = true;
+                removeIfPurchased = false;
+                Health.Heal(int.MaxValue);
+              }
+              break;
+
+              case ShopItemType.FishingRod:
+              {
+                if(CurrentState.WeaponType != OwliverWeaponType.FishingRod)
+                {
+                  purchase = true;
+                  newState.WeaponType = OwliverWeaponType.FishingRod;
+                  ChangeState(ref newState);
+
+                  var newGo = GameObjectFactory.CreateKnown(GameObjectType.ShopItem_Stick);
+                  newGo.Spatial.CopyFrom(shopItem.Owner.Spatial);
+                  Global.Game.AddGameObject(newGo);
+                }
+              }
+              break;
+
+              case ShopItemType.Stick:
+              {
+                if(CurrentState.WeaponType != OwliverWeaponType.Stick)
+                {
+                  purchase = true;
+                  newState.WeaponType = OwliverWeaponType.Stick;
+                  ChangeState(ref newState);
+
+                  var newGo = GameObjectFactory.CreateKnown(GameObjectType.ShopItem_FishingRod);
+                  newGo.Spatial.CopyFrom(shopItem.Owner.Spatial);
+                  Global.Game.AddGameObject(newGo);
+                }
+              }
+              break;
+
+              default: throw new InvalidProgramException("Invalid item type.");
+            }
+          }
+
+          if(purchase)
+          {
+            MoneyBag.CurrentAmount -= price;
+            if(removeIfPurchased)
+            {
+              Global.Game.RemoveGameObject(shopItem.Owner);
+            }
+          }
+        }
       }
 
       ChangeState(ref newState);
@@ -293,12 +399,14 @@ namespace Owlicity
       AABB weaponAABB = WeaponAABB;
       if(input.WantsAttack && CurrentState.MovementMode == OwliverMovementMode.Attacking)
       {
+        int damage = Damage;
+        float force = 0.1f * damage;
         List<Fixture> fixtures = Global.Game.World.QueryAABB(ref weaponAABB);
         foreach(Body hitBody in fixtures.Where(f => f.CollidesWith.HasFlag(Global.OwliverWeaponCollisionCategory))
                                       .Select(f => f.Body)
                                       .Distinct())
         {
-          Global.HandleDefaultHit(hitBody, MyBody.Position, damage: 1, force: 0.1f);
+          Global.HandleDefaultHit(hitBody, MyBody.Position, damage, force);
         }
 
         {
@@ -345,67 +453,23 @@ namespace Owlicity
       bool transferAnimationState = oldState.MovementMode == newState.MovementMode &&
                                     oldState.FacingDirection != newState.FacingDirection;
 
-      switch(newState.MovementMode)
+      SpriteAnimationType animType = GetAnimationType(ref newState);
+      if(Animation.ChangeActiveAnimation(animType))
       {
-        case OwliverMovementMode.Idle:
-        {
-          if(newState.FacingDirection == OwliverFacingDirection.Right)
-          {
-            Animation.ChangeActiveAnimation(SpriteAnimationType.Owliver_Idle_Right, transferAnimationState);
-          }
-          else if(newState.FacingDirection == OwliverFacingDirection.Left)
-          {
-            Animation.ChangeActiveAnimation(SpriteAnimationType.Owliver_Idle_Left, transferAnimationState);
-          }
-        }
-        break;
-
-        case OwliverMovementMode.Walking:
-        {
-          if(newState.FacingDirection == OwliverFacingDirection.Right)
-          {
-            Animation.ChangeActiveAnimation(SpriteAnimationType.Owliver_Walk_Right, transferAnimationState);
-          }
-          else if(newState.FacingDirection == OwliverFacingDirection.Left)
-          {
-            Animation.ChangeActiveAnimation(SpriteAnimationType.Owliver_Walk_Left, transferAnimationState);
-          }
-        }
-        break;
-
-        case OwliverMovementMode.Attacking:
-        {
-          switch(newState.WeaponType)
-          {
-            case OwliverWeaponType.Stick:
-            {
-              if(newState.FacingDirection == OwliverFacingDirection.Right)
-              {
-                Animation.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackStick_Right, transferAnimationState);
-              }
-              else if(newState.FacingDirection == OwliverFacingDirection.Left)
-              {
-                Animation.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackStick_Left, transferAnimationState);
-              }
-            }
-            break;
-
-            case OwliverWeaponType.FishingRod:
-            {
-              if(newState.FacingDirection == OwliverFacingDirection.Right)
-              {
-                Animation.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackFishingRod_Right, transferAnimationState);
-              }
-              else if(newState.FacingDirection == OwliverFacingDirection.Left)
-              {
-                Animation.ChangeActiveAnimation(SpriteAnimationType.Owliver_AttackFishingRod_Left, transferAnimationState);
-              }
-            }
-            break;
-          }
-        }
-        break;
+        Console.WriteLine();
       }
+    }
+
+    public static SpriteAnimationType GetAnimationType(ref OwliverState state)
+    {
+      return GetAnimationType(state.MovementMode, state.FacingDirection, state.WeaponType);
+    }
+
+    public static SpriteAnimationType GetAnimationType(OwliverMovementMode movement, OwliverFacingDirection facing, OwliverWeaponType weapon)
+    {
+      int baseOffset = (int)SpriteAnimationType.Owliver_Idle_Stick_Left;
+      var result = (SpriteAnimationType)(baseOffset + (int)weapon + (int)movement + (int)facing);
+      return result;
     }
   }
 }

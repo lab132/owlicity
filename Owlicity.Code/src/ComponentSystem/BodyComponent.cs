@@ -76,8 +76,7 @@ namespace Owlicity
 
       if(Body != null)
       {
-        Spatial.Position = Body.Position;
-        Spatial.Rotation.Radians = Body.Rotation;
+        this.SetWorldPositionAndRotation(Body.Position, new Angle { Radians = Body.Rotation });
 
         if(DebugDrawingEnabled)
         {

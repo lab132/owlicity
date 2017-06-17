@@ -66,7 +66,12 @@ namespace Owlicity
 
     public override string ToString()
     {
-      return $"{Position}|{Rotation.Degrees}°";
+      string result = $"{Position}|{Rotation.Degrees}°";
+      if(Parent != null)
+      {
+        result += $" (world: {this.GetWorldSpatialData()})";
+      }
+      return result;
     }
   }
 

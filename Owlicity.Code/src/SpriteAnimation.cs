@@ -224,14 +224,18 @@ namespace Owlicity
   {
     Unknown,
 
-    Owliver_Idle_Left,
-    Owliver_Idle_Right,
-    Owliver_Walk_Left,
-    Owliver_Walk_Right,
-    Owliver_AttackStick_Left,
-    Owliver_AttackStick_Right,
-    Owliver_AttackFishingRod_Left,
-    Owliver_AttackFishingRod_Right,
+    Owliver_Idle_Stick_Left,
+    Owliver_Idle_Stick_Right,
+    Owliver_Walk_Stick_Left,
+    Owliver_Walk_Stick_Right,
+    Owliver_Attack_Stick_Left,
+    Owliver_Attack_Stick_Right,
+    Owliver_Idle_FishingRod_Left,
+    Owliver_Idle_FishingRod_Right,
+    Owliver_Walk_FishingRod_Left,
+    Owliver_Walk_FishingRod_Right,
+    Owliver_Attack_FishingRod_Left,
+    Owliver_Attack_FishingRod_Right,
 
     Slurp_Idle_Left,
     Slurp_Idle_Right,
@@ -239,6 +243,8 @@ namespace Owlicity
     Shopkeeper_Idle_Front,
 
     Shop,
+    PriceTag_20,
+    PriceTag_100,
 
     Gate_Closed,
     Gate_Open,
@@ -262,6 +268,10 @@ namespace Owlicity
 
     Bonbon_Gold,
     Bonbon_Red,
+
+    FruitBowl,
+    Stick_Left,
+    FishingRod_Left,
 
     Cross,
 
@@ -377,7 +387,7 @@ namespace Owlicity
 
         switch(animType)
         {
-          case SpriteAnimationType.Owliver_Idle_Left:
+          case SpriteAnimationType.Owliver_Idle_Stick_Left:
           {
             config.TileSheetName = "owliver_idle_front_left_spritesheet";
             config.Scale = Global.OwliverScale;
@@ -385,9 +395,8 @@ namespace Owlicity
           }
           break;
 
-          case SpriteAnimationType.Owliver_Idle_Right:
+          case SpriteAnimationType.Owliver_Idle_Stick_Right:
           {
-            //config.TileSheetName = "owliver_idle_front_right_spritesheet";
             config.TileSheetName = "owliver_idle_front_left_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
@@ -395,7 +404,7 @@ namespace Owlicity
           }
           break;
 
-          case SpriteAnimationType.Owliver_Walk_Left:
+          case SpriteAnimationType.Owliver_Walk_Stick_Left:
           {
             config.TileSheetName = "owliver_walk_front_left_spritesheet";
             config.Scale = Global.OwliverScale;
@@ -403,9 +412,8 @@ namespace Owlicity
           }
           break;
 
-          case SpriteAnimationType.Owliver_Walk_Right:
+          case SpriteAnimationType.Owliver_Walk_Stick_Right:
           {
-            //TileSheetName = "owliver_walk_front_right_spritesheet",
             config.TileSheetName = "owliver_walk_front_left_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
@@ -413,7 +421,7 @@ namespace Owlicity
           }
           break;
 
-          case SpriteAnimationType.Owliver_AttackStick_Left:
+          case SpriteAnimationType.Owliver_Attack_Stick_Left:
           {
             config.TileSheetName = "owliver_attack_spritesheet";
             config.Scale = Global.OwliverScale;
@@ -424,7 +432,7 @@ namespace Owlicity
           }
           break;
 
-          case SpriteAnimationType.Owliver_AttackStick_Right:
+          case SpriteAnimationType.Owliver_Attack_Stick_Right:
           {
             config.TileSheetName = "owliver_attack_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
@@ -436,7 +444,41 @@ namespace Owlicity
           }
           break;
 
-          case SpriteAnimationType.Owliver_AttackFishingRod_Left:
+          case SpriteAnimationType.Owliver_Idle_FishingRod_Left:
+          {
+            config.TileSheetName = "owliver_idle_fishingrod_spritesheet";
+            config.Scale = Global.OwliverScale;
+            config.Hotspot = new Vector2(125, 230);
+          }
+          break;
+
+          case SpriteAnimationType.Owliver_Idle_FishingRod_Right:
+          {
+            config.TileSheetName = "owliver_idle_fishingrod_spritesheet";
+            config.SpriteEffects = SpriteEffects.FlipHorizontally;
+            config.Scale = Global.OwliverScale;
+            config.Hotspot = new Vector2(129, 230);
+          }
+          break;
+
+          case SpriteAnimationType.Owliver_Walk_FishingRod_Left:
+          {
+            config.TileSheetName = "owliver_walk_fishingrod_spritesheet";
+            config.Scale = Global.OwliverScale;
+            config.Hotspot = new Vector2(125, 230);
+          }
+          break;
+
+          case SpriteAnimationType.Owliver_Walk_FishingRod_Right:
+          {
+            config.TileSheetName = "owliver_walk_fishingrod_spritesheet";
+            config.SpriteEffects = SpriteEffects.FlipHorizontally;
+            config.Scale = Global.OwliverScale;
+            config.Hotspot = new Vector2(129, 230);
+          }
+          break;
+
+          case SpriteAnimationType.Owliver_Attack_FishingRod_Left:
           {
             config.TileSheetName = "owliver_attack_fishingrod_spritesheet";
             config.Scale = Global.OwliverScale;
@@ -447,7 +489,7 @@ namespace Owlicity
           }
           break;
 
-          case SpriteAnimationType.Owliver_AttackFishingRod_Right:
+          case SpriteAnimationType.Owliver_Attack_FishingRod_Right:
           {
             config.TileSheetName = "owliver_attack_fishingrod_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
@@ -488,6 +530,22 @@ namespace Owlicity
             config.TileSheetName = "shop_spritesheet";
             config.TileDim = new Point(512);
             config.Hotspot = new Vector2(261, 415);
+          }
+          break;
+
+          case SpriteAnimationType.PriceTag_20:
+          {
+            config.TileSheetName = "pricetag_20_spritesheet";
+            config.TileDim = new Point(128);
+            config.Hotspot = new Vector2(61, 100);
+          }
+          break;
+
+          case SpriteAnimationType.PriceTag_100:
+          {
+            config.TileSheetName = "pricetag_100_spritesheet";
+            config.TileDim = new Point(128);
+            config.Hotspot = new Vector2(61, 100);
           }
           break;
 
@@ -595,6 +653,30 @@ namespace Owlicity
             config.TileSheetName = "bonbon_red";
             config.TileDim = new Point(64);
             config.Hotspot = new Vector2(32);
+          }
+          break;
+
+          case SpriteAnimationType.FruitBowl:
+          {
+            config.TileSheetName = "fruitbowl_spritesheet";
+            config.TileDim = new Point(128);
+            config.Hotspot = new Vector2(62, 82);
+          }
+          break;
+
+          case SpriteAnimationType.Stick_Left:
+          {
+            config.TileSheetName = "stick_spritesheet";
+            config.TileDim = new Point(128);
+            config.Hotspot = new Vector2(94, 92);
+          }
+          break;
+
+          case SpriteAnimationType.FishingRod_Left:
+          {
+            config.TileSheetName = "fishingrod_spritesheet";
+            config.TileDim = new Point(128);
+            config.Hotspot = new Vector2(106, 104);
           }
           break;
 

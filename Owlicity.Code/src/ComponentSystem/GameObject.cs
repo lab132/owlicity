@@ -11,6 +11,12 @@ namespace Owlicity
 {
   public class GameObject : ISpatial
   {
+    private static int _idGenerator;
+
+    public readonly int ID = ++_idGenerator;
+
+    public string Name;
+
     public List<ComponentBase> Components { get; } = new List<ComponentBase>();
 
     public SpatialComponent RootComponent;
@@ -105,6 +111,11 @@ namespace Owlicity
         component.Destroy();
       }
     }
+
+    public override string ToString()
+    {
+      return $"{ID}: {Name} @ {Spatial}";
+    }
   }
 
   public enum GameObjectType
@@ -146,6 +157,10 @@ namespace Owlicity
     Bonbon_Red,
     Key_Gold,
 
+    ShopItem_FruitBowl,
+    ShopItem_FishingRod,
+    ShopItem_Stick,
+
     // Random groups
     Random_FirTree,
     Random_FirTreeAlt,
@@ -155,10 +170,12 @@ namespace Owlicity
   public static class GameObjectFactory
   {
     private static Random _random;
+    private static int[] _knownCreationCount;
 
     public static void Initialize()
     {
       _random = new Random();
+      _knownCreationCount = new int[Enum.GetNames(typeof(GameObjectType)).Length];
     }
 
     public static SquashComponent CreateOnHitSquasher(GameObject go, HealthComponent health)
@@ -252,6 +269,7 @@ namespace Owlicity
             bc.Body.FixedRotation = true;
             bc.Body.CollisionCategories = Global.OwliverCollisionCategory;
             bc.Body.CollidesWith = Global.LevelCollisionCategory | Global.EnemyCollisionCategory;
+            bc.Body.SleepingAllowed = false;
           };
           go.RootComponent = bc;
 
@@ -269,20 +287,22 @@ namespace Owlicity
           {
           };
 
-          var sqc = new SquashComponent(go);
-
           var sa = new SpriteAnimationComponent(go)
           {
             AnimationTypes = new List<SpriteAnimationType>
             {
-              SpriteAnimationType.Owliver_Idle_Left,
-              SpriteAnimationType.Owliver_Idle_Right,
-              SpriteAnimationType.Owliver_Walk_Left,
-              SpriteAnimationType.Owliver_Walk_Right,
-              SpriteAnimationType.Owliver_AttackStick_Left,
-              SpriteAnimationType.Owliver_AttackStick_Right,
-              SpriteAnimationType.Owliver_AttackFishingRod_Left,
-              SpriteAnimationType.Owliver_AttackFishingRod_Right,
+              SpriteAnimationType.Owliver_Idle_Stick_Left,
+              SpriteAnimationType.Owliver_Idle_Stick_Right,
+              SpriteAnimationType.Owliver_Walk_Stick_Left,
+              SpriteAnimationType.Owliver_Walk_Stick_Right,
+              SpriteAnimationType.Owliver_Attack_Stick_Left,
+              SpriteAnimationType.Owliver_Attack_Stick_Right,
+              SpriteAnimationType.Owliver_Idle_FishingRod_Left,
+              SpriteAnimationType.Owliver_Idle_FishingRod_Right,
+              SpriteAnimationType.Owliver_Walk_FishingRod_Left,
+              SpriteAnimationType.Owliver_Walk_FishingRod_Right,
+              SpriteAnimationType.Owliver_Attack_FishingRod_Left,
+              SpriteAnimationType.Owliver_Attack_FishingRod_Right,
             },
           };
           sa.AttachTo(bc);
@@ -904,6 +924,114 @@ namespace Owlicity
         }
         break;
 
+        case GameObjectType.ShopItem_FruitBowl:
+        case GameObjectType.ShopItem_FishingRod:
+        case GameObjectType.ShopItem_Stick:
+        {
+          var bc = new BodyComponent(go)
+          {
+            InitMode = BodyComponentInitMode.Manual,
+          };
+          bc.BeforeInitialize += () =>
+          {
+            SpatialData s = bc.GetWorldSpatialData();
+            bc.Body = BodyFactory.CreateBody(
+              world: Global.Game.World,
+              position: s.Position,
+              rotation: s.Rotation.Radians,
+              bodyType: BodyType.Static,
+              userData: bc);
+            FixtureFactory.AttachRectangle(
+              body: bc.Body,
+              width: Global.ToMeters(100),
+              height: Global.ToMeters(100),
+              offset: Global.ToMeters(0, 100),
+              density: Global.OwliverDensity,
+              userData: bc);
+            bc.Body.IsSensor = true;
+            bc.Body.CollidesWith = Global.OwliverCollisionCategory;
+          };
+          go.RootComponent = bc;
+
+          var sacItem = new SpriteAnimationComponent(go)
+          {
+            DepthReference = null,
+            RenderDepth = 0.1f,
+            AnimationTypes = new List<SpriteAnimationType>(),
+          };
+          sacItem.AttachTo(bc);
+
+#if true
+          var sacPriceTag = new SpriteAnimationComponent(go)
+          {
+            DepthReference = null,
+            RenderDepth = 0.11f,
+            AnimationTypes = new List<SpriteAnimationType>
+            {
+              SpriteAnimationType.PriceTag_20,
+              SpriteAnimationType.PriceTag_100,
+            },
+          };
+          sacPriceTag.Spatial.Position.Y -= Global.ToMeters(10);
+          sacPriceTag.AttachTo(sacItem);
+
+          var sic = new ShopItemComponent(go)
+          {
+            PriceTag = sacPriceTag,
+          };
+
+          switch(type)
+          {
+            case GameObjectType.ShopItem_FruitBowl:
+            {
+              sacItem.AnimationTypes.Add(SpriteAnimationType.FruitBowl);
+              sic.ItemType = ShopItemType.FruitBowl;
+            }
+            break;
+
+            case GameObjectType.ShopItem_FishingRod:
+            {
+              sacItem.AnimationTypes.Add(SpriteAnimationType.FishingRod_Left);
+              sic.ItemType = ShopItemType.FishingRod;
+            }
+            break;
+
+            case GameObjectType.ShopItem_Stick:
+            {
+              sacItem.AnimationTypes.Add(SpriteAnimationType.Stick_Left);
+              sic.ItemType = ShopItemType.Stick;
+            }
+            break;
+
+            default: throw new ArgumentException(nameof(type));
+          }
+#else
+          switch(type)
+          {
+            case GameObjectType.ShopItem_FruitBowl:
+            {
+              sacItem.AnimationTypes.Add(SpriteAnimationType.FruitBowl);
+            }
+            break;
+
+            case GameObjectType.ShopItem_FishingRod:
+            {
+              sacItem.AnimationTypes.Add(SpriteAnimationType.FishingRod_Left);
+            }
+            break;
+
+            case GameObjectType.ShopItem_Stick:
+            {
+              sacItem.AnimationTypes.Add(SpriteAnimationType.Stick_Left);
+            }
+            break;
+
+            default: throw new ArgumentException(nameof(type));
+          }
+#endif
+        }
+        break;
+
         case GameObjectType.Random_FirTree:
         {
           GameObjectType choice = _random.Choose(GameObjectType.Tree_Fir, GameObjectType.Tree_Conifer);
@@ -928,6 +1056,8 @@ namespace Owlicity
         default:
         throw new ArgumentException("Unknown game object type.");
       }
+
+      go.Name = $"{type}({_knownCreationCount[(int)type]++})";
 
       return go;
     }
