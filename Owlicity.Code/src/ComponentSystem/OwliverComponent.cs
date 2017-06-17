@@ -97,21 +97,24 @@ namespace Owlicity
         Vector2 worldPosition = Owner.GetWorldSpatialData().Position;
 
         AABB local;
-        switch(CurrentState.WeaponType)
         {
-          case OwliverWeaponType.Stick:
-          local = new AABB
+          Vector2 offset = Global.ToMeters(20, -120);
+          switch(CurrentState.WeaponType)
           {
-            LowerBound = Global.ToMeters(0, -50),
-            UpperBound = Global.ToMeters(150, 70),
-          };
-          break;
+            case OwliverWeaponType.Stick:
+            local = new AABB
+            {
+              LowerBound = Global.ToMeters(0, -50) + offset,
+              UpperBound = Global.ToMeters(150, 70) + offset,
+            };
+            break;
 
-          case OwliverWeaponType.FishingRod:
-          throw new NotImplementedException();
-          //break;
+            case OwliverWeaponType.FishingRod:
+            throw new NotImplementedException();
+            //break;
 
-          default: throw new ArgumentException();
+            default: throw new ArgumentException();
+          }
         }
 
         if(CurrentState.FacingDirection == OwliverFacingDirection.Left)
@@ -301,7 +304,7 @@ namespace Owlicity
         {
           float sign = CurrentState.FacingDirection == OwliverFacingDirection.Left ? -1.0f : 1.0f;
           GameObject projectile = GameObjectFactory.CreateKnown(GameObjectType.Projectile);
-          projectile.Spatial.CopyFrom(Owner.GetWorldSpatialData());
+          projectile.Spatial.CopyFrom(new SpatialData { Position = WeaponAABB.Center });
           projectile.Spatial.Position.X += sign * 0.1f;
           projectile.GetComponent<AutoDestructComponent>().SecondsUntilDestruction = 2.0f;
           var bc = projectile.GetComponent<BodyComponent>();

@@ -234,26 +234,25 @@ namespace Owlicity
               bodyType: BodyType.Dynamic,
               userdata: bc);
 
-            float radius = Global.ToMeters(50 * Global.OwliverScale.X);
+            float radius = Global.ToMeters(60) * Global.OwliverScale.X;
             float density = Global.OwliverDensity;
             FixtureFactory.AttachCircle(
               radius: radius,
               density: density,
               body: bc.Body,
-              offset: Global.ToMeters(0, 10) * Global.OwliverScale,
+              offset: Global.ToMeters(0, -60) * Global.OwliverScale,
               userData: bc);
             FixtureFactory.AttachCircle(
               radius: radius,
               density: density,
               body: bc.Body,
-              offset: Global.ToMeters(0, 60) * Global.OwliverScale,
+              offset: Global.ToMeters(0, -130) * Global.OwliverScale,
               userData: bc);
 
             bc.Body.FixedRotation = true;
             bc.Body.CollisionCategories = Global.OwliverCollisionCategory;
             bc.Body.CollidesWith = Global.LevelCollisionCategory | Global.EnemyCollisionCategory;
           };
-
           go.RootComponent = bc;
 
           var oc = new OwliverComponent(go)
@@ -286,12 +285,11 @@ namespace Owlicity
               SpriteAnimationType.Owliver_AttackFishingRod_Right,
             },
           };
-          sa.Spatial.Position += Global.ToMeters(0, -10);
           sa.AttachTo(bc);
 
           var hc = new HealthComponent(go)
           {
-            MaxHealth = 10,
+            MaxHealth = 5,
           };
           hc.OnHit += (damage) =>
           {
@@ -609,6 +607,7 @@ namespace Owlicity
               bodyType: BodyType.Dynamic);
             bc.Body.CollisionCategories = Global.OwliverWeaponCollisionCategory;
             bc.Body.CollidesWith = ~(Global.OwliverCollisionCategory | Global.OwliverWeaponCollisionCategory);
+            bc.Body.IsBullet = true;
             bc.Body.OnCollision += (fixtureA, fixtureB, contact) =>
             {
               Global.HandleDefaultHit(fixtureB.Body, bc.Body.Position, 1, 0.1f);
