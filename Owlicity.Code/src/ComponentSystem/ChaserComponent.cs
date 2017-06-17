@@ -46,8 +46,6 @@ namespace Owlicity
       set => _isChasing = value;
     }
 
-    public bool DebugDrawingEnabled = false;
-
     public ChaserComponent(GameObject owner)
       : base(owner)
     {

@@ -383,14 +383,14 @@ namespace Owlicity
         Random rand = new Random();
 
         Global.SpawnGameObjectsInRingFormation(
-          center: Global.ToMeters(1400, 500),
+          center: Global.ToMeters(2400, 500),
           radius: 2.5f,
           numToSpawn: 15,
           rand: rand,
           types: new[] { GameObjectType.Bonbon_Gold, GameObjectType.Bonbon_Red });
 
         Global.SpawnGameObjectsInRingFormation(
-          center: Global.ToMeters(1400, 500),
+          center: Global.ToMeters(2400, 500),
           radius: 1.0f,
           numToSpawn: 5,
           rand: rand,
@@ -406,8 +406,13 @@ namespace Owlicity
       {
         var testGate = GameObjectFactory.CreateKnown(GameObjectType.Gate);
         testGate.Spatial.Position += Global.ToMeters(2300, 1100);
-        //testGate.Spatial.Position += Global.ToMeters(1300, 600);
         AddGameObject(testGate);
+      }
+
+      {
+        var testShop = GameObjectFactory.CreateKnown(GameObjectType.Shop);
+        testShop.Spatial.Position += Global.ToMeters(1300, 500);
+        AddGameObject(testShop);
       }
 #endif
 

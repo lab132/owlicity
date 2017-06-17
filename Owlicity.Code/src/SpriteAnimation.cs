@@ -236,6 +236,10 @@ namespace Owlicity
     Slurp_Idle_Left,
     Slurp_Idle_Right,
 
+    Shopkeeper_Idle_Front,
+
+    Shop,
+
     Gate_Closed,
     Gate_Open,
 
@@ -288,6 +292,7 @@ namespace Owlicity
     public Vector2 Hotspot;
 
     public Vector2 ScaledTileDim => Scale * TileDim.ToVector2();
+    public Vector2 ScaledHotspot => Scale * Hotspot;
 
     public static readonly SpriteAnimationConfig Default = new SpriteAnimationConfig
     {
@@ -469,6 +474,22 @@ namespace Owlicity
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
           }
           goto case SpriteAnimationType.Slurp_Idle_Left;
+
+          case SpriteAnimationType.Shopkeeper_Idle_Front:
+          {
+            config.TileSheetName = "shopkeeper_spritesheet";
+            config.Scale = Global.OwliverScale;
+            config.Hotspot = new Vector2(137, 236);
+          }
+          break;
+
+          case SpriteAnimationType.Shop:
+          {
+            config.TileSheetName = "shop_spritesheet";
+            config.TileDim = new Point(512);
+            config.Hotspot = new Vector2(261, 415);
+          }
+          break;
 
           case SpriteAnimationType.Gate_Closed:
           {

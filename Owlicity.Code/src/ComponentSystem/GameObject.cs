@@ -35,7 +35,6 @@ namespace Owlicity
     }
 
     public GameLayer Layer = GameLayer.Default;
-    public bool IsStationary;
 
     public void AddComponent(ComponentBase newComponent)
     {
@@ -117,6 +116,8 @@ namespace Owlicity
 
     // Characters
     Owliver,
+
+    Shop,
 
     // Mobs
     Slurp,
@@ -307,6 +308,58 @@ namespace Owlicity
           };
 
           var kc = new KeyRingComponent(go);
+        }
+        break;
+
+        case GameObjectType.Shop:
+        {
+          var bc = new BodyComponent(go)
+          {
+            InitMode = BodyComponentInitMode.Manual,
+          };
+          bc.BeforePostInitialize += () =>
+          {
+            SpatialData s = go.GetWorldSpatialData();
+            bc.Body = BodyFactory.CreateBody(
+              world: Global.Game.World,
+              position: s.Position,
+              rotation: s.Rotation.Radians,
+              userData: bc);
+            FixtureFactory.AttachRectangle(
+              body: bc.Body,
+              offset: Global.ToMeters(0, -50),
+              width: Global.ToMeters(330),
+              height: Global.ToMeters(100),
+              density: Global.OwliverDensity,
+              userData: bc);
+            FixtureFactory.AttachRectangle(
+              body: bc.Body,
+              offset: Global.ToMeters(0, -160),
+              width: Global.ToMeters(280),
+              height: Global.ToMeters(150),
+              density: Global.OwliverDensity,
+              userData: bc);
+          };
+          go.RootComponent = bc;
+
+          var sacShop = new SpriteAnimationComponent(go)
+          {
+            AnimationTypes = new List<SpriteAnimationType>
+            {
+              SpriteAnimationType.Shop,
+            },
+          };
+          sacShop.AttachTo(bc);
+
+          var sacShopkeeper = new SpriteAnimationComponent(go)
+          {
+            AnimationTypes = new List<SpriteAnimationType>
+            {
+              SpriteAnimationType.Shopkeeper_Idle_Front,
+            },
+          };
+          sacShopkeeper.Spatial.Position.Y -= Global.ToMeters(100);
+          sacShopkeeper.AttachTo(sacShop);
         }
         break;
 
@@ -554,6 +607,8 @@ namespace Owlicity
               rotation: s.Rotation.Radians + new Angle { Degrees = 90.0f + new Random().NextBilateralFloat() * 2 }.Radians,
               density: 10 * Global.OwliverDensity,
               bodyType: BodyType.Dynamic);
+            bc.Body.CollisionCategories = Global.OwliverWeaponCollisionCategory;
+            bc.Body.CollidesWith = ~(Global.OwliverCollisionCategory | Global.OwliverWeaponCollisionCategory);
             bc.Body.OnCollision += (fixtureA, fixtureB, contact) =>
             {
               Global.HandleDefaultHit(fixtureB.Body, bc.Body.Position, 1, 0.1f);
@@ -595,7 +650,6 @@ namespace Owlicity
         case GameObjectType.BackgroundScreen:
         {
           go.Layer = GameLayer.Background;
-          go.IsStationary = true;
 
           var bc = new BodyComponent(go)
           {
@@ -610,6 +664,7 @@ namespace Owlicity
 
           var sc = new SpriteComponent(go)
           {
+            DepthReference = null, // Don't determine depth automatically
             RenderDepth = 1.0f,
           };
           sc.AttachTo(bc);
@@ -716,8 +771,6 @@ namespace Owlicity
         case GameObjectType.Tree_Orange:
         case GameObjectType.Bush:
         {
-          go.IsStationary = true;
-
           List<SpriteAnimationType> animTypes = new List<SpriteAnimationType>();
           switch(type)
           {
@@ -735,6 +788,7 @@ namespace Owlicity
           var sa = new SpriteAnimationComponent(go)
           {
             AnimationTypes = animTypes,
+            DepthReference = null, // Don't determine depth automatically
           };
           sa.BeforePostInitialize += () =>
           {
