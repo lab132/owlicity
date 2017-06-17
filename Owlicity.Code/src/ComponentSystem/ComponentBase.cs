@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using VelcroPhysics.Shared;
 
@@ -12,6 +13,8 @@ namespace Owlicity
     public bool IsPrePhysicsUpdateEnabled = true;
     public bool IsUpdateEnabled = true;
     public bool IsDrawEnabled = true;
+
+    public bool DebugDrawingEnabled = true;
 
     public Action BeforeInitialize;
     public Action BeforePostInitialize;
@@ -46,23 +49,29 @@ namespace Owlicity
   public abstract class DrawComponent : SpatialComponent
   {
     public float RenderDepth;
+    public ISpatial DepthReference;
 
     public DrawComponent(GameObject owner) : base(owner)
     {
-    }
-
-    public override void Initialize()
-    {
-      base.Initialize();
+      DepthReference = this;
     }
 
     public override void Update(float deltaSeconds)
     {
       base.Update(deltaSeconds);
 
-      if(!Owner.IsStationary)
+      if(DepthReference != null)
       {
-        RenderDepth = Global.Game.CalcDepth(this.GetWorldSpatialData(), Owner.Layer);
+        SpatialData spatial = DepthReference.GetWorldSpatialData();
+        RenderDepth = Global.Game.CalcDepth(spatial, Owner.Layer);
+
+        if(DebugDrawingEnabled)
+        {
+          Global.Game.DebugDrawCommands.Add(view =>
+          {
+            view.DrawPoint(spatial.Position, Global.ToMeters(3), Color.Navy);
+          });
+        }
       }
     }
   }

@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using VelcroPhysics.Shared;
 
 namespace Owlicity
 {
@@ -203,6 +204,20 @@ namespace Owlicity
       State.CurrentFrameIndex = 0;
       State.PlaybackState = SpriteAnimationPlaybackState.Stopped;
     }
+
+    public AABB CalcAABB()
+    {
+      Vector2 scale = State.Scale;
+      Vector2 hotspot = State.Hotspot;
+      Vector2 dim = Data.Config.TileDim.ToVector2();
+      AABB result = new AABB
+      {
+        LowerBound = scale * (-hotspot),
+        UpperBound = scale * (-hotspot + dim),
+      };
+
+      return result;
+    }
   }
 
   public enum SpriteAnimationType
@@ -218,7 +233,18 @@ namespace Owlicity
     Owliver_AttackFishingRod_Left,
     Owliver_AttackFishingRod_Right,
 
-    Slurp_Idle,
+    Slurp_Idle_Left,
+    Slurp_Idle_Right,
+
+    Shopkeeper_Idle_Front,
+
+    Shop,
+
+    Gate_Closed,
+    Gate_Open,
+
+    Tankton_Idle_Left,
+    Tankton_Idle_Right,
 
     Fir_Idle,
     FirAlt_Idle,
@@ -266,6 +292,7 @@ namespace Owlicity
     public Vector2 Hotspot;
 
     public Vector2 ScaledTileDim => Scale * TileDim.ToVector2();
+    public Vector2 ScaledHotspot => Scale * Hotspot;
 
     public static readonly SpriteAnimationConfig Default = new SpriteAnimationConfig
     {
@@ -354,7 +381,7 @@ namespace Owlicity
           {
             config.TileSheetName = "owliver_idle_front_left_spritesheet";
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(121, 90);
+            config.Hotspot = new Vector2(125, 230);
           }
           break;
 
@@ -364,7 +391,7 @@ namespace Owlicity
             config.TileSheetName = "owliver_idle_front_left_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(133, 90);
+            config.Hotspot = new Vector2(129, 230);
           }
           break;
 
@@ -372,7 +399,7 @@ namespace Owlicity
           {
             config.TileSheetName = "owliver_walk_front_left_spritesheet";
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(121, 90);
+            config.Hotspot = new Vector2(125, 230);
           }
           break;
 
@@ -382,7 +409,7 @@ namespace Owlicity
             config.TileSheetName = "owliver_walk_front_left_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(133, 90);
+            config.Hotspot = new Vector2(129, 230);
           }
           break;
 
@@ -390,7 +417,7 @@ namespace Owlicity
           {
             config.TileSheetName = "owliver_attack_spritesheet";
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(164, 90);
+            config.Hotspot = new Vector2(169, 230);
             config.TileCount = 5;
             config.PingPong = false;
             config.NumLoopsToPlay = 1;
@@ -402,7 +429,7 @@ namespace Owlicity
             config.TileSheetName = "owliver_attack_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(90, 90);
+            config.Hotspot = new Vector2(86, 230);
             config.TileCount = 5;
             config.PingPong = false;
             config.NumLoopsToPlay = 1;
@@ -413,7 +440,7 @@ namespace Owlicity
           {
             config.TileSheetName = "owliver_attack_fishingrod_spritesheet";
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(164, 90);
+            config.Hotspot = new Vector2(169, 230);
             config.TileCount = 5;
             config.PingPong = false;
             config.NumLoopsToPlay = 1;
@@ -425,20 +452,75 @@ namespace Owlicity
             config.TileSheetName = "owliver_attack_fishingrod_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(90, 90);
+            config.Hotspot = new Vector2(86, 230);
             config.TileCount = 5;
             config.PingPong = false;
             config.NumLoopsToPlay = 1;
           }
           break;
 
-          case SpriteAnimationType.Slurp_Idle:
+          case SpriteAnimationType.Slurp_Idle_Left:
           {
             config.TileSheetName = "slurp_spritesheet";
             config.TileCount = 7;
             config.TileDim = new Point(210, 270);
             config.Hotspot = 0.5f * config.TileDim.ToVector2();
             config.Scale = Global.SlurpScale;
+          }
+          break;
+
+          case SpriteAnimationType.Slurp_Idle_Right:
+          {
+            config.SpriteEffects = SpriteEffects.FlipHorizontally;
+          }
+          goto case SpriteAnimationType.Slurp_Idle_Left;
+
+          case SpriteAnimationType.Shopkeeper_Idle_Front:
+          {
+            config.TileSheetName = "shopkeeper_spritesheet";
+            config.Scale = Global.OwliverScale;
+            config.Hotspot = new Vector2(137, 236);
+          }
+          break;
+
+          case SpriteAnimationType.Shop:
+          {
+            config.TileSheetName = "shop_spritesheet";
+            config.TileDim = new Point(512);
+            config.Hotspot = new Vector2(261, 415);
+          }
+          break;
+
+          case SpriteAnimationType.Gate_Closed:
+          {
+            config.TileSheetName = "gate_spritesheet";
+            config.TileDim = new Point(1024);
+            config.Hotspot = new Vector2(560);
+          }
+          break;
+
+          case SpriteAnimationType.Gate_Open:
+          {
+            config.TileSheetName = "gate_open_spritesheet";
+            config.TileDim = new Point(1024);
+            config.Hotspot = new Vector2(560);
+          }
+          break;
+
+          case SpriteAnimationType.Tankton_Idle_Left:
+          {
+            config.SpriteEffects = SpriteEffects.FlipHorizontally;
+          }
+          goto case SpriteAnimationType.Tankton_Idle_Right;
+
+          case SpriteAnimationType.Tankton_Idle_Right:
+          {
+            config.TileSheetName = "boss_spritesheet";
+            config.TileDim = new Point(512);
+            config.Hotspot = new Vector2(256, 450);
+            config.Scale = Global.TanktonScale;
+            config.PingPong = false;
+            config.SecondsPerFrame *= 2;
           }
           break;
 

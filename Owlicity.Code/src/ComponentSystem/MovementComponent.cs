@@ -10,7 +10,6 @@ namespace Owlicity
     //
     public bool ManualInputProcessing;
     public float MaxMovementSpeed = 1.5f;
-    public float MovementDamping = 0.15f; // Loss of linear velocity per frame.
 
     //
     // Runtime data
@@ -70,18 +69,6 @@ namespace Owlicity
         {
           Owner.Spatial.Position += movementVector * MaxMovementSpeed * deltaSeconds;
         }
-      }
-    }
-
-    public override void Update(float deltaSeconds)
-    {
-      base.Update(deltaSeconds);
-
-      Body body = MyBody;
-      if(body != null && MovementDamping > 0.0f)
-      {
-        float preserved = 1 - MovementDamping;
-        body.LinearVelocity *= preserved;
       }
     }
   }

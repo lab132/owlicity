@@ -12,6 +12,7 @@ namespace Owlicity
     //
     // Initialization data. See also SetupDefaultSquashData().
     //
+    public HealthComponent Health;
     public Curve SquashCurveX;
     public Curve SquashCurveY;
 
@@ -20,9 +21,9 @@ namespace Owlicity
     //
     public SpriteAnimationComponent SpriteAnimationComponent { get; set; }
 
-    public float MaxCurvePosition;
-    public float CurrentCurvePosition;
-    public bool IsSquashing => MaxCurvePosition > 0.0f;
+    public float MaxCursor;
+    public float CurrentCursor;
+    public bool IsSquashing => MaxCursor > 0.0f;
 
 
     public SquashComponent(GameObject owner)
@@ -30,17 +31,31 @@ namespace Owlicity
     {
     }
 
-    public void SetupDefaultSquashData(float duration)
+    public void SetDefaultCurves(float duration, Vector2? initialScale = null, Vector2? extremeScale = null)
     {
+      Vector2 init = initialScale ?? Vector2.One;
+      Vector2 extreme = extremeScale ?? new Vector2(1.5f, 0.75f);
+
       SquashCurveX = new Curve();
-      SquashCurveX.Keys.Add(new CurveKey(0.0f * duration, 1.0f));
-      SquashCurveX.Keys.Add(new CurveKey(0.5f * duration, 1.5f));
-      SquashCurveX.Keys.Add(new CurveKey(1.0f * duration, 1.0f));
+      SquashCurveX.Keys.Add(new CurveKey(0.0f * duration, init.X));
+      SquashCurveX.Keys.Add(new CurveKey(0.5f * duration, extreme.X));
+      SquashCurveX.Keys.Add(new CurveKey(1.0f * duration, init.X));
 
       SquashCurveY = new Curve();
-      SquashCurveY.Keys.Add(new CurveKey(0.0f * duration, 1.0f));
-      SquashCurveY.Keys.Add(new CurveKey(0.5f * duration, 0.75f));
-      SquashCurveY.Keys.Add(new CurveKey(1.0f * duration, 1.0f));
+      SquashCurveY.Keys.Add(new CurveKey(0.0f * duration, init.Y));
+      SquashCurveY.Keys.Add(new CurveKey(0.5f * duration, extreme.Y));
+      SquashCurveY.Keys.Add(new CurveKey(1.0f * duration, init.Y));
+    }
+
+    public void StartSequence()
+    {
+      if(IsSquashing)
+      {
+        // TODO(manu): What to do? Restart?
+      }
+
+      CurrentCursor = 0.0f;
+      MaxCursor = SquashCurveX.Keys.Last().Position;
     }
 
     public override void Initialize()
@@ -59,33 +74,22 @@ namespace Owlicity
 
       if(SpriteAnimationComponent != null && IsSquashing)
       {
-        CurrentCurvePosition += deltaSeconds;
+        CurrentCursor += deltaSeconds;
 
-        if(CurrentCurvePosition >= MaxCurvePosition)
+        if(CurrentCursor >= MaxCursor)
         {
           // Squashing has ended. :(
-          CurrentCurvePosition = 0.0f;
-          MaxCurvePosition = 0.0f;
+          CurrentCursor = 0.0f;
+          MaxCursor = 0.0f;
           SpriteAnimationComponent.AdditionalScale = null;
         }
         else
         {
-          float scaleX = SquashCurveX.Evaluate(CurrentCurvePosition);
-          float scaleY = SquashCurveY.Evaluate(CurrentCurvePosition);
+          float scaleX = SquashCurveX.Evaluate(CurrentCursor);
+          float scaleY = SquashCurveY.Evaluate(CurrentCursor);
           SpriteAnimationComponent.AdditionalScale = new Vector2(scaleX, scaleY);
         }
       }
-    }
-
-    public void StartSquashing()
-    {
-      if(IsSquashing)
-      {
-        // TODO(manu): What to do? Restart?
-      }
-
-      CurrentCurvePosition = 0.0f;
-      MaxCurvePosition = SquashCurveX.Keys.Last().Position;
     }
   }
 }

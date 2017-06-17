@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Graphics;
+using VelcroPhysics.Shared;
 
 namespace Owlicity
 {
@@ -28,6 +29,7 @@ namespace Owlicity
       new Dictionary<SpriteAnimationType, SpriteAnimationInstance>();
 
     public Vector2? AdditionalScale;
+    public Color? Tint;
 
     public SpriteAnimationComponent(GameObject owner) : base(owner)
     {
@@ -71,6 +73,8 @@ namespace Owlicity
           ActiveAnimation.State.CurrentFrameTime = oldState.CurrentFrameTime;
           ActiveAnimation.State.CurrentFrameIndex = oldState.CurrentFrameIndex;
         }
+
+        Spatial.LocalAABB = Global.ToMeters(ActiveAnimation.CalcAABB());
       }
     }
 
@@ -89,7 +93,9 @@ namespace Owlicity
 
       Global.Game.DebugDrawCommands.Add(view =>
       {
-        view.DrawCircle(this.GetWorldSpatialData().Position, Global.ToMeters(10), new Color(0xdd, 0x99, 0x44));
+        SpatialData worldSpatial = this.GetWorldSpatialData();
+        //view.DrawCircle(worldSpatial.Position, Global.ToMeters(10), new Color(0xdd, 0x99, 0x44));
+        view.DrawAABB(worldSpatial.AbsoluteAABB, new Color(0xdd, 0x99, 0x44));
       });
     }
 
@@ -98,7 +104,11 @@ namespace Owlicity
       base.Draw(renderer);
 
       SpatialData worldSpatial = this.GetWorldSpatialData();
-      ActiveAnimation.Draw(renderer, worldSpatial, RenderDepth, AdditionalScale);
+      if(Tint != null && Tint != Color.White)
+      {
+        Console.WriteLine();
+      }
+      ActiveAnimation.Draw(renderer, worldSpatial, RenderDepth, AdditionalScale, Tint);
     }
   }
 }

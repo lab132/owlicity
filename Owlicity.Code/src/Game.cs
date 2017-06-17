@@ -22,8 +22,6 @@ namespace Owlicity
   // i.e. there is no need to convert to meters!
   public class OwlHud
   {
-    public Rectangle HudBounds;
-
     public GameObject Owliver;
 
     public HealthComponent Health;
@@ -31,7 +29,7 @@ namespace Owlicity
     public SpriteAnimationInstance HealthIconAnimation;
 
     public Color FullHealthTint = Color.White;
-    public Color NoHealthTint = new Color(30, 30, 30);
+    public Color NoHealthTint = new Color(60, 60, 60);
 
     public MoneyBagComponent MoneyBag;
     public SpatialData MoneyBagIconAnchor = new SpatialData();
@@ -45,19 +43,25 @@ namespace Owlicity
 
     public SpriteAnimationInstance[] KeyAnimations;
 
-    public void Initialize()
+    public void ResetLayout(Rectangle bounds)
     {
-      Rectangle margin = new Rectangle { X = 8, Y = 8, Width = HudBounds.Width - 16, Height = HudBounds.Bottom - 16 };
-      HealthIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.OwlHealthIcon);
+      Rectangle margin = new Rectangle { X = 8, Y = 8, Width = bounds.Width - 16, Height = bounds.Bottom - 16 };
+
       HealthIconAnchor.Position = new Vector2(margin.Left, margin.Top) + 0.5f * HealthIconAnimation.ScaledDim;
 
-      MoneyBagIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Bonbon_Gold);
       {
         Vector2 offset = MoneyBagIconAnimation.ScaledDim;
         offset.X = -offset.X;
         offset.Y = 0.6f * offset.Y;
-        MoneyBagIconAnchor.Position = new Vector2(HudBounds.Right, HudBounds.Top) + offset;
+        MoneyBagIconAnchor.Position = new Vector2(bounds.Right, bounds.Top) + offset;
       }
+    }
+
+    public void Initialize()
+    {
+      HealthIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.OwlHealthIcon);
+
+      MoneyBagIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Bonbon_Gold);
 
       Owliver = Global.Game.Owliver;
       Health = Owliver.GetComponent<HealthComponent>();
@@ -180,6 +184,8 @@ namespace Owlicity
   public class OwlGame : Game
   {
     GraphicsDeviceManager graphics;
+    public static readonly Point FullHD = new Point(1920, 1080);
+    public static readonly Point DebugResolution = (0.8f * FullHD.ToVector2()).ToPoint();
 
     public Renderer WorldRenderer = new Renderer { BaseDepth = -1, BaseScale = Global.RenderScale, };
     public Renderer UIRenderer = new Renderer { BaseDepth = 0, BaseScale = 1.0f, };
@@ -264,21 +270,20 @@ namespace Owlicity
 
       graphics = new GraphicsDeviceManager(this)
       {
-        HardwareModeSwitch = false, // Use "borderless fullscreen window"
-        IsFullScreen = true,
+        HardwareModeSwitch = false, // Use "borderless fullscreen window" (I guess?)
         SynchronizeWithVerticalRetrace = true,
-        PreferredBackBufferHeight = 1080,
-        PreferredBackBufferWidth = 1920
-      };
 
-#if true
-      // Note(manu): Can't debug properly in fullscreen.
-      {
-        graphics.IsFullScreen = false;
-        graphics.PreferredBackBufferHeight = graphics.PreferredBackBufferHeight / 2;
-        graphics.PreferredBackBufferWidth = graphics.PreferredBackBufferWidth / 2;
-      }
+#if DEBUG
+        // Note(manu): Can't debug properly in fullscreen.
+        IsFullScreen = false,
+        PreferredBackBufferWidth = DebugResolution.X,
+        PreferredBackBufferHeight = DebugResolution.Y,
+#else
+        IsFullScreen = true,
+        PreferredBackBufferWidth = FullHD.X,
+        PreferredBackBufferHeight = FullHD.Y,
 #endif
+      };
 
       Content.RootDirectory = "content";
     }
@@ -305,6 +310,10 @@ namespace Owlicity
       };
 
       base.Initialize();
+
+#if DEBUG
+      Window.AllowUserResizing = true;
+#endif
     }
 
     /// <summary>
@@ -347,41 +356,45 @@ namespace Owlicity
         ActiveCamera = GameObjectFactory.CreateKnown(GameObjectType.Camera);
 
         var cc = ActiveCamera.GetComponent<CameraComponent>();
-        Vector2 camExtents = 0.5f * Global.ToMeters(GraphicsDevice.Viewport.Bounds.Size.ToVector2());
-        cc.Spatial.LocalAABB = new AABB
-        {
-          LowerBound = -camExtents,
-          UpperBound = camExtents,
-        };
         cc.VisibilityBounds = CurrentLevel.LevelBounds;
-
-        var mc = ActiveCamera.GetComponent<MovementComponent>();
-        mc.MaxMovementSpeed = 5.0f;
-
-        var sac = ActiveCamera.GetComponent<SpringArmComponent>();
-        sac.Target = Owliver;
+        cc.OnGraphicsDeviceReset(GraphicsDevice);
+        Window.ClientSizeChanged += (o, e) =>
+        {
+          cc.OnGraphicsDeviceReset(GraphicsDevice);
+        };
 
         AddGameObject(ActiveCamera);
       }
 
+#if true
       {
         var testSlurp = GameObjectFactory.CreateKnown(GameObjectType.Slurp);
-        testSlurp.Spatial.Position += Global.ToMeters(600, 450);
+        testSlurp.Spatial.Position += Global.ToMeters(300, 250);
         AddGameObject(testSlurp);
       }
 
-#if true
       {
-        const int numBonbons = 10;
-        Vector2 spawnPosition = Global.ToMeters(600, 650);
-        for(int bonbonIndex = 0; bonbonIndex < numBonbons; bonbonIndex++)
-        {
-          var testBonbon = GameObjectFactory.CreateKnown(GameObjectType.Bonbon_Gold);
-          testBonbon.Spatial.Position += spawnPosition;
-          AddGameObject(testBonbon);
+        var testTankton = GameObjectFactory.CreateKnown(GameObjectType.Tankton);
+        testTankton.Spatial.Position += Global.ToMeters(900, 350);
+        AddGameObject(testTankton);
+      }
 
-          spawnPosition.X += Global.ToMeters(64);
-        }
+      {
+        Random rand = new Random();
+
+        Global.SpawnGameObjectsInRingFormation(
+          center: Global.ToMeters(2400, 500),
+          radius: 2.5f,
+          numToSpawn: 15,
+          rand: rand,
+          types: new[] { GameObjectType.Bonbon_Gold, GameObjectType.Bonbon_Red });
+
+        Global.SpawnGameObjectsInRingFormation(
+          center: Global.ToMeters(2400, 500),
+          radius: 1.0f,
+          numToSpawn: 5,
+          rand: rand,
+          types: new[] { GameObjectType.Bonbon_Gold, GameObjectType.Bonbon_Red });
       }
 
       {
@@ -389,16 +402,34 @@ namespace Owlicity
         testKey.Spatial.Position += Global.ToMeters(700, 720);
         AddGameObject(testKey);
       }
+
+      {
+        var testGate = GameObjectFactory.CreateKnown(GameObjectType.Gate);
+        testGate.Spatial.Position += Global.ToMeters(2300, 1100);
+        AddGameObject(testGate);
+      }
+
+      {
+        var testShop = GameObjectFactory.CreateKnown(GameObjectType.Shop);
+        testShop.Spatial.Position += Global.ToMeters(1300, 500);
+        AddGameObject(testShop);
+      }
 #endif
 
       {
         var BackgroundMusic = Content.Load<Song>("snd/FiluAndDina_-_Video_Game_Background_-_Edit");
         MediaPlayer.IsRepeating = true;
+#if false
         MediaPlayer.Play(BackgroundMusic);
+#endif
       }
 
-      Hud.HudBounds = GraphicsDevice.Viewport.Bounds;
       Hud.Initialize();
+      Hud.ResetLayout(GraphicsDevice.Viewport.Bounds);
+      Window.ClientSizeChanged += (o, e) =>
+      {
+        Hud.ResetLayout(GraphicsDevice.Viewport.Bounds);
+      };
     }
 
     /// <summary>
@@ -434,12 +465,16 @@ namespace Owlicity
         Exit();
       }
 
+      if(Input.PlatformInput.ToggleFullscreen)
+      {
+        graphics.ToggleFullScreen();
+      }
+
 #if DEBUG
       deltaSeconds *= Input.DebugInput.SpeedMultiplier;
 
       {
         var mv = ActiveCamera.GetComponent<MovementComponent>();
-        //mv.Input = Input.DebugInput;
         mv.MovementVector = Input.DebugMovement;
       }
 
@@ -463,6 +498,16 @@ namespace Owlicity
         {
           cc.VisibilityBounds = null;
         }
+
+        var chc = ActiveCamera.GetComponent<ChaserComponent>();
+        if(chc.Target == null)
+        {
+          chc.Target = Owliver;
+        }
+        else
+        {
+          chc.Target = null;
+        }
       }
 
       if(Input.DebugInput.ResetCameraPosition)
@@ -471,7 +516,7 @@ namespace Owlicity
       }
 #endif
 
-      {
+        {
         var mc = Owliver.GetComponent<MovementComponent>();
         mc.MovementVector = Input.CharacterMovement;
 
@@ -512,6 +557,16 @@ namespace Owlicity
       foreach(GameObject go in GameObjects)
       {
         go.Update(deltaSeconds);
+
+        AABB aabb = Global.CreateInvalidAABB();
+        foreach(SpatialComponent sc in go.GetComponents<SpatialComponent>())
+        {
+          AABB other = sc.GetWorldSpatialData().AbsoluteAABB;
+          aabb.Combine(ref other);
+        }
+
+        DebugDrawCommands.Add(view => view.DrawPoint(aabb.Center, Global.ToMeters(3), Color.MonoGameOrange));
+        DebugDrawCommands.Add(view => view.DrawAABB(ref aabb, Color.Lime));
       }
 
       // Remove pending game objects.
@@ -538,6 +593,8 @@ namespace Owlicity
 
       GraphicsDevice.Clear(Color.CornflowerBlue);
       Camera cam = ActiveCamera.GetComponent<CameraComponent>().Camera;
+      Matrix viewMatrix = cam.Effect.View;
+      Matrix projectionMatrix = cam.Effect.Projection;
 
       if(MainDrawingEnabled)
       {
@@ -560,7 +617,7 @@ namespace Owlicity
 
       if(DebugDrawingEnabled)
       {
-        PhysicsDebugView.BeginCustomDraw(ref cam.ProjectionMatrix, ref cam.ViewMatrix);
+        PhysicsDebugView.BeginCustomDraw(ref projectionMatrix, ref viewMatrix);
 
         foreach(DebugDrawCommand drawCommand in DebugDrawCommands)
         {
@@ -589,7 +646,7 @@ namespace Owlicity
         PhysicsDebugView.EndCustomDraw();
       }
 
-      PhysicsDebugView.RenderDebugData(ref cam.ProjectionMatrix, ref cam.ViewMatrix);
+      PhysicsDebugView.RenderDebugData(ref projectionMatrix, ref viewMatrix);
     }
   }
 }

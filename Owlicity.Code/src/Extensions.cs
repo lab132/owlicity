@@ -59,6 +59,20 @@ namespace Owlicity
         direction = self / length;
       }
     }
+
+    public static Vector2 GetRotated(this Vector2 self, Angle angle)
+    {
+      float cos = (float)Math.Cos(angle.Radians);
+      float sin = (float)Math.Sin(angle.Radians);
+
+      Vector2 result = new Vector2
+      {
+        X = self.X * cos - self.Y * sin,
+        Y = self.X * sin + self.Y * cos,
+      };
+
+      return result;
+    }
   }
 
   public static class RandomExtensions
@@ -177,6 +191,14 @@ namespace Owlicity
       }
 
       return result;
+    }
+  }
+
+  public static class DebugViewExtensions
+  {
+    public static void DrawAABB(this VelcroPhysics.DebugViews.MonoGame.DebugView self, AABB aabb, Color color)
+    {
+      self.DrawAABB(ref aabb, color);
     }
   }
 }

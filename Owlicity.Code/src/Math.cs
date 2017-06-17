@@ -43,24 +43,24 @@ namespace Owlicity
 
     public Transform Transform_ => new Transform { p = Position, q = new Rot(Rotation.Radians), };
 
-    public AABB WorldAABB => new AABB
+    public AABB AbsoluteAABB => new AABB
     {
       LowerBound = LocalAABB.LowerBound + Position,
       UpperBound = LocalAABB.UpperBound + Position
     };
 
-    public void CopyTo(SpatialData other)
+    public void CopyFrom(SpatialData other)
     {
-      other.Parent = Parent;
-      other.Position = Position;
-      other.Rotation = Rotation;
-      other.LocalAABB = LocalAABB;
+      Parent = other.Parent;
+      Position = other.Position;
+      Rotation = other.Rotation;
+      LocalAABB = other.LocalAABB;
     }
 
     public SpatialData GetCopy()
     {
       SpatialData result = new SpatialData();
-      CopyTo(result);
+      result.CopyFrom(this);
       return result;
     }
 
