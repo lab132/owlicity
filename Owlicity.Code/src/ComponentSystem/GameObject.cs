@@ -469,6 +469,7 @@ namespace Owlicity
 
           var chc = new ChaserComponent(go)
           {
+            AutoTargetOwliver = true,
             TargetRange = 2.0f,
 
             Speed = 0.5f,
