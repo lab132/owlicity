@@ -22,6 +22,7 @@ namespace Owlicity
   public class ChaserComponent : SpatialComponent
   {
     public ISpatial Target;
+    public bool AutoTargetOwliver;
 
     // The minimum range to the target. If the target is closer than this, no action is performed.
     public float TargetInnerRange;
@@ -81,6 +82,11 @@ namespace Owlicity
     public override void PrePhysicsUpdate(float deltaSeconds)
     {
       base.PrePhysicsUpdate(deltaSeconds);
+
+      if(AutoTargetOwliver)
+      {
+        Target = Global.Game.Owliver;
+      }
 
       if(MyBody != null)
       {

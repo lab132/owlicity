@@ -1,6 +1,6 @@
 ﻿
 #if DEBUG
-#define DETECT_CLOSE_PIXELS
+#define RUN_DIAGNOSTICS
 #endif
 
 #define DIAGNOSTICS
@@ -109,7 +109,7 @@ namespace Owlicity.Content.Pipeline
         }
       }
 
-#if DETECT_CLOSE_PIXELS
+#if RUN_DIAGNOSTICS
       DetectClosePixels(context, result);
 #endif
 
@@ -119,6 +119,7 @@ namespace Owlicity.Content.Pipeline
     private void ParseLayoutInfos(byte[] bytes, int rowOffset, int width,
       List<ScreenLayoutInfo> infos, List<string> warnings)
     {
+      Random rand = new Random();
       int pixelOffset = rowOffset * width;
       uint[] data = new uint[width];
       for(int localPixelIndex = 0; localPixelIndex < data.Length; localPixelIndex++)
@@ -134,17 +135,23 @@ namespace Owlicity.Content.Pipeline
 
           uint hexColor = (uint)pixel.R << 24 | (uint)pixel.G << 16 | (uint)pixel.B << 8 | (uint)0xFF;
           GameObjectType objectType = GetGameObjectTypeFromColor(hexColor);
+          Vector2 offsetInMeters = Global.ToMeters(x, y);
           if(objectType != GameObjectType.Unknown)
           {
             infos.Add(new ScreenLayoutInfo
             {
               ObjectType = objectType,
-              OffsetInMeters = Global.ToMeters(x, y),
+              OffsetInMeters = offsetInMeters,
             });
           }
           else
           {
             warnings.Add($"Unknown layout color at {x + 1}x{y + 1}: {pixel} (hex: 0x{hexColor.ToString("X8")})");
+            infos.Add(new ScreenLayoutInfo
+            {
+              ObjectType = rand.Choose(GameObjectType.Slurp),
+              OffsetInMeters = offsetInMeters,
+            });
           }
         }
       }
