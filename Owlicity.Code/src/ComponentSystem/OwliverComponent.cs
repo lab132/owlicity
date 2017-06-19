@@ -409,7 +409,7 @@ namespace Owlicity
           Global.HandleDefaultHit(hitBody, MyBody.Position, damage, force);
         }
 
-        bool throwProjectiles = false;
+        bool throwProjectiles = true;
         if(throwProjectiles)
         {
           float sign = CurrentState.FacingDirection == OwliverFacingDirection.Left ? -1.0f : 1.0f;
