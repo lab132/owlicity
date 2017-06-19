@@ -524,7 +524,7 @@ namespace Owlicity
 
       if(Input.DebugInput.ResetCameraPosition)
       {
-        ActiveCamera.Spatial.Position = Vector2.Zero;
+        ActiveCamera.Spatial.Position = Owliver.GetWorldSpatialData().Position;
       }
 #endif
 
