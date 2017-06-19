@@ -8,22 +8,73 @@ namespace Owlicity
 {
   public class AutoDestructComponent : ComponentBase
   {
-    public float SecondsUntilDestruction;
-    public float CurrentTime;
+    //
+    // Input data.
+    //
+    public TimeSpan DestructionDelay;
+    public bool AutoStart = true;
+
+    //
+    // Runtime data.
+    //
+    public TimeSpan CurrentTime;
+    public bool IsRunning;
+
 
     public AutoDestructComponent(GameObject owner)
       : base(owner)
     {
     }
 
+    public void Resume()
+    {
+      IsRunning = true;
+    }
+
+    public void Pause()
+    {
+      IsRunning = false;
+    }
+
+    public void Reset()
+    {
+      CurrentTime = TimeSpan.Zero;
+    }
+
+    public void Stop()
+    {
+      Reset();
+      Pause();
+    }
+
+    public void Start()
+    {
+      Reset();
+      Resume();
+    }
+
+    public override void Initialize()
+    {
+      base.Initialize();
+
+      if(AutoStart)
+      {
+        Start();
+      }
+    }
+
     public override void Update(float deltaSeconds)
     {
       base.Update(deltaSeconds);
 
-      CurrentTime += deltaSeconds;
-      if(CurrentTime >= SecondsUntilDestruction)
+      if(IsRunning)
       {
-        Global.Game.RemoveGameObject(Owner);
+        CurrentTime += TimeSpan.FromSeconds(deltaSeconds);
+        if(CurrentTime >= DestructionDelay)
+        {
+          Pause();
+          Global.Game.RemoveGameObject(Owner);
+        }
       }
     }
   }

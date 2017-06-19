@@ -452,7 +452,7 @@ namespace Owlicity
 
             var confetti = CreateKnown(GameObjectType.DeathConfetti);
             confetti.Spatial.CopyFrom(go.Spatial);
-            confetti.GetComponent<AutoDestructComponent>().SecondsUntilDestruction = 1.0f;
+            confetti.GetComponent<AutoDestructComponent>().DestructionDelay = TimeSpan.FromSeconds(1.0f);
             Global.Game.AddGameObject(confetti);
           };
 
@@ -545,7 +545,7 @@ namespace Owlicity
 
             var confetti = CreateKnown(GameObjectType.DeathConfetti);
             confetti.Spatial.CopyFrom(go.Spatial);
-            confetti.GetComponent<AutoDestructComponent>().SecondsUntilDestruction = 5.0f;
+            confetti.GetComponent<AutoDestructComponent>().DestructionDelay = TimeSpan.FromSeconds(5.0f);
             ParticleEmitterComponent deathEmitter = confetti.GetComponent<ParticleEmitterComponent>();
             deathEmitter.NumParticles = 4096;
             deathEmitter.BeforePostInitialize += () =>
@@ -576,7 +576,7 @@ namespace Owlicity
         {
           var adc = new AutoDestructComponent(go)
           {
-            SecondsUntilDestruction = 1.0f,
+            DestructionDelay = TimeSpan.FromSeconds(1.0f),
           };
 
           var pec = new ParticleEmitterComponent(go)
@@ -599,7 +599,7 @@ namespace Owlicity
 
           pec.BeforePostInitialize += delegate ()
           {
-            pec.Emitter.MaxTTL = 0.8f * adc.SecondsUntilDestruction;
+            pec.Emitter.MaxTTL = 0.8f * (float)adc.DestructionDelay.TotalSeconds;
             pec.Emitter.MaxParticleSpread = 0.05f;
             pec.Emitter.MaxParticleSpeed = 5f;
             pec.Emit(go.GetWorldSpatialData().Position);
@@ -637,7 +637,7 @@ namespace Owlicity
               var confetti = CreateKnown(GameObjectType.DeathConfetti);
               confetti.Spatial.CopyFrom(go.Spatial);
 
-              confetti.GetComponent<AutoDestructComponent>().SecondsUntilDestruction = 0.25f;
+              confetti.GetComponent<AutoDestructComponent>().DestructionDelay = TimeSpan.FromSeconds(0.25f);
 
               var confettiPec = confetti.GetComponent<ParticleEmitterComponent>();
               confettiPec.NumParticles = 16;

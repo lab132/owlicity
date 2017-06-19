@@ -409,12 +409,26 @@ namespace Owlicity
           Global.HandleDefaultHit(hitBody, MyBody.Position, damage, force);
         }
 
+        bool throwProjectiles = false;
+        if(throwProjectiles)
         {
           float sign = CurrentState.FacingDirection == OwliverFacingDirection.Left ? -1.0f : 1.0f;
           GameObject projectile = GameObjectFactory.CreateKnown(GameObjectType.Projectile);
           projectile.Spatial.CopyFrom(new SpatialData { Position = WeaponAABB.Center });
           projectile.Spatial.Position.X += sign * 0.1f;
-          projectile.GetComponent<AutoDestructComponent>().SecondsUntilDestruction = 2.0f;
+          projectile.GetComponent<AutoDestructComponent>().DestructionDelay = TimeSpan.FromSeconds(2.0f);
+
+#if false
+          var chc = new ChaserComponent(projectile)
+          {
+            Target = Global.Game.GameObjects.Where(go => go.GetComponent<TanktonComponent>() != null).FirstOrDefault(),
+            MovementType = ChaserMovementType.Linear,
+            TargetRange = 10.0f,
+            Speed = 0.05f,
+          };
+          chc.AttachTo(projectile);
+#endif
+
           var bc = projectile.GetComponent<BodyComponent>();
           bc.BeforePostInitialize += () =>
           {

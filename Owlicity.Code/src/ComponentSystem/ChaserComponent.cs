@@ -14,9 +14,8 @@ namespace Owlicity
   public enum ChaserMovementType
   {
     Constant,
+    Linear,
     SmoothProximity, // TODO(manu): Better name for this?
-
-    // TODO(manu): "Linear" that linearly speeds up the chase over time.
   }
 
   // Note(manu): To disable chasing, just set Target to null.
@@ -169,6 +168,20 @@ namespace Owlicity
                 Vector2 deltaPosition = velocity * deltaSeconds;
                 Vector2 newPosition = worldSpatial.Position + deltaPosition;
                 Spatial.SetWorldPosition(newPosition);
+              }
+            }
+            break;
+
+            case ChaserMovementType.Linear:
+            {
+              Vector2 impulse = targetDir * Speed;
+              if(body != null)
+              {
+                body.ApplyLinearImpulse(impulse);
+              }
+              else
+              {
+                throw new NotImplementedException();
               }
             }
             break;
