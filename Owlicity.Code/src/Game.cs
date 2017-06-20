@@ -342,8 +342,6 @@ namespace Owlicity
         }
       }
 
-      CurrentLevel.LoadContent();
-
       {
         Owliver = GameObjectFactory.CreateKnown(GameObjectType.Owliver);
         Owliver.Spatial.Position += Global.ToMeters(450, 600);
@@ -351,6 +349,8 @@ namespace Owlicity
 
         CurrentLevel.CullingCenter = Owliver;
       }
+
+      CurrentLevel.LoadContent();
 
       {
         ActiveCamera = GameObjectFactory.CreateKnown(GameObjectType.Camera);
@@ -361,6 +361,12 @@ namespace Owlicity
         Window.ClientSizeChanged += (o, e) =>
         {
           cc.OnGraphicsDeviceReset(GraphicsDevice);
+        };
+
+        var spc = ActiveCamera.GetComponent<SpringArmComponent>();
+        spc.BeforeInitialize += () =>
+        {
+          spc.Target = Owliver;
         };
 
         AddGameObject(ActiveCamera);
@@ -511,7 +517,7 @@ namespace Owlicity
           cc.VisibilityBounds = null;
         }
 
-        var chc = ActiveCamera.GetComponent<ChaserComponent>();
+        var chc = ActiveCamera.GetComponent<HomingComponent>();
         if(chc.Target == null)
         {
           chc.Target = Owliver;
@@ -528,7 +534,7 @@ namespace Owlicity
       }
 #endif
 
-        {
+      {
         var mc = Owliver.GetComponent<MovementComponent>();
         mc.MovementVector = Input.CharacterMovement;
 

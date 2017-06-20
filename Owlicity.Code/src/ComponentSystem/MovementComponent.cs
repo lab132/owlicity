@@ -61,7 +61,7 @@ namespace Owlicity
         Body body = MyBody;
         if(body != null)
         {
-          Vector2 impulse = movementVector;
+          Vector2 impulse = body.Mass * movementVector;
           body.ApplyLinearImpulse(ref impulse);
           body.LinearVelocity = body.LinearVelocity.GetClampedTo(MaxMovementSpeed);
         }

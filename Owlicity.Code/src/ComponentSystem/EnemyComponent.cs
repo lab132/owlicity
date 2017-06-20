@@ -29,7 +29,7 @@ namespace Owlicity
     //
     // Optional components
     //
-    public ChaserComponent Chaser;
+    public HomingComponent Chaser;
 
     public Body MyBody => BodyComponent.Body;
 
@@ -49,7 +49,7 @@ namespace Owlicity
 
       if(Chaser == null)
       {
-        Chaser = Owner.GetComponent<ChaserComponent>();
+        Chaser = Owner.GetComponent<HomingComponent>();
       }
 
       if(Health == null)

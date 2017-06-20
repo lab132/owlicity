@@ -418,22 +418,25 @@ namespace Owlicity
           projectile.Spatial.Position.X += sign * 0.1f;
           projectile.GetComponent<AutoDestructComponent>().DestructionDelay = TimeSpan.FromSeconds(2.0f);
 
+          Vector2 velocity = sign * new Vector2(8.0f, 0.0f);
+
 #if false
-          var chc = new ChaserComponent(projectile)
+          var hoc = new HomingComponent(projectile)
           {
             Target = Global.Game.GameObjects.Where(go => go.GetComponent<TanktonComponent>() != null).FirstOrDefault(),
-            MovementType = ChaserMovementType.Linear,
-            TargetRange = 10.0f,
-            Speed = 0.05f,
+            HomingType = HomingType.ConstantAcceleration,
+            TargetRange = 1.0f,
+            Speed = velocity.Length() * 10,
           };
-          chc.AttachTo(projectile);
+          hoc.AttachTo(projectile);
 #endif
 
           var bc = projectile.GetComponent<BodyComponent>();
           bc.BeforePostInitialize += () =>
           {
-            bc.Body.CollidesWith = ~Global.OwliverCollisionCategory;
-            bc.Body.LinearVelocity = sign * new Vector2(10.0f, 0.0f);
+            bc.Body.CollidesWith = ~(Global.OwliverCollisionCategory | Global.OwliverWeaponCollisionCategory);
+            Vector2 impulse = bc.Body.Mass * velocity;
+            bc.Body.ApplyLinearImpulse(ref impulse);
           };
           Global.Game.AddGameObject(projectile);
         }

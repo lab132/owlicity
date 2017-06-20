@@ -207,24 +207,19 @@ namespace Owlicity
       {
         case GameObjectType.Camera:
         {
-          var chc = new ChaserComponent(go)
+          var spc = new SpringArmComponent(go)
           {
-            AutoTargetOwliver = true,
             TargetInnerRange = 0.2f,
             TargetRange = float.MaxValue,
-            OutOfReachResponse = ChaserOutOfReachResponse.SnapToTargetAtMaximumRange,
-            MovementType = ChaserMovementType.SmoothProximity,
 
-            Speed = 5,
+            SpeedFactor = 5,
 
             DebugDrawingEnabled = false,
           };
-          go.RootComponent = chc;
+          go.RootComponent = spc;
 
-          var cc = new CameraComponent(go)
-          {
-          };
-          cc.AttachTo(chc);
+          var cc = new CameraComponent(go);
+          cc.AttachTo(spc);
 
 #if DEBUG
           var mc = new MovementComponent(go)
@@ -270,6 +265,7 @@ namespace Owlicity
             bc.Body.CollisionCategories = Global.OwliverCollisionCategory;
             bc.Body.CollidesWith = Global.LevelCollisionCategory | Global.EnemyCollisionCategory;
             bc.Body.SleepingAllowed = false;
+            bc.Body.LinearDamping = 15.0f;
           };
           go.RootComponent = bc;
 
@@ -280,11 +276,7 @@ namespace Owlicity
           var mc = new MovementComponent(go)
           {
             ManualInputProcessing = true,
-            MaxMovementSpeed = 2.0f,
-          };
-
-          var abp = new AutoBrakeComponent(go)
-          {
+            MaxMovementSpeed = 2.5f,
           };
 
           var sa = new SpriteAnimationComponent(go)
@@ -414,13 +406,10 @@ namespace Owlicity
               userData: bc);
 
             bc.Body.FixedRotation = true;
+            bc.Body.LinearDamping = 5.0f;
           };
 
           go.RootComponent = bc;
-
-          var abp = new AutoBrakeComponent(go)
-          {
-          };
 
           var sa = new SpriteAnimationComponent(go)
           {
@@ -467,16 +456,18 @@ namespace Owlicity
 
           CreateOnHitBlinkingSequence(go, hc).SetDefaultCurves(ec.HitDuration);
 
-          var chc = new ChaserComponent(go)
+          var hoc = new HomingComponent(go)
           {
-            AutoTargetOwliver = true,
-            TargetRange = 2.0f,
-
+            TargetRange = 3.0f,
             Speed = 0.5f,
 
             DebugDrawingEnabled = true,
           };
-          chc.AttachTo(bc);
+          hoc.BeforeInitialize += () =>
+          {
+            hoc.Target = Global.Game.Owliver;
+          };
+          hoc.AttachTo(bc);
         }
         break;
 
@@ -508,17 +499,9 @@ namespace Owlicity
               density: 2 * Global.OwliverDensity,
               segments: 0);
             bc.Body.FixedRotation = true;
+            bc.Body.LinearDamping = 20.0f;
           };
           go.RootComponent = bc;
-
-          var mc = new MovementComponent(go)
-          {
-            ManualInputProcessing = true,
-          };
-
-          var abp = new AutoBrakeComponent(go)
-          {
-          };
 
           var sa = new SpriteAnimationComponent(go)
           {
@@ -864,15 +847,18 @@ namespace Owlicity
 
           var puc = new PickupComponent(go);
 
-          var chc = new ChaserComponent(go)
+          var hoc = new HomingComponent(go)
           {
-            AutoTargetOwliver = true,
             TargetRange = 1.0f,
             Speed = 3.0f,
 
             DebugDrawingEnabled = true,
           };
-          chc.AttachTo(bc);
+          hoc.BeforeInitialize += () =>
+          {
+            hoc.Target = Global.Game.Owliver;
+          };
+          hoc.AttachTo(bc);
         }
         break;
 
@@ -912,15 +898,18 @@ namespace Owlicity
 
           var puc = new PickupComponent(go);
 
-          var chc = new ChaserComponent(go)
+          var hoc = new HomingComponent(go)
           {
-            AutoTargetOwliver = true,
             TargetRange = 1.0f,
             Speed = 3.0f,
 
             DebugDrawingEnabled = true,
           };
-          chc.AttachTo(bc);
+          hoc.BeforeInitialize += () =>
+          {
+            hoc.Target = Global.Game.Owliver;
+          };
+          hoc.AttachTo(bc);
         }
         break;
 

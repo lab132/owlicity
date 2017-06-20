@@ -44,7 +44,7 @@
     <Compile Include="src\ComponentSystem\AutoDestructComponent.cs" />
     <Compile Include="src\ComponentSystem\BlinkingSequenceComponent.cs" />
     <Compile Include="src\ComponentSystem\BodyComponent.cs" />
-    <Compile Include="src\ComponentSystem\AutoBrakeComponent.cs" />
+    <Compile Include="src\ComponentSystem\SpringArmComponent.cs" />
     <Compile Include="src\ComponentSystem\GateComponent.cs" />
     <Compile Include="src\ComponentSystem\HealthDisplayComponent.cs" />
     <Compile Include="src\ComponentSystem\MoneyBagComponent.cs" />
@@ -57,7 +57,7 @@
     <Compile Include="src\ComponentSystem\OwliverComponent.cs" />
     <Compile Include="src\ComponentSystem\ParticleEmitterComponent.cs" />
     <Compile Include="src\ComponentSystem\PickupComponent.cs" />
-    <Compile Include="src\ComponentSystem\ChaserComponent.cs" />
+    <Compile Include="src\ComponentSystem\HomingComponent.cs" />
     <Compile Include="src\ComponentSystem\ShopItemComponent.cs" />
     <Compile Include="src\ComponentSystem\SpriteAnimationComponent.cs" />
     <Compile Include="src\ComponentSystem\SpriteComponent.cs" />

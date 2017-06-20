@@ -45,8 +45,9 @@ namespace Owlicity
       foreach(ScreenLayoutInfo layout in layoutInfos)
       {
         var deco = GameObjectFactory.CreateKnown(layout.ObjectType);
-        SpriteAnimationComponent sa = deco.GetComponent<SpriteAnimationComponent>();
+
 #if false
+        SpriteAnimationComponent sa = deco.GetComponent<SpriteAnimationComponent>();
         // Choose random initial frame
         sa.OnPostInitialize += delegate ()
         {
