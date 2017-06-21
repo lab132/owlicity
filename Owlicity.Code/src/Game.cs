@@ -408,7 +408,7 @@ namespace Owlicity
       }
 
       {
-        var testShop = GameObjectFactory.CreateKnown(KnownGameObject.Shop);
+        var testShop = new Shop();
         testShop.Spatial.Position += Conversion.ToMeters(1300, 500);
         AddGameObject(testShop);
 

@@ -44,12 +44,6 @@ namespace Owlicity
       GameObject go = new GameObject();
       switch(type)
       {
-        case KnownGameObject.Camera:
-        {
-          go = new CameraObject();
-        }
-        break;
-
         case KnownGameObject.Owliver:
         {
           go = new Owliver();
@@ -58,53 +52,7 @@ namespace Owlicity
 
         case KnownGameObject.Shop:
         {
-          var bc = new BodyComponent(go)
-          {
-            InitMode = BodyComponentInitMode.Manual,
-          };
-          bc.BeforePostInitialize += () =>
-          {
-            SpatialData s = go.GetWorldSpatialData();
-            bc.Body = BodyFactory.CreateBody(
-              world: Global.Game.World,
-              position: s.Position,
-              rotation: s.Rotation.Radians,
-              userData: bc);
-            FixtureFactory.AttachRectangle(
-              body: bc.Body,
-              offset: Conversion.ToMeters(0, -50),
-              width: Conversion.ToMeters(330),
-              height: Conversion.ToMeters(100),
-              density: Global.OwliverDensity,
-              userData: bc);
-            FixtureFactory.AttachRectangle(
-              body: bc.Body,
-              offset: Conversion.ToMeters(0, -160),
-              width: Conversion.ToMeters(280),
-              height: Conversion.ToMeters(150),
-              density: Global.OwliverDensity,
-              userData: bc);
-          };
-          go.RootComponent = bc;
-
-          var sacShop = new SpriteAnimationComponent(go)
-          {
-            AnimationTypes = new List<SpriteAnimationType>
-            {
-              SpriteAnimationType.Shop,
-            },
-          };
-          sacShop.AttachTo(bc);
-
-          var sacShopkeeper = new SpriteAnimationComponent(go)
-          {
-            AnimationTypes = new List<SpriteAnimationType>
-            {
-              SpriteAnimationType.Shopkeeper_Idle_Front,
-            },
-          };
-          sacShopkeeper.Spatial.Position.Y -= Conversion.ToMeters(100);
-          sacShopkeeper.AttachTo(sacShop);
+          go = new Shop();
         }
         break;
 

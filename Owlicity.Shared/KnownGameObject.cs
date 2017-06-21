@@ -10,9 +10,6 @@ namespace Owlicity
   {
     Unknown,
 
-    // Misc
-    Camera,
-
     // Characters
     Owliver,
 
