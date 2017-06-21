@@ -5,11 +5,6 @@ using System.Linq;
 
 namespace Owlicity
 {
-  public struct ScreenLayoutInfo
-  {
-    public Vector2 OffsetInMeters;
-    public GameObjectType ObjectType;
-  }
 
   public class Screen
   {
@@ -28,7 +23,7 @@ namespace Owlicity
       // Screen game object
       //
       {
-        var go = GameObjectFactory.CreateKnown(GameObjectType.BackgroundScreen);
+        var go = GameObjectFactory.CreateKnown(KnownGameObject.BackgroundScreen);
         go.Spatial.Position += WorldPosition;
 
         var bc = go.Components.OfType<BodyComponent>().Single();

@@ -75,7 +75,7 @@ namespace Owlicity
           ActiveAnimation.State.CurrentFrameIndex = oldState.CurrentFrameIndex;
         }
 
-        Spatial.LocalAABB = Global.ToMeters(ActiveAnimation.CalcAABB());
+        Spatial.LocalAABB = Conversion.ToMeters(ActiveAnimation.CalcAABB());
 
         result = true;
       }

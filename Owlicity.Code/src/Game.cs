@@ -187,7 +187,7 @@ namespace Owlicity
     public static readonly Point FullHD = new Point(1920, 1080);
     public static readonly Point DebugResolution = (0.8f * FullHD.ToVector2()).ToPoint();
 
-    public Renderer WorldRenderer = new Renderer { BaseDepth = -1, BaseScale = Global.RenderScale, };
+    public Renderer WorldRenderer = new Renderer { BaseDepth = -1, BaseScale = Conversion.RenderScale, };
     public Renderer UIRenderer = new Renderer { BaseDepth = 0, BaseScale = 1.0f, };
 
     public GameObject ActiveCamera;
@@ -343,8 +343,8 @@ namespace Owlicity
       }
 
       {
-        Owliver = GameObjectFactory.CreateKnown(GameObjectType.Owliver);
-        Owliver.Spatial.Position += Global.ToMeters(450, 600);
+        Owliver = GameObjectFactory.CreateKnown(KnownGameObject.Owliver);
+        Owliver.Spatial.Position += Conversion.ToMeters(450, 600);
         AddGameObject(Owliver);
 
         CurrentLevel.CullingCenter = Owliver;
@@ -353,7 +353,7 @@ namespace Owlicity
       CurrentLevel.LoadContent();
 
       {
-        ActiveCamera = GameObjectFactory.CreateKnown(GameObjectType.Camera);
+        ActiveCamera = GameObjectFactory.CreateKnown(KnownGameObject.Camera);
 
         var cc = ActiveCamera.GetComponent<CameraComponent>();
         cc.VisibilityBounds = CurrentLevel.LevelBounds;
@@ -374,14 +374,14 @@ namespace Owlicity
 
 #if true
       {
-        var testSlurp = GameObjectFactory.CreateKnown(GameObjectType.Slurp);
-        testSlurp.Spatial.Position += Global.ToMeters(300, 250);
+        var testSlurp = GameObjectFactory.CreateKnown(KnownGameObject.Slurp);
+        testSlurp.Spatial.Position += Conversion.ToMeters(300, 250);
         AddGameObject(testSlurp);
       }
 
       {
-        var testTankton = GameObjectFactory.CreateKnown(GameObjectType.Tankton);
-        testTankton.Spatial.Position += Global.ToMeters(900, 350);
+        var testTankton = GameObjectFactory.CreateKnown(KnownGameObject.Tankton);
+        testTankton.Spatial.Position += Conversion.ToMeters(900, 350);
         AddGameObject(testTankton);
       }
 
@@ -389,47 +389,47 @@ namespace Owlicity
         Random rand = new Random();
 
         Global.SpawnGameObjectsInRingFormation(
-          center: Global.ToMeters(2400, 500),
+          center: Conversion.ToMeters(2400, 500),
           radius: 2.5f,
           numToSpawn: 15,
           rand: rand,
-          types: new[] { GameObjectType.Bonbon_Gold, GameObjectType.Bonbon_Red });
+          types: new[] { KnownGameObject.Bonbon_Gold, KnownGameObject.Bonbon_Red });
 
         Global.SpawnGameObjectsInRingFormation(
-          center: Global.ToMeters(2400, 500),
+          center: Conversion.ToMeters(2400, 500),
           radius: 1.0f,
           numToSpawn: 5,
           rand: rand,
-          types: new[] { GameObjectType.Bonbon_Gold, GameObjectType.Bonbon_Red });
+          types: new[] { KnownGameObject.Bonbon_Gold, KnownGameObject.Bonbon_Red });
       }
 
       {
-        var testKey = GameObjectFactory.CreateKnown(GameObjectType.Key_Gold);
-        testKey.Spatial.Position += Global.ToMeters(700, 720);
+        var testKey = GameObjectFactory.CreateKnown(KnownGameObject.Key_Gold);
+        testKey.Spatial.Position += Conversion.ToMeters(700, 720);
         AddGameObject(testKey);
       }
 
       {
-        var testGate = GameObjectFactory.CreateKnown(GameObjectType.Gate);
-        testGate.Spatial.Position += Global.ToMeters(2300, 1100);
+        var testGate = GameObjectFactory.CreateKnown(KnownGameObject.Gate);
+        testGate.Spatial.Position += Conversion.ToMeters(2300, 1100);
         AddGameObject(testGate);
       }
 
       {
-        var testShop = GameObjectFactory.CreateKnown(GameObjectType.Shop);
-        testShop.Spatial.Position += Global.ToMeters(1300, 500);
+        var testShop = GameObjectFactory.CreateKnown(KnownGameObject.Shop);
+        testShop.Spatial.Position += Conversion.ToMeters(1300, 500);
         AddGameObject(testShop);
 
-        var testFruitBowl = GameObjectFactory.CreateKnown(GameObjectType.ShopItem_FruitBowl);
+        var testFruitBowl = GameObjectFactory.CreateKnown(KnownGameObject.ShopItem_FruitBowl);
         testFruitBowl.GetComponent<ShopItemComponent>().Price = ShopItemPriceType._20;
         testFruitBowl.AttachTo(testShop);
-        testFruitBowl.Spatial.Position += Global.ToMeters(-110.0f, -90.0f);
+        testFruitBowl.Spatial.Position += Conversion.ToMeters(-110.0f, -90.0f);
         AddGameObject(testFruitBowl);
 
-        var testRod = GameObjectFactory.CreateKnown(GameObjectType.ShopItem_FishingRod);
+        var testRod = GameObjectFactory.CreateKnown(KnownGameObject.ShopItem_FishingRod);
         testRod.GetComponent<ShopItemComponent>().Price = ShopItemPriceType._100;
         testRod.AttachTo(testShop);
-        testRod.Spatial.Position += Global.ToMeters(128.0f, -80.0f);
+        testRod.Spatial.Position += Conversion.ToMeters(128.0f, -80.0f);
         AddGameObject(testRod);
       }
 #endif
@@ -583,7 +583,7 @@ namespace Owlicity
           aabb.Combine(ref other);
         }
 
-        DebugDrawCommands.Add(view => view.DrawPoint(aabb.Center, Global.ToMeters(3), Color.MonoGameOrange));
+        DebugDrawCommands.Add(view => view.DrawPoint(aabb.Center, Conversion.ToMeters(3), Color.MonoGameOrange));
         DebugDrawCommands.Add(view => view.DrawAABB(ref aabb, Color.Lime));
       }
 

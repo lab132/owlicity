@@ -63,15 +63,13 @@
     <Compile Include="src\ComponentSystem\SpriteComponent.cs" />
     <Compile Include="src\ComponentSystem\SquashComponent.cs" />
     <Compile Include="src\ComponentSystem\TanktonComponent.cs" />
-    <Compile Include="src\Conversion.cs" />
-    <Compile Include="src\Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Game.cs" />
     <Compile Include="src\ComponentSystem\GameObject.cs" />
     <Compile Include="src\Global.cs" />
     <Compile Include="src\Input.cs" />
     <Compile Include="src\Level.cs" />
-    <Compile Include="src\Math.cs" />
+    <Compile Include="src\Spatial.cs" />
     <Compile Include="src\Particle.cs" />
     <Compile Include="src\ParticleEmitter.cs" />
     <Compile Include="src\Performance.cs" />
@@ -82,6 +80,10 @@
     <Compile Include="src\World.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Owlicity.Shared\Owlicity.Shared.csproj">
+      <Project>{b2ae595e-7cac-4889-9084-63ad1b05fd62}</Project>
+      <Name>Owlicity.Shared</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VelcroPhysics\DebugViews\MonoGame\MonoGame.csproj">
       <Project>{7a712520-a665-4ed7-a2b0-9c3e9705ecf8}</Project>
       <Name>MonoGame</Name>

@@ -49,9 +49,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Owlicity.Code\Owlicity.Code.csproj">
-      <Project>{d33c2a57-2cc3-4af4-8b8e-cf530ac5f288}</Project>
-      <Name>Owlicity.Code</Name>
+    <ProjectReference Include="..\Owlicity.Shared\Owlicity.Shared.csproj">
+      <Project>{b2ae595e-7cac-4889-9084-63ad1b05fd62}</Project>
+      <Name>Owlicity.Shared</Name>
     </ProjectReference>
     <ProjectReference Include="..\VelcroPhysics\VelcroPhysics\VelcroPhysics.MonoGame.csproj">
       <Project>{3394f375-947a-4358-aa68-b6cf6743740e}</Project>

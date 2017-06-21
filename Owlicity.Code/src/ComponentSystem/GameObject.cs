@@ -118,55 +118,6 @@ namespace Owlicity
     }
   }
 
-  public enum GameObjectType
-  {
-    Unknown,
-
-    // Misc
-    Camera,
-
-    // Characters
-    Owliver,
-
-    Shop,
-
-    // Mobs
-    Slurp,
-
-    // Bosses
-    Tankton,
-
-    // Particles
-    DeathConfetti,
-
-    Projectile,
-
-    // Static stuff
-    BackgroundScreen,
-    Gate,
-    Tree_Fir,
-    Tree_FirAlt, // is "upside down"
-    Tree_Conifer,
-    Tree_ConiferAlt, // is "upside down"
-    Tree_Oak,
-    Tree_Orange,
-    Bush,
-
-    // Pickups
-    Bonbon_Gold,
-    Bonbon_Red,
-    Key_Gold,
-
-    ShopItem_FruitBowl,
-    ShopItem_FishingRod,
-    ShopItem_Stick,
-
-    // Random groups
-    Random_FirTree,
-    Random_FirTreeAlt,
-    Random_OakTree,
-  }
-
   public static class GameObjectFactory
   {
     private static Random _random;
@@ -175,7 +126,7 @@ namespace Owlicity
     public static void Initialize()
     {
       _random = new Random();
-      _knownCreationCount = new int[Enum.GetNames(typeof(GameObjectType)).Length];
+      _knownCreationCount = new int[Enum.GetNames(typeof(KnownGameObject)).Length];
     }
 
     public static SquashComponent CreateOnHitSquasher(GameObject go, HealthComponent health)
@@ -200,12 +151,12 @@ namespace Owlicity
       return result;
     }
 
-    public static GameObject CreateKnown(GameObjectType type)
+    public static GameObject CreateKnown(KnownGameObject type)
     {
       GameObject go = new GameObject();
       switch(type)
       {
-        case GameObjectType.Camera:
+        case KnownGameObject.Camera:
         {
           var spc = new SpringArmComponent(go)
           {
@@ -230,7 +181,7 @@ namespace Owlicity
         }
         break;
 
-        case GameObjectType.Owliver:
+        case KnownGameObject.Owliver:
         {
           var bc = new BodyComponent(go)
           {
@@ -246,19 +197,19 @@ namespace Owlicity
               bodyType: BodyType.Dynamic,
               userdata: bc);
 
-            float radius = Global.ToMeters(60) * Global.OwliverScale.X;
+            float radius = Conversion.ToMeters(60) * Global.OwliverScale.X;
             float density = Global.OwliverDensity;
             FixtureFactory.AttachCircle(
               radius: radius,
               density: density,
               body: bc.Body,
-              offset: Global.ToMeters(0, -60) * Global.OwliverScale,
+              offset: Conversion.ToMeters(0, -60) * Global.OwliverScale,
               userData: bc);
             FixtureFactory.AttachCircle(
               radius: radius,
               density: density,
               body: bc.Body,
-              offset: Global.ToMeters(0, -130) * Global.OwliverScale,
+              offset: Conversion.ToMeters(0, -130) * Global.OwliverScale,
               userData: bc);
 
             bc.Body.FixedRotation = true;
@@ -321,7 +272,7 @@ namespace Owlicity
         }
         break;
 
-        case GameObjectType.Shop:
+        case KnownGameObject.Shop:
         {
           var bc = new BodyComponent(go)
           {
@@ -337,16 +288,16 @@ namespace Owlicity
               userData: bc);
             FixtureFactory.AttachRectangle(
               body: bc.Body,
-              offset: Global.ToMeters(0, -50),
-              width: Global.ToMeters(330),
-              height: Global.ToMeters(100),
+              offset: Conversion.ToMeters(0, -50),
+              width: Conversion.ToMeters(330),
+              height: Conversion.ToMeters(100),
               density: Global.OwliverDensity,
               userData: bc);
             FixtureFactory.AttachRectangle(
               body: bc.Body,
-              offset: Global.ToMeters(0, -160),
-              width: Global.ToMeters(280),
-              height: Global.ToMeters(150),
+              offset: Conversion.ToMeters(0, -160),
+              width: Conversion.ToMeters(280),
+              height: Conversion.ToMeters(150),
               density: Global.OwliverDensity,
               userData: bc);
           };
@@ -368,12 +319,12 @@ namespace Owlicity
               SpriteAnimationType.Shopkeeper_Idle_Front,
             },
           };
-          sacShopkeeper.Spatial.Position.Y -= Global.ToMeters(100);
+          sacShopkeeper.Spatial.Position.Y -= Conversion.ToMeters(100);
           sacShopkeeper.AttachTo(sacShop);
         }
         break;
 
-        case GameObjectType.Slurp:
+        case KnownGameObject.Slurp:
         {
           var bc = new BodyComponent(go)
           {
@@ -390,19 +341,19 @@ namespace Owlicity
               bodyType: BodyType.Dynamic,
               userdata: bc);
 
-            float radius = Global.ToMeters(80 * Global.SlurpScale.X);
+            float radius = Conversion.ToMeters(80 * Global.SlurpScale.X);
             float density = Global.OwliverDensity;
             FixtureFactory.AttachCircle(
               radius: radius,
               density: density,
               body: bc.Body,
-              offset: Global.ToMeters(0, -25) * Global.SlurpScale,
+              offset: Conversion.ToMeters(0, -25) * Global.SlurpScale,
               userData: bc);
             FixtureFactory.AttachCircle(
               radius: radius,
               density: density,
               body: bc.Body,
-              offset: Global.ToMeters(0, 25) * Global.SlurpScale,
+              offset: Conversion.ToMeters(0, 25) * Global.SlurpScale,
               userData: bc);
 
             bc.Body.FixedRotation = true;
@@ -439,7 +390,7 @@ namespace Owlicity
           {
             Global.Game.RemoveGameObject(go);
 
-            var confetti = CreateKnown(GameObjectType.DeathConfetti);
+            var confetti = CreateKnown(KnownGameObject.DeathConfetti);
             confetti.Spatial.CopyFrom(go.Spatial);
             confetti.GetComponent<AutoDestructComponent>().DestructionDelay = TimeSpan.FromSeconds(1.0f);
             Global.Game.AddGameObject(confetti);
@@ -471,7 +422,7 @@ namespace Owlicity
         }
         break;
 
-        case GameObjectType.Tankton:
+        case KnownGameObject.Tankton:
         {
           var tankton = new TanktonComponent(go)
           {
@@ -485,7 +436,7 @@ namespace Owlicity
           bc.BeforeInitialize += () =>
           {
             SpatialData s = go.GetWorldSpatialData();
-            Vector2 dim = Global.ToMeters(350, 400) * Global.TanktonScale;
+            Vector2 dim = Conversion.ToMeters(350, 400) * Global.TanktonScale;
             bc.Body = BodyFactory.CreateRoundedRectangle(
               world: Global.Game.World,
               position: s.Position,
@@ -511,7 +462,7 @@ namespace Owlicity
               SpriteAnimationType.Tankton_Idle_Right,
             },
           };
-          sa.Spatial.Position.Y += Global.ToMeters(100);
+          sa.Spatial.Position.Y += Conversion.ToMeters(100);
           sa.AttachTo(bc);
 
           var hc = new HealthComponent(go)
@@ -526,7 +477,7 @@ namespace Owlicity
           {
             Global.Game.RemoveGameObject(go);
 
-            var confetti = CreateKnown(GameObjectType.DeathConfetti);
+            var confetti = CreateKnown(KnownGameObject.DeathConfetti);
             confetti.Spatial.CopyFrom(go.Spatial);
             confetti.GetComponent<AutoDestructComponent>().DestructionDelay = TimeSpan.FromSeconds(5.0f);
             ParticleEmitterComponent deathEmitter = confetti.GetComponent<ParticleEmitterComponent>();
@@ -555,7 +506,7 @@ namespace Owlicity
         }
         break;
 
-        case GameObjectType.DeathConfetti:
+        case KnownGameObject.DeathConfetti:
         {
           var adc = new AutoDestructComponent(go)
           {
@@ -590,7 +541,7 @@ namespace Owlicity
         }
         break;
 
-        case GameObjectType.Projectile:
+        case KnownGameObject.Projectile:
         {
           var bc = new BodyComponent(go)
           {
@@ -601,8 +552,8 @@ namespace Owlicity
             SpatialData s = go.GetWorldSpatialData();
             bc.Body = BodyFactory.CreateCapsule(
               world: Global.Game.World,
-              endRadius: Global.ToMeters(9),
-              height: Global.ToMeters(50),
+              endRadius: Conversion.ToMeters(9),
+              height: Conversion.ToMeters(50),
               userData: bc,
               position: s.Position,
               rotation: s.Rotation.Radians + new Angle { Degrees = 90.0f + new Random().NextBilateralFloat() * 2 }.Radians,
@@ -617,7 +568,7 @@ namespace Owlicity
 
               Global.Game.RemoveGameObject(go);
 
-              var confetti = CreateKnown(GameObjectType.DeathConfetti);
+              var confetti = CreateKnown(KnownGameObject.DeathConfetti);
               confetti.Spatial.CopyFrom(go.Spatial);
 
               confetti.GetComponent<AutoDestructComponent>().DestructionDelay = TimeSpan.FromSeconds(0.25f);
@@ -649,7 +600,7 @@ namespace Owlicity
         }
         break;
 
-        case GameObjectType.BackgroundScreen:
+        case KnownGameObject.BackgroundScreen:
         {
           go.Layer = GameLayer.Background;
 
@@ -673,23 +624,23 @@ namespace Owlicity
         }
         break;
 
-        case GameObjectType.Gate:
+        case KnownGameObject.Gate:
         {
-          float outerLeft = Global.ToMeters(310);
-          float innerLeft = Global.ToMeters(79);
-          float inner = Global.ToMeters(80);
-          float innerRight = Global.ToMeters(79);
-          float outerRight = Global.ToMeters(222);
-          float width = Global.ToMeters(768);
-          float height = Global.ToMeters(128);
-          float barrierHeight = Global.ToMeters(20);
+          float outerLeft = Conversion.ToMeters(310);
+          float innerLeft = Conversion.ToMeters(79);
+          float inner = Conversion.ToMeters(80);
+          float innerRight = Conversion.ToMeters(79);
+          float outerRight = Conversion.ToMeters(222);
+          float width = Conversion.ToMeters(768);
+          float height = Conversion.ToMeters(128);
+          float barrierHeight = Conversion.ToMeters(20);
           float density = Global.OwliverDensity;
 
           var leftEdge = new SpatialComponent(go);
           {
             SpriteAnimationData anim = SpriteAnimationFactory.GetAnimation(SpriteAnimationType.Gate_Closed);
             Vector2 hotspot = anim.Config.Hotspot * anim.Config.Scale;
-            float offset = Global.ToMeters(hotspot.X - 128);
+            float offset = Conversion.ToMeters(hotspot.X - 128);
             leftEdge.Spatial.Position.X -= offset;
           }
           leftEdge.AttachTo(go);
@@ -727,7 +678,7 @@ namespace Owlicity
               bodyType: BodyType.Static,
               userData: bcOuter);
 
-            Vector2 offsetRight = Global.ToMeters(300, 0);
+            Vector2 offsetRight = Conversion.ToMeters(300, 0);
             FixtureFactory.AttachRectangle(
               body: bcOuter.Body,
               width: outerLeft,
@@ -757,32 +708,32 @@ namespace Owlicity
 
           var gac = new GateComponent(go)
           {
-            Dimensions = Global.ToMeters(60, 130),
+            Dimensions = Conversion.ToMeters(60, 130),
             UnlockableBlockade = bcInner,
           };
-          gac.Spatial.Position.Y -= Global.ToMeters((0.5f * 128) - 20);
+          gac.Spatial.Position.Y -= Conversion.ToMeters((0.5f * 128) - 20);
           gac.AttachTo(go);
         }
         break;
 
-        case GameObjectType.Tree_Fir:
-        case GameObjectType.Tree_FirAlt:
-        case GameObjectType.Tree_Conifer:
-        case GameObjectType.Tree_ConiferAlt:
-        case GameObjectType.Tree_Oak:
-        case GameObjectType.Tree_Orange:
-        case GameObjectType.Bush:
+        case KnownGameObject.Tree_Fir:
+        case KnownGameObject.Tree_FirAlt:
+        case KnownGameObject.Tree_Conifer:
+        case KnownGameObject.Tree_ConiferAlt:
+        case KnownGameObject.Tree_Oak:
+        case KnownGameObject.Tree_Orange:
+        case KnownGameObject.Bush:
         {
           List<SpriteAnimationType> animTypes = new List<SpriteAnimationType>();
           switch(type)
           {
-            case GameObjectType.Tree_Fir: animTypes.Add(SpriteAnimationType.Fir_Idle); break;
-            case GameObjectType.Tree_FirAlt: animTypes.Add(SpriteAnimationType.FirAlt_Idle); go.Layer = GameLayer.CloseToTheScreen; break;
-            case GameObjectType.Tree_Conifer: animTypes.Add(SpriteAnimationType.Conifer_Idle); break;
-            case GameObjectType.Tree_ConiferAlt: animTypes.Add(SpriteAnimationType.ConiferAlt_Idle); go.Layer = GameLayer.CloseToTheScreen; break;
-            case GameObjectType.Tree_Oak: animTypes.Add(SpriteAnimationType.Oak_Idle); break;
-            case GameObjectType.Tree_Orange: animTypes.Add(SpriteAnimationType.Orange_Idle); break;
-            case GameObjectType.Bush: animTypes.Add(SpriteAnimationType.Bush_Idle); break;
+            case KnownGameObject.Tree_Fir: animTypes.Add(SpriteAnimationType.Fir_Idle); break;
+            case KnownGameObject.Tree_FirAlt: animTypes.Add(SpriteAnimationType.FirAlt_Idle); go.Layer = GameLayer.CloseToTheScreen; break;
+            case KnownGameObject.Tree_Conifer: animTypes.Add(SpriteAnimationType.Conifer_Idle); break;
+            case KnownGameObject.Tree_ConiferAlt: animTypes.Add(SpriteAnimationType.ConiferAlt_Idle); go.Layer = GameLayer.CloseToTheScreen; break;
+            case KnownGameObject.Tree_Oak: animTypes.Add(SpriteAnimationType.Oak_Idle); break;
+            case KnownGameObject.Tree_Orange: animTypes.Add(SpriteAnimationType.Orange_Idle); break;
+            case KnownGameObject.Bush: animTypes.Add(SpriteAnimationType.Bush_Idle); break;
 
             default: throw new InvalidProgramException();
           }
@@ -800,14 +751,14 @@ namespace Owlicity
         }
         break;
 
-        case GameObjectType.Bonbon_Gold:
-        case GameObjectType.Bonbon_Red:
+        case KnownGameObject.Bonbon_Gold:
+        case KnownGameObject.Bonbon_Red:
         {
           SpriteAnimationType animType;
           switch(type)
           {
-            case GameObjectType.Bonbon_Gold: animType = SpriteAnimationType.Bonbon_Gold; break;
-            case GameObjectType.Bonbon_Red: animType = SpriteAnimationType.Bonbon_Red; break;
+            case KnownGameObject.Bonbon_Gold: animType = SpriteAnimationType.Bonbon_Gold; break;
+            case KnownGameObject.Bonbon_Red: animType = SpriteAnimationType.Bonbon_Red; break;
             default: throw new InvalidProgramException();
           }
 
@@ -862,7 +813,7 @@ namespace Owlicity
         }
         break;
 
-        case GameObjectType.Key_Gold:
+        case KnownGameObject.Key_Gold:
         {
           var bc = new BodyComponent(go)
           {
@@ -913,9 +864,9 @@ namespace Owlicity
         }
         break;
 
-        case GameObjectType.ShopItem_FruitBowl:
-        case GameObjectType.ShopItem_FishingRod:
-        case GameObjectType.ShopItem_Stick:
+        case KnownGameObject.ShopItem_FruitBowl:
+        case KnownGameObject.ShopItem_FishingRod:
+        case KnownGameObject.ShopItem_Stick:
         {
           var bc = new BodyComponent(go)
           {
@@ -932,9 +883,9 @@ namespace Owlicity
               userData: bc);
             FixtureFactory.AttachRectangle(
               body: bc.Body,
-              width: Global.ToMeters(100),
-              height: Global.ToMeters(100),
-              offset: Global.ToMeters(0, 100),
+              width: Conversion.ToMeters(100),
+              height: Conversion.ToMeters(100),
+              offset: Conversion.ToMeters(0, 100),
               density: Global.OwliverDensity,
               userData: bc);
             bc.Body.IsSensor = true;
@@ -961,7 +912,7 @@ namespace Owlicity
               SpriteAnimationType.PriceTag_100,
             },
           };
-          sacPriceTag.Spatial.Position.Y -= Global.ToMeters(10);
+          sacPriceTag.Spatial.Position.Y -= Conversion.ToMeters(10);
           sacPriceTag.AttachTo(sacItem);
 
           var sic = new ShopItemComponent(go)
@@ -971,21 +922,21 @@ namespace Owlicity
 
           switch(type)
           {
-            case GameObjectType.ShopItem_FruitBowl:
+            case KnownGameObject.ShopItem_FruitBowl:
             {
               sacItem.AnimationTypes.Add(SpriteAnimationType.FruitBowl);
               sic.ItemType = ShopItemType.FruitBowl;
             }
             break;
 
-            case GameObjectType.ShopItem_FishingRod:
+            case KnownGameObject.ShopItem_FishingRod:
             {
               sacItem.AnimationTypes.Add(SpriteAnimationType.FishingRod_Left);
               sic.ItemType = ShopItemType.FishingRod;
             }
             break;
 
-            case GameObjectType.ShopItem_Stick:
+            case KnownGameObject.ShopItem_Stick:
             {
               sacItem.AnimationTypes.Add(SpriteAnimationType.Stick_Left);
               sic.ItemType = ShopItemType.Stick;
@@ -1021,23 +972,23 @@ namespace Owlicity
         }
         break;
 
-        case GameObjectType.Random_FirTree:
+        case KnownGameObject.Random_FirTree:
         {
-          GameObjectType choice = _random.Choose(GameObjectType.Tree_Fir, GameObjectType.Tree_Conifer);
+          KnownGameObject choice = _random.Choose(KnownGameObject.Tree_Fir, KnownGameObject.Tree_Conifer);
           go = CreateKnown(choice);
         }
         break;
 
-        case GameObjectType.Random_FirTreeAlt:
+        case KnownGameObject.Random_FirTreeAlt:
         {
-          GameObjectType choice = _random.Choose(GameObjectType.Tree_FirAlt, GameObjectType.Tree_ConiferAlt);
+          KnownGameObject choice = _random.Choose(KnownGameObject.Tree_FirAlt, KnownGameObject.Tree_ConiferAlt);
           go = CreateKnown(choice);
         }
         break;
 
-        case GameObjectType.Random_OakTree:
+        case KnownGameObject.Random_OakTree:
         {
-          GameObjectType choice = _random.Choose(GameObjectType.Tree_Oak, GameObjectType.Tree_Orange);
+          KnownGameObject choice = _random.Choose(KnownGameObject.Tree_Oak, KnownGameObject.Tree_Orange);
           go = CreateKnown(choice);
         }
         break;

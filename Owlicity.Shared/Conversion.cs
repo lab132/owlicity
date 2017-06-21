@@ -8,7 +8,7 @@ using VelcroPhysics.Shared;
 
 namespace Owlicity
 {
-  public static partial class Global
+  public static class Conversion
   {
     // 100 pixels map to 1 meter.
     public static readonly float PixelsPerMeter = 100.0f / 1.0f;

@@ -25,7 +25,7 @@ namespace Owlicity
     //
     public DisplayOrigin InitialDisplayOrigin;
     public SpriteAnimationInstance HealthIcon;
-    public Vector2 IconPadding = Global.ToMeters(-3, -3);
+    public Vector2 IconPadding = Conversion.ToMeters(-3, -3);
     public int NumIconsPerRow = int.MaxValue;
 
     //
@@ -46,7 +46,7 @@ namespace Owlicity
       Debug.Assert(NumIconsPerRow > 0);
 
       // TODO(manu): Does the AABB of this component count? It's just a display after all...
-      //Spatial.LocalAABB = Global.ToMeters(HealthIcon.CalcAABB());
+      //Spatial.LocalAABB = Conversion.ToMeters(HealthIcon.CalcAABB());
 
       if(Health == null)
       {
@@ -100,7 +100,7 @@ namespace Owlicity
       {
         int currentHP = Health.CurrentHealth;
         int cols = Math.Min(currentHP, NumIconsPerRow);
-        Vector2 healthIconDim = Global.ToMeters(HealthIcon.ScaledDim);
+        Vector2 healthIconDim = Conversion.ToMeters(HealthIcon.ScaledDim);
         Vector2 spacing = healthIconDim + IconPadding;
         SpatialData anchor = this.GetWorldSpatialData();
         anchor.Position.X -= 0.5f * (cols * spacing.X);

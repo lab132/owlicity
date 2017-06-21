@@ -69,7 +69,7 @@ namespace Owlicity
         {
           Global.Game.DebugDrawCommands.Add(view =>
           {
-            view.DrawPoint(spatial.Position, Global.ToMeters(3), Color.Navy);
+            view.DrawPoint(spatial.Position, Conversion.ToMeters(3), Color.Navy);
           });
         }
       }

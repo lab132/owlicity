@@ -25,7 +25,7 @@ namespace Owlicity
       if(SpriteContentName != null)
       {
         Sprite.Texture = Global.Game.Content.Load<Texture2D>(SpriteContentName);
-        Spatial.LocalAABB = Global.ToMeters(Sprite.CalcAABB());
+        Spatial.LocalAABB = Conversion.ToMeters(Sprite.CalcAABB());
       }
     }
 

@@ -50,7 +50,7 @@ namespace Owlicity
 
       Camera.Reset(device, ref projection, ref view);
 
-      Vector2 screenSizeInMeters = Global.ToMeters(Camera.Viewport.Bounds.Size.ToVector2());
+      Vector2 screenSizeInMeters = Conversion.ToMeters(Camera.Viewport.Bounds.Size.ToVector2());
       Spatial.LocalAABB.LowerBound = -0.5f * screenSizeInMeters;
       Spatial.LocalAABB.UpperBound = 0.5f * screenSizeInMeters;
     }
@@ -111,7 +111,7 @@ namespace Owlicity
         // Note(manu): No rotation.
 
         // Scale
-        Vector2 scale2D = new Vector2(_invZoom, _invZoom) * Global.RenderScale;
+        Vector2 scale2D = new Vector2(_invZoom, _invZoom) * Conversion.RenderScale;
         mat.Scale = new Vector3(scale2D, 1.0f);
 
         Camera.Effect.View = Matrix.Invert(mat);

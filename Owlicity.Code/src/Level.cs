@@ -34,7 +34,7 @@ namespace Owlicity
           LowerBound = new Vector2(float.MaxValue),
           UpperBound = new Vector2(float.MinValue),
         };
-        Vector2 extents = Global.ToMeters(ScreenTileWidth, ScreenTileHeight);
+        Vector2 extents = Conversion.ToMeters(ScreenTileWidth, ScreenTileHeight);
 
         foreach(Screen screen in _screens)
         {
@@ -68,7 +68,7 @@ namespace Owlicity
     {
       Screen screen = new Screen
       {
-        WorldPosition = Global.ToMeters(posX * ScreenTileWidth, posY * ScreenTileHeight),
+        WorldPosition = Conversion.ToMeters(posX * ScreenTileWidth, posY * ScreenTileHeight),
         GridPosition = new Point(posX, posY),
       };
       _screens[posY, posX] = screen;

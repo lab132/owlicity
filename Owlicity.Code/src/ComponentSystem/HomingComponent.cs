@@ -146,7 +146,7 @@ namespace Owlicity
         Global.Game.DebugDrawCommands.Add(view =>
         {
           Vector2 p = this.GetWorldSpatialData().Position;
-          view.DrawPoint(p, Global.ToMeters(3.0f), Color.Turquoise);
+          view.DrawPoint(p, Conversion.ToMeters(3.0f), Color.Turquoise);
           view.DrawCircle(p, TargetInnerRange, Color.Yellow);
           view.DrawCircle(p, TargetRange, Color.Blue);
         });

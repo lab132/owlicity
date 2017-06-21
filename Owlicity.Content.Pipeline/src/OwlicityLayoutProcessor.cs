@@ -28,12 +28,12 @@ namespace Owlicity.Content.Pipeline
   [ContentProcessor(DisplayName = "Layout Processor - Owlicity")]
   public class OwlicityLayoutProcessor : ContentProcessor<TextureContent, List<ScreenLayoutInfo>>
   {
-    static Dictionary<Color, GameObjectType> _colorToTypeMap = new Dictionary<Color, GameObjectType>
+    static Dictionary<Color, KnownGameObject> _colorToTypeMap = new Dictionary<Color, KnownGameObject>
     {
-      { new Color(255,   0,   0), GameObjectType.Random_FirTree },
-      { new Color(  0,   0, 255), GameObjectType.Random_OakTree },
-      { new Color(255,   0, 255), GameObjectType.Random_FirTreeAlt },
-      { new Color(255, 255,   0), GameObjectType.Bush },
+      { new Color(255,   0,   0), KnownGameObject.Random_FirTree },
+      { new Color(  0,   0, 255), KnownGameObject.Random_OakTree },
+      { new Color(255,   0, 255), KnownGameObject.Random_FirTreeAlt },
+      { new Color(255, 255,   0), KnownGameObject.Bush },
     };
 
     struct JobInfo
@@ -134,9 +134,9 @@ namespace Owlicity.Content.Pipeline
           int y = rowOffset;
 
           uint hexColor = (uint)pixel.R << 24 | (uint)pixel.G << 16 | (uint)pixel.B << 8 | (uint)0xFF;
-          GameObjectType objectType = GetGameObjectTypeFromColor(hexColor);
-          Vector2 offsetInMeters = Global.ToMeters(x, y);
-          if(objectType != GameObjectType.Unknown)
+          KnownGameObject objectType = GetGameObjectTypeFromColor(hexColor);
+          Vector2 offsetInMeters = Conversion.ToMeters(x, y);
+          if(objectType != KnownGameObject.Unknown)
           {
             infos.Add(new ScreenLayoutInfo
             {
@@ -149,7 +149,7 @@ namespace Owlicity.Content.Pipeline
             warnings.Add($"Unknown layout color at {x + 1}x{y + 1}: {pixel} (hex: 0x{hexColor.ToString("X8")})");
             infos.Add(new ScreenLayoutInfo
             {
-              ObjectType = rand.Choose(GameObjectType.Slurp),
+              ObjectType = rand.Choose(KnownGameObject.Slurp),
               OffsetInMeters = offsetInMeters,
             });
           }
@@ -158,17 +158,17 @@ namespace Owlicity.Content.Pipeline
     }
 
     /// <param name="hexColor">Format: 0xRRGGBBAA</param>
-    private GameObjectType GetGameObjectTypeFromColor(uint hexColor)
+    private KnownGameObject GetGameObjectTypeFromColor(uint hexColor)
     {
       switch(hexColor)
       {
-        case 0xFF0000FF: return GameObjectType.Random_FirTree;
-        case 0x0000FFFF: return GameObjectType.Random_OakTree;
-        case 0xFF00FFFF: return GameObjectType.Random_FirTreeAlt;
-        case 0xFFFF00FF: return GameObjectType.Bush;
+        case 0xFF0000FF: return KnownGameObject.Random_FirTree;
+        case 0x0000FFFF: return KnownGameObject.Random_OakTree;
+        case 0xFF00FFFF: return KnownGameObject.Random_FirTreeAlt;
+        case 0xFFFF00FF: return KnownGameObject.Bush;
       }
 
-      return GameObjectType.Unknown;
+      return KnownGameObject.Unknown;
     }
 
     private void DetectClosePixels(ContentProcessorContext context, List<ScreenLayoutInfo> infos)
@@ -180,7 +180,7 @@ namespace Owlicity.Content.Pipeline
           Vector2 a = infos[infoIndex].OffsetInMeters;
           Vector2 b = infos[otherIndex].OffsetInMeters;
 
-          float distance = Global.ToPixels(Vector2.Distance(a, b));
+          float distance = Conversion.ToPixels(Vector2.Distance(a, b));
           if(distance <= 2)
           {
             // Note(manu): a and b are zero-based offsets. We report the one-based pixel because that's what the artist expects.

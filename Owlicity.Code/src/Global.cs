@@ -9,7 +9,7 @@ namespace Owlicity
   public static partial class Global
   {
     public static OwlGame Game { get; set; }
-
+    
     public static readonly Vector2 OwliverScale = new Vector2(0.5f);
     public static readonly Vector2 BonbonScale = new Vector2(0.6f);
     public static readonly Vector2 SlurpScale = new Vector2(0.5f);
@@ -47,13 +47,13 @@ namespace Owlicity
     }
 
     public static void SpawnGameObjectsInRingFormation(Vector2 center, float radius, int numToSpawn, Random rand,
-                                                       params GameObjectType[] types)
+                                                       params KnownGameObject[] types)
     {
       Vector2 localPosition = new Vector2(radius, 0.0f);
       Angle angle = new Angle { Radians = MathHelper.TwoPi / numToSpawn };
       for(int bonbonIndex = 0; bonbonIndex < numToSpawn; bonbonIndex++)
       {
-        GameObjectType type = rand.Choose(types);
+        KnownGameObject type = rand.Choose(types);
         GameObject go = GameObjectFactory.CreateKnown(type);
         go.SetWorldPosition(center + localPosition);
         Game.AddGameObject(go);

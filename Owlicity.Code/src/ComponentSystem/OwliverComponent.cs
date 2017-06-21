@@ -100,15 +100,15 @@ namespace Owlicity
 
         AABB local;
         {
-          Vector2 offset = Global.ToMeters(20, -120);
+          Vector2 offset = Conversion.ToMeters(20, -120);
           switch(CurrentState.WeaponType)
           {
             case OwliverWeaponType.Stick:
             {
               local = new AABB
               {
-                LowerBound = Global.ToMeters(0, -50) + offset,
-                UpperBound = Global.ToMeters(150, 70) + offset,
+                LowerBound = Conversion.ToMeters(0, -50) + offset,
+                UpperBound = Conversion.ToMeters(150, 70) + offset,
               };
             }
             break;
@@ -117,8 +117,8 @@ namespace Owlicity
             {
               local = new AABB
               {
-                LowerBound = Global.ToMeters(0, -50) + offset,
-                UpperBound = Global.ToMeters(150, 70) + offset,
+                LowerBound = Conversion.ToMeters(0, -50) + offset,
+                UpperBound = Conversion.ToMeters(150, 70) + offset,
               };
             }
             break;
@@ -357,7 +357,7 @@ namespace Owlicity
                   newState.WeaponType = OwliverWeaponType.FishingRod;
                   ChangeState(ref newState);
 
-                  var newGo = GameObjectFactory.CreateKnown(GameObjectType.ShopItem_Stick);
+                  var newGo = GameObjectFactory.CreateKnown(KnownGameObject.ShopItem_Stick);
                   newGo.Spatial.CopyFrom(shopItem.Owner.Spatial);
                   Global.Game.AddGameObject(newGo);
                 }
@@ -372,7 +372,7 @@ namespace Owlicity
                   newState.WeaponType = OwliverWeaponType.Stick;
                   ChangeState(ref newState);
 
-                  var newGo = GameObjectFactory.CreateKnown(GameObjectType.ShopItem_FishingRod);
+                  var newGo = GameObjectFactory.CreateKnown(KnownGameObject.ShopItem_FishingRod);
                   newGo.Spatial.CopyFrom(shopItem.Owner.Spatial);
                   Global.Game.AddGameObject(newGo);
                 }
@@ -413,7 +413,7 @@ namespace Owlicity
         if(throwProjectiles)
         {
           float sign = CurrentState.FacingDirection == OwliverFacingDirection.Left ? -1.0f : 1.0f;
-          GameObject projectile = GameObjectFactory.CreateKnown(GameObjectType.Projectile);
+          GameObject projectile = GameObjectFactory.CreateKnown(KnownGameObject.Projectile);
           projectile.Spatial.CopyFrom(new SpatialData { Position = WeaponAABB.Center });
           projectile.Spatial.Position.X += sign * 0.1f;
           projectile.GetComponent<AutoDestructComponent>().DestructionDelay = TimeSpan.FromSeconds(2.0f);
