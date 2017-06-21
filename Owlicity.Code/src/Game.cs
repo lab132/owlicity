@@ -372,7 +372,7 @@ namespace Owlicity
       }
 
       {
-        var testTankton = GameObjectFactory.CreateKnown(KnownGameObject.Tankton);
+        var testTankton = new Tankton();
         testTankton.Spatial.Position += Conversion.ToMeters(900, 350);
         AddGameObject(testTankton);
       }
