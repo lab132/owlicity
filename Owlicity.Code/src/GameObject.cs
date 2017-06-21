@@ -60,7 +60,7 @@ namespace Owlicity
       return Components.OfType<T>();
     }
 
-    public void Initialize()
+    public virtual void Initialize()
     {
       ComponentBase[] toInit = Components.Where(c => c.IsInitializationEnabled).ToArray();
       foreach(ComponentBase component in toInit)
@@ -76,7 +76,7 @@ namespace Owlicity
       }
     }
 
-    public void PrePhysicsUpdate(float deltaSeconds)
+    public virtual void PrePhysicsUpdate(float deltaSeconds)
     {
       foreach(ComponentBase component in Components.Where(c => c.IsPrePhysicsUpdateEnabled))
       {
@@ -85,7 +85,7 @@ namespace Owlicity
       }
     }
 
-    public void Update(float deltaSeconds)
+    public virtual void Update(float deltaSeconds)
     {
       foreach(ComponentBase component in Components.Where(c => c.IsUpdateEnabled))
       {
@@ -94,7 +94,7 @@ namespace Owlicity
       }
     }
 
-    public void Draw(Renderer renderer)
+    public virtual void Draw(Renderer renderer)
     {
       foreach(ComponentBase component in Components.Where(c => c.IsDrawEnabled))
       {
@@ -103,7 +103,7 @@ namespace Owlicity
       }
     }
 
-    public void Destroy()
+    public virtual void Destroy()
     {
       foreach(ComponentBase component in Components)
       {
@@ -183,92 +183,7 @@ namespace Owlicity
 
         case KnownGameObject.Owliver:
         {
-          var bc = new BodyComponent(go)
-          {
-            InitMode = BodyComponentInitMode.Manual,
-          };
-          bc.BeforeInitialize += () =>
-          {
-            SpatialData s = go.GetWorldSpatialData();
-            bc.Body = new Body(
-              world: Global.Game.World,
-              position: s.Position,
-              rotation: s.Rotation.Radians,
-              bodyType: BodyType.Dynamic,
-              userdata: bc);
-
-            float radius = Conversion.ToMeters(60) * Global.OwliverScale.X;
-            float density = Global.OwliverDensity;
-            FixtureFactory.AttachCircle(
-              radius: radius,
-              density: density,
-              body: bc.Body,
-              offset: Conversion.ToMeters(0, -60) * Global.OwliverScale,
-              userData: bc);
-            FixtureFactory.AttachCircle(
-              radius: radius,
-              density: density,
-              body: bc.Body,
-              offset: Conversion.ToMeters(0, -130) * Global.OwliverScale,
-              userData: bc);
-
-            bc.Body.FixedRotation = true;
-            bc.Body.CollisionCategories = Global.OwliverCollisionCategory;
-            bc.Body.CollidesWith = Global.LevelCollisionCategory | Global.EnemyCollisionCategory;
-            bc.Body.SleepingAllowed = false;
-            bc.Body.LinearDamping = 15.0f;
-          };
-          go.RootComponent = bc;
-
-          var oc = new OwliverComponent(go)
-          {
-          };
-
-          var mc = new MovementComponent(go)
-          {
-            ManualInputProcessing = true,
-            MaxMovementSpeed = 2.5f,
-          };
-
-          var sa = new SpriteAnimationComponent(go)
-          {
-            AnimationTypes = new List<SpriteAnimationType>
-            {
-              SpriteAnimationType.Owliver_Idle_Stick_Left,
-              SpriteAnimationType.Owliver_Idle_Stick_Right,
-              SpriteAnimationType.Owliver_Walk_Stick_Left,
-              SpriteAnimationType.Owliver_Walk_Stick_Right,
-              SpriteAnimationType.Owliver_Attack_Stick_Left,
-              SpriteAnimationType.Owliver_Attack_Stick_Right,
-              SpriteAnimationType.Owliver_Idle_FishingRod_Left,
-              SpriteAnimationType.Owliver_Idle_FishingRod_Right,
-              SpriteAnimationType.Owliver_Walk_FishingRod_Left,
-              SpriteAnimationType.Owliver_Walk_FishingRod_Right,
-              SpriteAnimationType.Owliver_Attack_FishingRod_Left,
-              SpriteAnimationType.Owliver_Attack_FishingRod_Right,
-            },
-          };
-          sa.AttachTo(bc);
-
-          var hc = new HealthComponent(go)
-          {
-            MaxHealth = 5,
-          };
-          hc.OnHit += (damage) =>
-          {
-            hc.MakeInvincible(oc.HitDuration);
-          };
-
-          CreateOnHitSquasher(go, hc).SetDefaultCurves(oc.HitDuration);
-
-          CreateOnHitBlinkingSequence(go, hc).SetDefaultCurves(oc.HitDuration);
-
-          var moc = new MoneyBagComponent(go)
-          {
-            InitialAmount = 0,
-          };
-
-          var kc = new KeyRingComponent(go);
+          go = new Owliver();
         }
         break;
 

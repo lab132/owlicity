@@ -6,6 +6,7 @@ using System.Linq;
 using VelcroPhysics.Dynamics;
 using VelcroPhysics.Shared;
 using VelcroPhysics.Collision.ContactSystem;
+using VelcroPhysics.Factories;
 
 namespace Owlicity
 {
@@ -60,13 +61,12 @@ namespace Owlicity
     }
   }
 
-  public class OwliverComponent : ComponentBase
+  public class Owliver : GameObject
   {
     public SpriteAnimationComponent Animation;
     public float HitDuration = 0.25f;
 
-    public BodyComponent BodyComponent;
-    public Body MyBody => BodyComponent?.Body;
+    public Body MyBody;
 
     public HashSet<ShopItemComponent> ConnectedShopItems = new HashSet<ShopItemComponent>();
 
@@ -88,15 +88,11 @@ namespace Owlicity
       SpriteAnimationType.Owliver_Attack_FishingRod_Right,
     };
 
-    public OwliverComponent(GameObject owner) : base(owner)
-    {
-    }
-
     public AABB WeaponAABB
     {
       get
       {
-        Vector2 worldPosition = Owner.GetWorldSpatialData().Position;
+        Vector2 worldPosition = this.GetWorldSpatialData().Position;
 
         AABB local;
         {
@@ -161,6 +157,94 @@ namespace Owlicity
 
         return result;
       }
+    }
+
+    public Owliver()
+    {
+      var bodyComponent = new BodyComponent(this)
+      {
+        InitMode = BodyComponentInitMode.Manual,
+      };
+      bodyComponent.BeforeInitialize += () =>
+      {
+        SpatialData s = this.GetWorldSpatialData();
+        bodyComponent.Body = new Body(
+          world: Global.Game.World,
+          position: s.Position,
+          rotation: s.Rotation.Radians,
+          bodyType: BodyType.Dynamic,
+          userdata: bodyComponent);
+
+        float radius = Conversion.ToMeters(60) * Global.OwliverScale.X;
+        float density = Global.OwliverDensity;
+        FixtureFactory.AttachCircle(
+          radius: radius,
+          density: density,
+          body: bodyComponent.Body,
+          offset: Conversion.ToMeters(0, -60) * Global.OwliverScale,
+          userData: bodyComponent);
+        FixtureFactory.AttachCircle(
+          radius: radius,
+          density: density,
+          body: bodyComponent.Body,
+          offset: Conversion.ToMeters(0, -130) * Global.OwliverScale,
+          userData: bodyComponent);
+
+        bodyComponent.Body.FixedRotation = true;
+        bodyComponent.Body.CollisionCategories = Global.OwliverCollisionCategory;
+        bodyComponent.Body.CollidesWith = Global.LevelCollisionCategory | Global.EnemyCollisionCategory;
+        bodyComponent.Body.SleepingAllowed = false;
+        bodyComponent.Body.LinearDamping = 15.0f;
+
+        MyBody = bodyComponent.Body;
+      };
+      RootComponent = bodyComponent;
+
+      Movement = new MovementComponent(this)
+      {
+        ManualInputProcessing = true,
+        MaxMovementSpeed = 2.5f,
+      };
+
+      Animation = new SpriteAnimationComponent(this)
+      {
+        AnimationTypes = new List<SpriteAnimationType>
+            {
+              SpriteAnimationType.Owliver_Idle_Stick_Left,
+              SpriteAnimationType.Owliver_Idle_Stick_Right,
+              SpriteAnimationType.Owliver_Walk_Stick_Left,
+              SpriteAnimationType.Owliver_Walk_Stick_Right,
+              SpriteAnimationType.Owliver_Attack_Stick_Left,
+              SpriteAnimationType.Owliver_Attack_Stick_Right,
+              SpriteAnimationType.Owliver_Idle_FishingRod_Left,
+              SpriteAnimationType.Owliver_Idle_FishingRod_Right,
+              SpriteAnimationType.Owliver_Walk_FishingRod_Left,
+              SpriteAnimationType.Owliver_Walk_FishingRod_Right,
+              SpriteAnimationType.Owliver_Attack_FishingRod_Left,
+              SpriteAnimationType.Owliver_Attack_FishingRod_Right,
+            },
+      };
+      Animation.AttachTo(bodyComponent);
+
+      Health = new HealthComponent(this)
+      {
+        MaxHealth = 5,
+      };
+      Health.OnHit += (damage) =>
+      {
+        Health.MakeInvincible(HitDuration);
+      };
+
+      GameObjectFactory.CreateOnHitSquasher(this, Health).SetDefaultCurves(HitDuration);
+
+      GameObjectFactory.CreateOnHitBlinkingSequence(this, Health).SetDefaultCurves(HitDuration);
+
+      MoneyBag = new MoneyBagComponent(this)
+      {
+        InitialAmount = 0,
+      };
+
+      KeyRing = new KeyRingComponent(this);
     }
 
     public GameInput ConsumeInput()
@@ -236,44 +320,6 @@ namespace Owlicity
     public override void Initialize()
     {
       base.Initialize();
-
-      if(Animation == null)
-      {
-        Animation = Owner.GetComponent<SpriteAnimationComponent>();
-        Debug.Assert(Animation != null, "Owliver has no animation component!");
-      }
-
-      if(BodyComponent == null)
-      {
-        BodyComponent = Owner.GetComponent<BodyComponent>();
-        Debug.Assert(BodyComponent != null, "Owliver has no body component!");
-      }
-
-      if(Movement == null)
-      {
-        Movement = Owner.GetComponent<MovementComponent>();
-      }
-
-      if(Health == null)
-      {
-        Health = Owner.GetComponent<HealthComponent>();
-        Debug.Assert(Health != null, "Owliver has no health component!");
-      }
-
-      if(MoneyBag == null)
-      {
-        MoneyBag = Owner.GetComponent<MoneyBagComponent>();
-      }
-
-      if(KeyRing == null)
-      {
-        KeyRing = Owner.GetComponent<KeyRingComponent>();
-      }
-    }
-
-    public override void PostInitialize()
-    {
-      base.PostInitialize();
 
       Animation.OnAnimationPlaybackStateChanged += OnAnimationLoopFinished;
 

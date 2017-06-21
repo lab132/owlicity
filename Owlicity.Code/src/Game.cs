@@ -22,23 +22,20 @@ namespace Owlicity
   // i.e. there is no need to convert to meters!
   public class OwlHud
   {
-    public GameObject Owliver;
+    public Owliver Owliver;
 
-    public HealthComponent Health;
     public SpatialData HealthIconAnchor = new SpatialData();
     public SpriteAnimationInstance HealthIconAnimation;
 
     public Color FullHealthTint = Color.White;
     public Color NoHealthTint = new Color(60, 60, 60);
 
-    public MoneyBagComponent MoneyBag;
     public SpatialData MoneyBagIconAnchor = new SpatialData();
     public SpriteAnimationInstance MoneyBagIconAnimation;
 
     public SpriteAnimationInstance CrossAnimation;
     public SpriteAnimationInstance[] DigitAnimations;
 
-    public KeyRingComponent KeyRing;
     public SpatialData KeyRingAnchor = new SpatialData();
 
     public SpriteAnimationInstance[] KeyAnimations;
@@ -64,8 +61,6 @@ namespace Owlicity
       MoneyBagIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Bonbon_Gold);
 
       Owliver = Global.Game.Owliver;
-      Health = Owliver.GetComponent<HealthComponent>();
-      MoneyBag = Owliver.GetComponent<MoneyBagComponent>();
 
       CrossAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Cross);
 
@@ -76,7 +71,6 @@ namespace Owlicity
         DigitAnimations[digit] = SpriteAnimationFactory.CreateAnimationInstance(animType);
       }
 
-      KeyRing = Owliver.GetComponent<KeyRingComponent>();
       KeyRingAnchor.AttachTo(HealthIconAnchor);
       KeyRingAnchor.Position.Y += 64;
 
@@ -104,18 +98,18 @@ namespace Owlicity
       if(HealthIconAnimation != null)
       {
         HealthIconAnimation.Update(deltaSeconds);
-        int hp = Health.MaxHealth;
+        int hp = Owliver.Health.MaxHealth;
         SpatialData spatial = HealthIconAnchor.GetWorldSpatialData();
         const float spacing = 3;
         for(int healthIndex = 0; healthIndex < hp; healthIndex++)
         {
-          Color tint = healthIndex < Health.CurrentHealth ? FullHealthTint : NoHealthTint;
+          Color tint = healthIndex < Owliver.Health.CurrentHealth ? FullHealthTint : NoHealthTint;
           HealthIconAnimation.Draw(renderer, spatial.GetWorldSpatialData(), tint: tint);
           spatial.Position.X += HealthIconAnimation.ScaledDim.X + spacing;
         }
       }
 
-      if(MoneyBag != null)
+      if(Owliver.MoneyBag != null)
       {
         MoneyBagIconAnimation.Update(deltaSeconds);
 
@@ -129,7 +123,7 @@ namespace Owlicity
         CrossAnimation.Draw(renderer, spatial);
         previousAnimWidth = CrossAnimation.ScaledDim.X;
 
-        int value = MoneyBag.CurrentAmount;
+        int value = Owliver.MoneyBag.CurrentAmount;
         while(true)
         {
           int digit = value % 10;
@@ -146,13 +140,13 @@ namespace Owlicity
         }
       }
 
-      if(KeyRing != null)
+      if(Owliver.KeyRing != null)
       {
         SpatialData anchor = KeyRingAnchor.GetWorldSpatialData();
-        for(int keyTypeIndex = 0; keyTypeIndex < KeyRing.CurrentKeyAmounts.Length; keyTypeIndex++)
+        for(int keyTypeIndex = 0; keyTypeIndex < Owliver.KeyRing.CurrentKeyAmounts.Length; keyTypeIndex++)
         {
           KeyType keyType = (KeyType)keyTypeIndex;
-          int keyAmount = KeyRing.CurrentKeyAmounts[keyTypeIndex];
+          int keyAmount = Owliver.KeyRing.CurrentKeyAmounts[keyTypeIndex];
           SpriteAnimationInstance keyAnim = KeyAnimations[keyTypeIndex];
           SpatialData spatial = anchor.GetWorldSpatialData();
           for(int keyIndex = 0; keyIndex < keyAmount; keyIndex++)
@@ -196,7 +190,7 @@ namespace Owlicity
     public World World { get; set; }
     public InputHandler Input = new InputHandler();
 
-    public GameObject Owliver { get; set; }
+    public Owliver Owliver { get; set; }
 
     public bool MainDrawingEnabled = true;
 
@@ -343,7 +337,7 @@ namespace Owlicity
       }
 
       {
-        Owliver = GameObjectFactory.CreateKnown(KnownGameObject.Owliver);
+        Owliver = new Owliver();
         Owliver.Spatial.Position += Conversion.ToMeters(450, 600);
         AddGameObject(Owliver);
 
@@ -535,11 +529,8 @@ namespace Owlicity
 #endif
 
       {
-        var mc = Owliver.GetComponent<MovementComponent>();
-        mc.MovementVector = Input.CharacterMovement;
-
-        var oc = Owliver.GetComponent<OwliverComponent>();
-        oc.Input = Input.CharacterInput;
+        Owliver.Movement.MovementVector = Input.CharacterMovement;
+        Owliver.Input = Input.CharacterInput;
       }
 
       // TODO(manu): Make use of `Input.CompationInput`!
