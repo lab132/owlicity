@@ -517,14 +517,14 @@ namespace Owlicity
           cc.VisibilityBounds = null;
         }
 
-        var chc = ActiveCamera.GetComponent<HomingComponent>();
-        if(chc.Target == null)
+        var spc = ActiveCamera.GetComponent<SpringArmComponent>();
+        if(spc.Target == null)
         {
-          chc.Target = Owliver;
+          spc.Target = Owliver;
         }
         else
         {
-          chc.Target = null;
+          spc.Target = null;
         }
       }
 
