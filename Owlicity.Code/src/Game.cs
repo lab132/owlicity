@@ -184,7 +184,7 @@ namespace Owlicity
     public Renderer WorldRenderer = new Renderer { BaseDepth = -1, BaseScale = Conversion.RenderScale, };
     public Renderer UIRenderer = new Renderer { BaseDepth = 0, BaseScale = 1.0f, };
 
-    public GameObject ActiveCamera;
+    public CameraObject ActiveCamera;
     public Level CurrentLevel;
 
     public World World { get; set; }
@@ -347,20 +347,18 @@ namespace Owlicity
       CurrentLevel.LoadContent();
 
       {
-        ActiveCamera = GameObjectFactory.CreateKnown(KnownGameObject.Camera);
+        ActiveCamera = new CameraObject();
 
-        var cc = ActiveCamera.GetComponent<CameraComponent>();
-        cc.VisibilityBounds = CurrentLevel.LevelBounds;
-        cc.OnGraphicsDeviceReset(GraphicsDevice);
+        ActiveCamera.CameraComponent.VisibilityBounds = CurrentLevel.LevelBounds;
+        ActiveCamera.CameraComponent.OnGraphicsDeviceReset(GraphicsDevice);
         Window.ClientSizeChanged += (o, e) =>
         {
-          cc.OnGraphicsDeviceReset(GraphicsDevice);
+          ActiveCamera.CameraComponent.OnGraphicsDeviceReset(GraphicsDevice);
         };
 
-        var spc = ActiveCamera.GetComponent<SpringArmComponent>();
-        spc.BeforeInitialize += () =>
+        ActiveCamera.SpringArm.BeforeInitialize += () =>
         {
-          spc.Target = Owliver;
+          ActiveCamera.SpringArm.Target = Owliver;
         };
 
         AddGameObject(ActiveCamera);
@@ -486,8 +484,7 @@ namespace Owlicity
       deltaSeconds *= Input.DebugInput.SpeedMultiplier;
 
       {
-        var mv = ActiveCamera.GetComponent<MovementComponent>();
-        mv.MovementVector = Input.DebugMovement;
+        ActiveCamera.Movement.MovementVector = Input.DebugMovement;
       }
 
       if(Input.DebugInput.ToggleMainDrawing)
@@ -501,24 +498,22 @@ namespace Owlicity
 
       if(Input.DebugInput.ToggleCameraVisibilityBounds)
       {
-        var cc = ActiveCamera.GetComponent<CameraComponent>();
-        if(cc.VisibilityBounds == null)
+        if(ActiveCamera.CameraComponent.VisibilityBounds == null)
         {
-          cc.VisibilityBounds = CurrentLevel.LevelBounds;
+          ActiveCamera.CameraComponent.VisibilityBounds = CurrentLevel.LevelBounds;
         }
         else
         {
-          cc.VisibilityBounds = null;
+          ActiveCamera.CameraComponent.VisibilityBounds = null;
         }
 
-        var spc = ActiveCamera.GetComponent<SpringArmComponent>();
-        if(spc.Target == null)
+        if(ActiveCamera.SpringArm.Target == null)
         {
-          spc.Target = Owliver;
+          ActiveCamera.SpringArm.Target = Owliver;
         }
         else
         {
-          spc.Target = null;
+          ActiveCamera.SpringArm.Target = null;
         }
       }
 
@@ -601,7 +596,7 @@ namespace Owlicity
       base.Draw(gameTime);
 
       GraphicsDevice.Clear(Color.CornflowerBlue);
-      Camera cam = ActiveCamera.GetComponent<CameraComponent>().Camera;
+      CameraData cam = ActiveCamera.CameraComponent.CamData;
       Matrix viewMatrix = cam.Effect.View;
       Matrix projectionMatrix = cam.Effect.Projection;
 

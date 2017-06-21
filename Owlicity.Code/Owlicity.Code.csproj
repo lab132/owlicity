@@ -55,6 +55,7 @@
     <Compile Include="src\Components\MovementComponent.cs" />
     <Compile Include="src\ComponentBase.cs" />
     <Compile Include="src\GameObjectFactory.cs" />
+    <Compile Include="src\GameObjects\MainCamera.cs" />
     <Compile Include="src\GameObjects\Owliver.cs" />
     <Compile Include="src\Components\ParticleEmitterComponent.cs" />
     <Compile Include="src\Components\PickupComponent.cs" />

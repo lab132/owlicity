@@ -23,7 +23,7 @@ namespace Owlicity
     //
     // Runtime data
     //
-    public Camera Camera = new Camera();
+    public CameraData CamData = new CameraData();
 
     public CameraComponent(GameObject owner)
       : base(owner)
@@ -46,11 +46,11 @@ namespace Owlicity
       Matrix halfPixelOffset = Matrix.CreateTranslation(-0.5f, -0.5f, 0);
       Matrix projection = halfPixelOffset * baseProjection;
 
-      Matrix view = Camera.Effect?.View ?? Matrix.Identity;
+      Matrix view = CamData.Effect?.View ?? Matrix.Identity;
 
-      Camera.Reset(device, ref projection, ref view);
+      CamData.Reset(device, ref projection, ref view);
 
-      Vector2 screenSizeInMeters = Conversion.ToMeters(Camera.Viewport.Bounds.Size.ToVector2());
+      Vector2 screenSizeInMeters = Conversion.ToMeters(CamData.Viewport.Bounds.Size.ToVector2());
       Spatial.LocalAABB.LowerBound = -0.5f * screenSizeInMeters;
       Spatial.LocalAABB.UpperBound = 0.5f * screenSizeInMeters;
     }
@@ -114,7 +114,7 @@ namespace Owlicity
         Vector2 scale2D = new Vector2(_invZoom, _invZoom) * Conversion.RenderScale;
         mat.Scale = new Vector3(scale2D, 1.0f);
 
-        Camera.Effect.View = Matrix.Invert(mat);
+        CamData.Effect.View = Matrix.Invert(mat);
       }
     }
   }

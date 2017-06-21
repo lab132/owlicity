@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Owlicity
 {
-  public class Camera
+  public class CameraData
   {
     public Viewport Viewport;
 

@@ -46,26 +46,7 @@ namespace Owlicity
       {
         case KnownGameObject.Camera:
         {
-          var spc = new SpringArmComponent(go)
-          {
-            TargetInnerRange = 0.2f,
-            TargetRange = float.MaxValue,
-
-            SpeedFactor = 5,
-
-            DebugDrawingEnabled = false,
-          };
-          go.RootComponent = spc;
-
-          var cc = new CameraComponent(go);
-          cc.AttachTo(spc);
-
-#if DEBUG
-          var mc = new MovementComponent(go)
-          {
-            MaxMovementSpeed = 5.0f,
-          };
-#endif
+          go = new CameraObject();
         }
         break;
 
