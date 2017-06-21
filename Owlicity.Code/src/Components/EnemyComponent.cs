@@ -102,7 +102,7 @@ namespace Owlicity
     {
       base.Update(deltaSeconds);
 
-      if(Chaser != null && Chaser.IsChasing)
+      if(Chaser != null && Chaser.IsHoming)
       {
         // Change the facing direction to the target.
         Vector2 myPosition = Owner.GetWorldSpatialData().Position;

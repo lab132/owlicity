@@ -34,11 +34,11 @@ namespace Owlicity
 
     public Body MyBody => BodyComponent?.Body;
 
-    private bool _isChasing;
-    public bool IsChasing
+    private bool _isHoming;
+    public bool IsHoming
     {
-      get => _isChasing && Target != null;
-      set => _isChasing = value;
+      get => _isHoming && Target != null;
+      set => _isHoming = value;
     }
 
     public HomingComponent(GameObject owner)
@@ -78,7 +78,7 @@ namespace Owlicity
 
     public void PerformChase(float deltaSeconds)
     {
-      IsChasing = false;
+      IsHoming = false;
       Body body = MyBody;
 
       if(Target != null)
@@ -94,7 +94,7 @@ namespace Owlicity
         }
         else if(targetDistance > TargetInnerRange)
         {
-          IsChasing = true;
+          IsHoming = true;
           Vector2 velocity = targetDir * Speed;
 
           switch(HomingType)
