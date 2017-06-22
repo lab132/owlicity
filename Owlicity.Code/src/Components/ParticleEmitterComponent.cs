@@ -1,61 +1,57 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Owlicity
 {
   public class ParticleEmitterComponent : SpatialComponent
   {
-    //
-    // Init data
-    //
-    public int NumParticles;
-    public string[] TextureContentNames;
-    public Color[] AvailableColors;
+    public string[] AdditionalTextures;
+    public ParticleEmitter Emitter;
 
-    //
-    // Runtime data
-    //
-    public ParticleEmitter Emitter = new ParticleEmitter();
-    //public bool IsEmittingEnabled; // Note(manu): Unused for now.
-
-    public ParticleEmitterComponent(GameObject owner) : base(owner)
+    public ParticleEmitterComponent(GameObject owner)
+      : base(owner)
     {
+    }
+
+    public void Emit(int numParticles = -1)
+    {
+      Vector2 emitAt = this.GetWorldSpatialData().Position;
+      Emit(emitAt, numParticles);
+    }
+
+    public void Emit(Vector2 emitAt, int numParticles = -1)
+    {
+      Emitter.EmitParticles(emitAt, numParticles);
     }
 
     public override void Initialize()
     {
       base.Initialize();
 
-      List<Texture2D> textures = new List<Texture2D>(TextureContentNames.Length);
-      foreach(string textureName in TextureContentNames)
+      Debug.Assert(Emitter != null);
+      if(AdditionalTextures != null)
       {
-        Texture2D texture = Global.Game.Content.Load<Texture2D>(textureName);
-        textures.Add(texture);
+        IEnumerable<Texture2D> textures = AdditionalTextures.Select(textureName => {
+          return Global.Game.Content.Load<Texture2D>(textureName);
+        });
+
+        if(Emitter.Textures == null)
+        {
+          Emitter.Textures = new List<Texture2D>();
+        }
+
+        Emitter.Textures.AddRange(textures);
       }
 
-      Emitter = new ParticleEmitter(NumParticles, textures, AvailableColors.ToList());
-    }
-
-    public void Emit(Vector2? emitAt = null, int numParticles = -1)
-    {
-      Vector2 spawnPosition;
-      if (emitAt != null)
-      {
-        spawnPosition = emitAt.Value;
-      } else
-      {
-        spawnPosition = this.GetWorldSpatialData().Position;
-      }
-
-      Emitter.EmitParticles(spawnPosition, numParticles);
+      Emitter.Initialize();
     }
 
     public override void Update(float deltaSeconds)
     {
       base.Update(deltaSeconds);
-
       Emitter.Update(deltaSeconds);
     }
 

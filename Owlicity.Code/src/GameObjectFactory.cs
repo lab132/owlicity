@@ -105,12 +105,9 @@ namespace Owlicity
               confetti.Spatial.CopyFrom(go.Spatial);
               confetti.AutoDestruct.DestructionDelay = TimeSpan.FromSeconds(0.25f);
 
-              confetti.ParticleEmitter.NumParticles = 16;
+              confetti.ParticleEmitter.Emitter.MaxNumParticles = 16;
               Vector2 g = -2.5f * bc.Body.LinearVelocity;
-              confetti.ParticleEmitter.BeforePostInitialize += () =>
-              {
-                confetti.ParticleEmitter.Emitter.Gravity = g;
-              };
+              confetti.ParticleEmitter.Emitter.Gravity = g;
 
               Global.Game.AddGameObject(confetti);
             };

@@ -30,18 +30,21 @@ namespace Owlicity
     public float MaxParticleSpread = 20.0f;
     public float MaxAngularVelocity = 10.0f;
     public Vector2 Gravity = new Vector2(0.0f, 1.5f);
-    public Texture2D[] Textures;
-    public Color[] Colors;
+    public List<Texture2D> Textures;
+    public Color[] Colors = new[] { Color.White };
 
+    //
+    // Runtime data.
+    //
     public Random Random = new Random();
     public Particle[] Particles;
 
     private Stack<int> _freeParticleSlots;
 
 
-    private void Initialize()
+    public void Initialize()
     {
-      Debug.Assert(Textures != null && Textures.Length > 0);
+      Debug.Assert(Textures != null && Textures.Count > 0);
       Particles = new Particle[MaxNumParticles];
       _freeParticleSlots = new Stack<int>(Enumerable.Range(0, MaxNumParticles));
     }
@@ -56,7 +59,7 @@ namespace Owlicity
       while (_freeParticleSlots.Count > 0 && numParticles > 0)
       {
         int idx = _freeParticleSlots.Pop();
-        Particle particle = new Particle
+        Particles[idx] = new Particle
         {
           Velocity = MaxParticleSpeed * Random.NextBilateralVector2().GetClampedTo(1.0f),
           Position = position + MaxParticleSpread * Random.NextBilateralVector2().GetClampedTo(1.0f),
@@ -65,7 +68,6 @@ namespace Owlicity
           TTL = Random.NextFloatBetween(MinTTL, MaxTTL),
           AngularVelocity = Random.NextFloatBetween(-MaxAngularVelocity, MaxAngularVelocity)
         };
-        Particles[idx] = particle;
         numParticles--;
       }
     }
@@ -99,8 +101,8 @@ namespace Owlicity
 
       for(int i = 0; i < MaxNumParticles; i++)
       {
-        ref Particle p = ref Particles[i];
-        if (p.TTL > 0)
+        ref Particle particle = ref Particles[i];
+        if (particle.TTL > 0)
         {
           Vector2 hotspot = Vector2.Zero;
 #if false
@@ -111,14 +113,14 @@ namespace Owlicity
           float depth = 0.0f;
 
           renderer.DrawSprite(
-            position: p.Position,
-            rotation: new Angle { Radians = p.Rotation },
+            position: particle.Position,
+            rotation: new Angle { Radians = particle.Rotation },
             scale: Vector2.One,
             depth: depth,
             sourceRectangle: null,
-            texture: p.Texture,
+            texture: particle.Texture,
             hotspot: hotspot,
-            tint: p.Color,
+            tint: particle.Color,
             spriteEffects: SpriteEffects.None);
         }
       }

@@ -20,9 +20,13 @@ namespace Owlicity
 
       ParticleEmitter = new ParticleEmitterComponent(this)
       {
-        NumParticles = 64,
+        Emitter = new ParticleEmitter
+        {
+          MaxNumParticles = 64,
+          Colors = Global.AllConfettiColors,
+        },
 
-        TextureContentNames = new[]
+        AdditionalTextures = new[]
         {
           "confetti/confetti_01",
           "confetti/confetti_02",
@@ -32,8 +36,6 @@ namespace Owlicity
           "confetti/confetti_06",
           "confetti/confetti_07",
         },
-
-        AvailableColors = Global.AllConfettiColors,
       };
     }
 

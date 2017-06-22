@@ -74,12 +74,10 @@ namespace Owlicity
       confetti.Spatial.CopyFrom(this.Spatial);
       confetti.AutoDestruct.DestructionDelay = TimeSpan.FromSeconds(5.0f);
       confetti.ParticleEmitter = confetti.GetComponent<ParticleEmitterComponent>();
-      confetti.ParticleEmitter.NumParticles = 4096;
-      confetti.ParticleEmitter.BeforePostInitialize += () =>
-      {
+      confetti.ParticleEmitter.Emitter.MaxNumParticles = 4096;
         // TODO(manu): Somehow, this doesn't work...
-        confetti.ParticleEmitter.Emitter.MaxParticleSpeed = 200.0f;
-      };
+      confetti.ParticleEmitter.Emitter.MaxParticleSpeed = 200.0f;
+
       Global.Game.AddGameObject(confetti);
     }
 
