@@ -1363,3 +1363,9 @@
 /processorParam:TextureFormat=Color
 /build:owliver_walk_fishingrod_spritesheet.png
 
+#begin snd/walking_grass.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:snd/walking_grass.wav
+

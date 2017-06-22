@@ -75,6 +75,7 @@
     <Compile Include="src\Input.cs" />
     <Compile Include="src\Level.cs" />
     <Compile Include="src\Hud.cs" />
+    <Compile Include="src\SoundEffect.cs" />
     <Compile Include="src\Spatial.cs" />
     <Compile Include="src\Particle.cs" />
     <Compile Include="src\ParticleEmitter.cs" />
