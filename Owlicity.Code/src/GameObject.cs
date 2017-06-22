@@ -9,9 +9,17 @@ namespace Owlicity
   {
     private static int _idGenerator;
 
-    public readonly int ID = ++_idGenerator;
+    public readonly int LocalID = ++_idGenerator;
 
-    public string Name;
+    private string _defaultName;
+    public string DefaultName => _defaultName ?? (_defaultName = $"{GetType().Name}_{LocalID}");
+
+    private string _name;
+    public string Name
+    {
+      get => _name ?? DefaultName;
+      set => _name = value;
+    }
 
     public List<ComponentBase> Components { get; } = new List<ComponentBase>();
 
@@ -110,7 +118,7 @@ namespace Owlicity
 
     public override string ToString()
     {
-      return $"{ID}: {Name} @ {Spatial}";
+      return $"{Name} ({LocalID}) @ {Spatial}";
     }
   }
 }

@@ -463,7 +463,6 @@ namespace Owlicity
           };
           sacItem.AttachTo(bc);
 
-#if true
           var sacPriceTag = new SpriteAnimationComponent(go)
           {
             DepthReference = null,
@@ -507,30 +506,6 @@ namespace Owlicity
 
             default: throw new ArgumentException(nameof(type));
           }
-#else
-          switch(type)
-          {
-            case GameObjectType.ShopItem_FruitBowl:
-            {
-              sacItem.AnimationTypes.Add(SpriteAnimationType.FruitBowl);
-            }
-            break;
-
-            case GameObjectType.ShopItem_FishingRod:
-            {
-              sacItem.AnimationTypes.Add(SpriteAnimationType.FishingRod_Left);
-            }
-            break;
-
-            case GameObjectType.ShopItem_Stick:
-            {
-              sacItem.AnimationTypes.Add(SpriteAnimationType.Stick_Left);
-            }
-            break;
-
-            default: throw new ArgumentException(nameof(type));
-          }
-#endif
         }
         break;
 
@@ -559,7 +534,8 @@ namespace Owlicity
         throw new ArgumentException("Unknown game object type.");
       }
 
-      go.Name = $"{type}({_knownCreationCount[(int)type]++})";
+      int instanceID = _knownCreationCount[(int)type]++;
+      go.Name = $"{type}_{instanceID}";
 
       return go;
     }
