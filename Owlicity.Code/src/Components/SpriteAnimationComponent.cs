@@ -108,10 +108,6 @@ namespace Owlicity
       base.Draw(renderer);
 
       SpatialData worldSpatial = this.GetWorldSpatialData();
-      if(Tint != null && Tint != Color.White)
-      {
-        Console.WriteLine();
-      }
       ActiveAnimation.Draw(renderer, worldSpatial, RenderDepth, AdditionalScale, Tint);
     }
   }

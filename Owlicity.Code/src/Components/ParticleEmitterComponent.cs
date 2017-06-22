@@ -17,7 +17,7 @@ namespace Owlicity
     //
     // Runtime data
     //
-    public ParticleEmitter Emitter;
+    public ParticleEmitter Emitter = new ParticleEmitter();
     //public bool IsEmittingEnabled; // Note(manu): Unused for now.
 
     public ParticleEmitterComponent(GameObject owner) : base(owner)
