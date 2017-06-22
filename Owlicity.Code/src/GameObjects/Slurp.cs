@@ -78,9 +78,9 @@ namespace Owlicity
 
     public void OnDeath(int damage)
     {
-      GameObject confetti = GameObjectFactory.CreateKnown(KnownGameObject.DeathConfetti);
+      DeathConfetti confetti = new DeathConfetti();
       confetti.Spatial.CopyFrom(this.Spatial);
-      confetti.GetComponent<AutoDestructComponent>().DestructionDelay = TimeSpan.FromSeconds(1.0f);
+      confetti.AutoDestruct.DestructionDelay = TimeSpan.FromSeconds(1.0f);
       Global.Game.AddGameObject(confetti);
 
       Global.Game.RemoveGameObject(this);

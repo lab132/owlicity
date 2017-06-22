@@ -392,6 +392,7 @@ namespace Owlicity
       foreach(GameObject go in GameObjectsPendingAdd)
       {
         go.Initialize();
+        go.PostInitialize();
       }
       GameObjectsPendingAdd.Clear();
 

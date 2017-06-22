@@ -66,14 +66,16 @@ namespace Owlicity
 
     public virtual void Initialize()
     {
-      ComponentBase[] toInit = Components.Where(c => c.IsInitializationEnabled).ToArray();
-      foreach(ComponentBase component in toInit)
+      foreach(ComponentBase component in Components.Where(c => c.IsInitializationEnabled))
       {
         component.BeforeInitialize?.Invoke();
         component.Initialize();
       }
+    }
 
-      foreach(ComponentBase component in toInit)
+    public virtual void PostInitialize()
+    {
+      foreach(ComponentBase component in Components.Where(c => c.IsInitializationEnabled))
       {
         component.BeforePostInitialize?.Invoke();
         component.PostInitialize();

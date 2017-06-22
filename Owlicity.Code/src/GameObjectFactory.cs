@@ -70,36 +70,7 @@ namespace Owlicity
 
         case KnownGameObject.DeathConfetti:
         {
-          var adc = new AutoDestructComponent(go)
-          {
-            DestructionDelay = TimeSpan.FromSeconds(1.0f),
-          };
-
-          var pec = new ParticleEmitterComponent(go)
-          {
-            NumParticles = 64,
-
-            TextureContentNames = new[]
-            {
-              "confetti/confetti_01",
-              "confetti/confetti_02",
-              "confetti/confetti_03",
-              "confetti/confetti_04",
-              "confetti/confetti_05",
-              "confetti/confetti_06",
-              "confetti/confetti_07",
-            },
-
-            AvailableColors = Global.AllConfettiColors,
-          };
-
-          pec.BeforePostInitialize += delegate ()
-          {
-            pec.Emitter.MaxTTL = 0.8f * (float)adc.DestructionDelay.TotalSeconds;
-            pec.Emitter.MaxParticleSpread = 0.05f;
-            pec.Emitter.MaxParticleSpeed = 5f;
-            pec.Emit(go.GetWorldSpatialData().Position);
-          };
+          go = new DeathConfetti();
         }
         break;
 
@@ -130,17 +101,15 @@ namespace Owlicity
 
               Global.Game.RemoveGameObject(go);
 
-              var confetti = CreateKnown(KnownGameObject.DeathConfetti);
+              DeathConfetti confetti = new DeathConfetti();
               confetti.Spatial.CopyFrom(go.Spatial);
+              confetti.AutoDestruct.DestructionDelay = TimeSpan.FromSeconds(0.25f);
 
-              confetti.GetComponent<AutoDestructComponent>().DestructionDelay = TimeSpan.FromSeconds(0.25f);
-
-              var confettiPec = confetti.GetComponent<ParticleEmitterComponent>();
-              confettiPec.NumParticles = 16;
+              confetti.ParticleEmitter.NumParticles = 16;
               Vector2 g = -2.5f * bc.Body.LinearVelocity;
-              confettiPec.BeforePostInitialize += () =>
+              confetti.ParticleEmitter.BeforePostInitialize += () =>
               {
-                confettiPec.Emitter.Gravity = g;
+                confetti.ParticleEmitter.Emitter.Gravity = g;
               };
 
               Global.Game.AddGameObject(confetti);

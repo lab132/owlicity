@@ -56,6 +56,7 @@
     <Compile Include="src\ComponentBase.cs" />
     <Compile Include="src\GameObjectFactory.cs" />
     <Compile Include="src\GameObjects\CameraObject.cs" />
+    <Compile Include="src\GameObjects\DeathConfetti.cs" />
     <Compile Include="src\GameObjects\Owliver.cs" />
     <Compile Include="src\Components\ParticleEmitterComponent.cs" />
     <Compile Include="src\Components\PickupComponent.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="src\Global.cs" />
     <Compile Include="src\Input.cs" />
     <Compile Include="src\Level.cs" />
+    <Compile Include="src\Hud.cs" />
     <Compile Include="src\Spatial.cs" />
     <Compile Include="src\Particle.cs" />
     <Compile Include="src\ParticleEmitter.cs" />

@@ -70,15 +70,15 @@ namespace Owlicity
     {
       Global.Game.RemoveGameObject(this);
 
-      GameObject confetti = GameObjectFactory.CreateKnown(KnownGameObject.DeathConfetti);
+      DeathConfetti confetti = new DeathConfetti();
       confetti.Spatial.CopyFrom(this.Spatial);
-      confetti.GetComponent<AutoDestructComponent>().DestructionDelay = TimeSpan.FromSeconds(5.0f);
-      ParticleEmitterComponent deathEmitter = confetti.GetComponent<ParticleEmitterComponent>();
-      deathEmitter.NumParticles = 4096;
-      deathEmitter.BeforePostInitialize += () =>
+      confetti.AutoDestruct.DestructionDelay = TimeSpan.FromSeconds(5.0f);
+      confetti.ParticleEmitter = confetti.GetComponent<ParticleEmitterComponent>();
+      confetti.ParticleEmitter.NumParticles = 4096;
+      confetti.ParticleEmitter.BeforePostInitialize += () =>
       {
         // TODO(manu): Somehow, this doesn't work...
-        deathEmitter.Emitter.MaxParticleSpeed = 200.0f;
+        confetti.ParticleEmitter.Emitter.MaxParticleSpeed = 200.0f;
       };
       Global.Game.AddGameObject(confetti);
     }

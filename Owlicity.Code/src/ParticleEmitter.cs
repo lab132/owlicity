@@ -22,6 +22,11 @@ namespace Owlicity
     private Color[] _colors;
     private Stack<int> _freeParticleSlots;
 
+    public ParticleEmitter()
+    {
+
+    }
+
     public ParticleEmitter(int maxNumParticles, Texture2D texture, params Color[] colors)
       : this(maxNumParticles, new List<Texture2D> { texture }, new List<Color>(colors))
     {
