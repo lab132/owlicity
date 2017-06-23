@@ -7,13 +7,9 @@ namespace Owlicity
 {
   public class SpringArmComponent : SpatialComponent
   {
-    #region Dependencies
-
     // The body to move towards the target (optional).
     public BodyComponent BodyComponent;
-
-    #endregion Dependencies
-    #region Input data
+    public Body MyBody => BodyComponent?.Body;
 
     public ISpatial Target;
 
@@ -26,12 +22,7 @@ namespace Owlicity
     // The actual speed is determined by the distance to the target times this factor.
     public float SpeedFactor = 0.1f;
 
-    #endregion Input data
-    #region Runtime data
 
-    public Body MyBody => BodyComponent?.Body;
-
-    #endregion
 
     public SpringArmComponent(GameObject owner)
       : base(owner)

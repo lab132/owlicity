@@ -4,15 +4,9 @@ namespace Owlicity
 {
   public class SpriteComponent : DrawComponent
   {
-    //
-    // Init data
-    //
     public string SpriteContentName;
-
-    //
-    // Runtime data
-    //
     public Sprite Sprite = new Sprite();
+
 
     public SpriteComponent(GameObject owner) : base(owner)
     {

@@ -57,12 +57,13 @@ namespace Owlicity
       };
       HealthDisplay.AttachTo(Animation);
 
-      GameObjectFactory.CreateOnHitSquasher(this, Health).SetDefaultCurves(HitDuration);
+      GameObjectFactory.CreateOnHitSquasher(this, Health, Animation).SetDefaultCurves(HitDuration);
 
-      GameObjectFactory.CreateOnHitBlinkingSequence(this, Health).SetDefaultCurves(HitDuration);
+      GameObjectFactory.CreateOnHitBlinkingSequence(this, Health, Animation).SetDefaultCurves(HitDuration);
 
       Homing = new HomingComponent(this)
       {
+        BodyComponent = BodyComponent,
         TargetRange = 3.0f,
         Speed = 0.5f,
 

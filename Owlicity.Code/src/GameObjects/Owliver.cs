@@ -176,6 +176,7 @@ namespace Owlicity
 
       Movement = new MovementComponent(this)
       {
+        BodyComponent = BodyComponent,
         ManualInputProcessing = true,
         MaxMovementSpeed = 2.5f,
       };
@@ -206,9 +207,9 @@ namespace Owlicity
       };
       Health.OnHit += OnHit;
 
-      GameObjectFactory.CreateOnHitSquasher(this, Health).SetDefaultCurves(HitDuration);
+      GameObjectFactory.CreateOnHitSquasher(this, Health, Animation).SetDefaultCurves(HitDuration);
 
-      GameObjectFactory.CreateOnHitBlinkingSequence(this, Health).SetDefaultCurves(HitDuration);
+      GameObjectFactory.CreateOnHitBlinkingSequence(this, Health, Animation).SetDefaultCurves(HitDuration);
 
       MoneyBag = new MoneyBagComponent(this)
       {

@@ -6,12 +6,6 @@ using System.Threading.Tasks;
 
 namespace Owlicity
 {
-  public enum CurrencyType
-  {
-    Bonbon,
-    Key,
-  }
-
   public class MoneyBagComponent
     : ComponentBase
   {

@@ -33,16 +33,6 @@ namespace Owlicity
       return result;
     }
 
-    public override void Initialize()
-    {
-      base.Initialize();
-
-      if(BodyComponent == null)
-      {
-        BodyComponent = Owner.GetComponent<BodyComponent>();
-      }
-    }
-
     public override void PrePhysicsUpdate(float deltaSeconds)
     {
       base.PrePhysicsUpdate(deltaSeconds);

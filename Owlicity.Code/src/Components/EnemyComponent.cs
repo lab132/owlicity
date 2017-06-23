@@ -8,6 +8,7 @@ using VelcroPhysics.Dynamics;
 
 namespace Owlicity
 {
+  // Note(manu): This component is not used at the moment...
   public class EnemyComponent : ComponentBase
   {
     //

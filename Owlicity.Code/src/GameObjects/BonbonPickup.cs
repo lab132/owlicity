@@ -42,6 +42,7 @@ namespace Owlicity
 
       Homing = new HomingComponent(this)
       {
+        BodyComponent = BodyComponent,
         TargetRange = 1.0f,
         Speed = 3.0f,
 
@@ -49,7 +50,10 @@ namespace Owlicity
       };
       Homing.AttachTo(BodyComponent);
 
-      Pickup = new PickupComponent(this);
+      Pickup = new PickupComponent(this)
+      {
+        BodyComponent = BodyComponent,
+      };
     }
 
     public override void Initialize()

@@ -127,7 +127,7 @@ namespace Owlicity
       // Trigger body
       //
       {
-        Vector2 dim = Conversion.ToMeters(60, 130);
+        Vector2 dim = Conversion.ToMeters(60, 80);
         Trigger.Spatial.LocalAABB = new AABB
         {
           LowerBound = -0.5f * dim,
@@ -135,7 +135,8 @@ namespace Owlicity
         };
 
         SpatialData s = Trigger.GetWorldSpatialData();
-        s.Position.Y -= Conversion.ToMeters((0.5f * 128) - 20);
+        s.Position.Y -= Conversion.ToMeters(20);
+        //s.Position.Y -= Conversion.ToMeters((0.5f * 128) - 10);
         Trigger.Body = BodyFactory.CreateRectangle(
           world: Global.Game.World,
           width: s.LocalAABB.Width,

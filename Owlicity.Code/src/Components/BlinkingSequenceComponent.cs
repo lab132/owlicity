@@ -64,16 +64,6 @@ namespace Owlicity
       MaxCursor = ColorTrackR.Keys.Last().Position;
     }
 
-    public override void Initialize()
-    {
-      base.Initialize();
-
-      if(Animation == null)
-      {
-        Animation = Owner.GetComponent<SpriteAnimationComponent>();
-      }
-    }
-
     public override void Update(float deltaSeconds)
     {
       base.Update(deltaSeconds);

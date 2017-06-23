@@ -33,10 +33,14 @@ namespace Owlicity
 
       KeyRing = new KeyRingComponent(this);
 
-      Pickup = new PickupComponent(this);
+      Pickup = new PickupComponent(this)
+      {
+        BodyComponent = BodyComponent,
+      };
 
       Homing = new HomingComponent(this)
       {
+        BodyComponent = BodyComponent,
         TargetRange = 1.0f,
         Speed = 3.0f,
 

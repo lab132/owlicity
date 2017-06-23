@@ -54,11 +54,11 @@ namespace Owlicity
       };
       HealthDisplay.AttachTo(Animation);
 
-      GameObjectFactory.CreateOnHitSquasher(this, Health).SetDefaultCurves(
+      GameObjectFactory.CreateOnHitSquasher(this, Health, Animation).SetDefaultCurves(
         duration: HitDuration,
         extremeScale: new Vector2(0.9f, 1.1f));
 
-      GameObjectFactory.CreateOnHitBlinkingSequence(this, Health).SetDefaultCurves(HitDuration);
+      GameObjectFactory.CreateOnHitBlinkingSequence(this, Health, Animation).SetDefaultCurves(HitDuration);
     }
 
     private void OnHit(int damage)

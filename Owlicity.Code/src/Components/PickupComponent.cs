@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,11 +21,7 @@ namespace Owlicity
     {
       base.Initialize();
 
-      if(BodyComponent == null)
-      {
-        BodyComponent = Owner.GetComponent<BodyComponent>();
-      }
-
+      Debug.Assert(BodyComponent != null);
       BodyComponent.Body.OnCollision += OnCollision;
     }
 

@@ -9,17 +9,10 @@ namespace Owlicity
 {
   public class SquashComponent : ComponentBase
   {
-    //
-    // Initialization data. See also SetupDefaultSquashData().
-    //
-    public HealthComponent Health;
     public Curve SquashCurveX;
     public Curve SquashCurveY;
 
-    //
-    // Runtime data.
-    //
-    public SpriteAnimationComponent SpriteAnimationComponent { get; set; }
+    public SpriteAnimationComponent Animation;
 
     public float MaxCursor;
     public float CurrentCursor;
@@ -58,21 +51,11 @@ namespace Owlicity
       MaxCursor = SquashCurveX.Keys.Last().Position;
     }
 
-    public override void Initialize()
-    {
-      base.Initialize();
-
-      if(SpriteAnimationComponent == null)
-      {
-        SpriteAnimationComponent = Owner.GetComponent<SpriteAnimationComponent>();
-      }
-    }
-
     public override void Update(float deltaSeconds)
     {
       base.Update(deltaSeconds);
 
-      if(SpriteAnimationComponent != null && IsSquashing)
+      if(Animation != null && IsSquashing)
       {
         CurrentCursor += deltaSeconds;
 
@@ -81,13 +64,13 @@ namespace Owlicity
           // Squashing has ended. :(
           CurrentCursor = 0.0f;
           MaxCursor = 0.0f;
-          SpriteAnimationComponent.AdditionalScale = null;
+          Animation.AdditionalScale = null;
         }
         else
         {
           float scaleX = SquashCurveX.Evaluate(CurrentCursor);
           float scaleY = SquashCurveY.Evaluate(CurrentCursor);
-          SpriteAnimationComponent.AdditionalScale = new Vector2(scaleX, scaleY);
+          Animation.AdditionalScale = new Vector2(scaleX, scaleY);
         }
       }
     }

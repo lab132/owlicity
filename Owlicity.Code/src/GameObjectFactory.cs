@@ -17,9 +17,12 @@ namespace Owlicity
       _knownCreationCount = new int[Enum.GetNames(typeof(KnownGameObject)).Length];
     }
 
-    public static SquashComponent CreateOnHitSquasher(GameObject go, HealthComponent health)
+    public static SquashComponent CreateOnHitSquasher(GameObject go, HealthComponent health, SpriteAnimationComponent animation)
     {
-      var result = new SquashComponent(go);
+      var result = new SquashComponent(go)
+      {
+        Animation = animation,
+      };
       health.OnHit += (damage) =>
       {
         result.StartSequence();
@@ -28,9 +31,12 @@ namespace Owlicity
       return result;
     }
 
-    public static BlinkingSequenceComponent CreateOnHitBlinkingSequence(GameObject go, HealthComponent health)
+    public static BlinkingSequenceComponent CreateOnHitBlinkingSequence(GameObject go, HealthComponent health, SpriteAnimationComponent animation)
     {
-      var result = new BlinkingSequenceComponent(go);
+      var result = new BlinkingSequenceComponent(go)
+      {
+        Animation = animation,
+      };
       health.OnHit += (damage) =>
       {
         result.StartSequence();
