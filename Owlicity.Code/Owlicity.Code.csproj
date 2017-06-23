@@ -45,7 +45,9 @@
     <Compile Include="src\Components\AutoDestructComponent.cs" />
     <Compile Include="src\Components\BlinkingSequenceComponent.cs" />
     <Compile Include="src\Components\BodyComponent.cs" />
+    <Compile Include="src\Components\PickupComponent.cs" />
     <Compile Include="src\GameObjects\KeyPickup.cs" />
+    <Compile Include="src\GameObjects\ShopItem.cs" />
     <Compile Include="src\KeyType.cs" />
     <Compile Include="src\Components\SpringArmComponent.cs" />
     <Compile Include="src\Components\HealthDisplayComponent.cs" />
@@ -65,9 +67,7 @@
     <Compile Include="src\GameObjects\Gate.cs" />
     <Compile Include="src\GameObjects\Owliver.cs" />
     <Compile Include="src\Components\ParticleEmitterComponent.cs" />
-    <Compile Include="src\Components\PickupComponent.cs" />
     <Compile Include="src\Components\HomingComponent.cs" />
-    <Compile Include="src\Components\ShopItemComponent.cs" />
     <Compile Include="src\Components\SpriteAnimationComponent.cs" />
     <Compile Include="src\Components\SpriteComponent.cs" />
     <Compile Include="src\Components\SquashComponent.cs" />

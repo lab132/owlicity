@@ -125,10 +125,10 @@ namespace Owlicity
       if(Owliver.KeyRing != null)
       {
         SpatialData anchor = KeyRingAnchor.GetWorldSpatialData();
-        for(int keyTypeIndex = 0; keyTypeIndex < Owliver.KeyRing.CurrentKeyAmounts.Length; keyTypeIndex++)
+        for(int keyTypeIndex = 0; keyTypeIndex < (int)KeyType.COUNT; keyTypeIndex++)
         {
           KeyType keyType = (KeyType)keyTypeIndex;
-          int keyAmount = Owliver.KeyRing.CurrentKeyAmounts[keyTypeIndex];
+          int keyAmount = Owliver.KeyRing[keyType];
           SpriteAnimationInstance keyAnim = KeyAnimations[keyTypeIndex];
           SpatialData spatial = anchor.GetWorldSpatialData();
           for(int keyIndex = 0; keyIndex < keyAmount; keyIndex++)

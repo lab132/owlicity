@@ -70,7 +70,7 @@ namespace Owlicity
     public BodyComponent BodyComponent;
     public Body MyBody;
 
-    public HashSet<ShopItemComponent> ConnectedShopItems = new HashSet<ShopItemComponent>();
+    public HashSet<ShopItem> ConnectedShopItems = new HashSet<ShopItem>();
 
     public MovementComponent Movement;
     public HealthComponent Health;
@@ -246,16 +246,16 @@ namespace Owlicity
       {
         foreach (KeyRingComponent keyRing in go.GetComponents<KeyRingComponent>())
         {
-          for (int keyTypeIndex = 0; keyTypeIndex < (int)KeyType.COUNT; keyTypeIndex++)
+          foreach(KeyType keyType in Global.IterKeyTypes())
           {
-            int amountStolen = keyRing.CurrentKeyAmounts[keyTypeIndex];
-            keyRing.CurrentKeyAmounts[keyTypeIndex] = 0;
-            KeyRing.CurrentKeyAmounts[keyTypeIndex] += amountStolen;
+            int amountStolen = keyRing[keyType];
+            keyRing[keyType] = 0;
+            this.KeyRing[keyType] += amountStolen;
           }
         }
       }
 
-      foreach(ShopItemComponent shopItem in go.GetComponents<ShopItemComponent>())
+      if(go is ShopItem shopItem)
       {
         ConnectedShopItems.Add(shopItem);
         shopItem.IsSelected = true;
@@ -263,11 +263,11 @@ namespace Owlicity
       }
     }
 
-    private void OnSeparation(Fixture fixtureA, Fixture fixtureB, Contact contact)
+    private void OnSeparation(Fixture myFixture, Fixture theirFixture, Contact contact)
     {
-      GameObject go = ((ComponentBase)fixtureB.Body.UserData).Owner;
+      GameObject go = ((BodyComponent)theirFixture.Body.UserData).Owner;
 
-      foreach(ShopItemComponent shopItem in go.GetComponents<ShopItemComponent>())
+      if(go is ShopItem shopItem)
       {
         shopItem.IsSelected = false;
         ConnectedShopItems.Remove(shopItem);
@@ -386,7 +386,7 @@ namespace Owlicity
 
       if(input.WantsInteraction)
       {
-        foreach(ShopItemComponent shopItem in ConnectedShopItems)
+        foreach(ShopItem shopItem in ConnectedShopItems)
         {
           bool purchase = false;
           bool removeIfPurchased = true;
@@ -413,7 +413,7 @@ namespace Owlicity
                   ChangeState(ref newState);
 
                   var newGo = GameObjectFactory.CreateKnown(KnownGameObject.ShopItem_Stick);
-                  newGo.Spatial.CopyFrom(shopItem.Owner.Spatial);
+                  newGo.Spatial.CopyFrom(shopItem.Spatial);
                   Global.Game.AddGameObject(newGo);
                 }
               }
@@ -428,7 +428,7 @@ namespace Owlicity
                   ChangeState(ref newState);
 
                   var newGo = GameObjectFactory.CreateKnown(KnownGameObject.ShopItem_FishingRod);
-                  newGo.Spatial.CopyFrom(shopItem.Owner.Spatial);
+                  newGo.Spatial.CopyFrom(shopItem.Spatial);
                   Global.Game.AddGameObject(newGo);
                 }
               }
@@ -443,9 +443,14 @@ namespace Owlicity
             MoneyBag.CurrentAmount -= price;
             if(removeIfPurchased)
             {
-              Global.Game.RemoveGameObject(shopItem.Owner);
+              Global.Game.RemoveGameObject(shopItem);
             }
           }
+        }
+
+        foreach(ShopItem shopItem in ConnectedShopItems)
+        {
+          shopItem.IsAffordable = MoneyBag.CurrentAmount >= shopItem.PriceValue;
         }
       }
 

@@ -133,82 +133,8 @@ namespace Owlicity
         case KnownGameObject.ShopItem_FishingRod:
         case KnownGameObject.ShopItem_Stick:
         {
-          var bc = new BodyComponent(go)
-          {
-            InitMode = BodyComponentInitMode.Manual,
-          };
-          bc.BeforeInitialize += () =>
-          {
-            SpatialData s = bc.GetWorldSpatialData();
-            bc.Body = BodyFactory.CreateBody(
-              world: Global.Game.World,
-              position: s.Position,
-              rotation: s.Rotation.Radians,
-              bodyType: BodyType.Static,
-              userData: bc);
-            FixtureFactory.AttachRectangle(
-              body: bc.Body,
-              width: Conversion.ToMeters(100),
-              height: Conversion.ToMeters(100),
-              offset: Conversion.ToMeters(0, 100),
-              density: Global.OwliverDensity,
-              userData: bc);
-            bc.Body.IsSensor = true;
-            bc.Body.CollidesWith = Global.OwliverCollisionCategory;
-          };
-          go.RootComponent = bc;
-
-          var sacItem = new SpriteAnimationComponent(go)
-          {
-            DepthReference = null,
-            RenderDepth = 0.1f,
-            AnimationTypes = new List<SpriteAnimationType>(),
-          };
-          sacItem.AttachTo(bc);
-
-          var sacPriceTag = new SpriteAnimationComponent(go)
-          {
-            DepthReference = null,
-            RenderDepth = 0.11f,
-            AnimationTypes = new List<SpriteAnimationType>
-            {
-              SpriteAnimationType.PriceTag_20,
-              SpriteAnimationType.PriceTag_100,
-            },
-          };
-          sacPriceTag.Spatial.Position.Y -= Conversion.ToMeters(10);
-          sacPriceTag.AttachTo(sacItem);
-
-          var sic = new ShopItemComponent(go)
-          {
-            PriceTag = sacPriceTag,
-          };
-
-          switch(type)
-          {
-            case KnownGameObject.ShopItem_FruitBowl:
-            {
-              sacItem.AnimationTypes.Add(SpriteAnimationType.FruitBowl);
-              sic.ItemType = ShopItemType.FruitBowl;
-            }
-            break;
-
-            case KnownGameObject.ShopItem_FishingRod:
-            {
-              sacItem.AnimationTypes.Add(SpriteAnimationType.FishingRod_Left);
-              sic.ItemType = ShopItemType.FishingRod;
-            }
-            break;
-
-            case KnownGameObject.ShopItem_Stick:
-            {
-              sacItem.AnimationTypes.Add(SpriteAnimationType.Stick_Left);
-              sic.ItemType = ShopItemType.Stick;
-            }
-            break;
-
-            default: throw new ArgumentException(nameof(type));
-          }
+          ShopItemType itemType = (ShopItemType)(type - KnownGameObject.ShopItem_FruitBowl);
+          go = new ShopItem() { ItemType = itemType };
         }
         break;
 

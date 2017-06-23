@@ -45,6 +45,7 @@ namespace Owlicity
     Bonbon_Red,
     Key_Gold,
 
+    // Shop items
     ShopItem_FruitBowl,
     ShopItem_FishingRod,
     ShopItem_Stick,

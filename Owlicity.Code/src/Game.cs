@@ -253,7 +253,7 @@ namespace Owlicity
       }
 
       {
-        var testKey = GameObjectFactory.CreateKnown(KnownGameObject.Key_Gold);
+        var testKey = new KeyPickup() { KeyType = KeyType.Gold };
         testKey.Spatial.Position += Conversion.ToMeters(700, 720);
         AddGameObject(testKey);
       }
@@ -269,14 +269,14 @@ namespace Owlicity
         testShop.Spatial.Position += Conversion.ToMeters(1300, 500);
         AddGameObject(testShop);
 
-        var testFruitBowl = GameObjectFactory.CreateKnown(KnownGameObject.ShopItem_FruitBowl);
-        testFruitBowl.GetComponent<ShopItemComponent>().Price = ShopItemPriceType._20;
+        var testFruitBowl = new ShopItem() { ItemType = ShopItemType.FruitBowl };
+        testFruitBowl.Price = ShopItemPriceType._20;
         testFruitBowl.AttachTo(testShop);
         testFruitBowl.Spatial.Position += Conversion.ToMeters(-110.0f, -90.0f);
         AddGameObject(testFruitBowl);
 
-        var testRod = GameObjectFactory.CreateKnown(KnownGameObject.ShopItem_FishingRod);
-        testRod.GetComponent<ShopItemComponent>().Price = ShopItemPriceType._100;
+        var testRod = new ShopItem() { ItemType = ShopItemType.FishingRod };
+        testRod.Price = ShopItemPriceType._100;
         testRod.AttachTo(testShop);
         testRod.Spatial.Position += Conversion.ToMeters(128.0f, -80.0f);
         AddGameObject(testRod);

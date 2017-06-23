@@ -20,6 +20,8 @@ namespace Owlicity
     public BodyComponent Trigger;
     public SpriteAnimationComponent Animation;
 
+    public KeyType KeyTypeToUnlock;
+
     public bool IsOpen => Trigger.Body == null;
 
     public Gate()
@@ -159,10 +161,9 @@ namespace Owlicity
 
       foreach(KeyRingComponent keyRing in go.GetComponents<KeyRingComponent>())
       {
-        const int keyIndex = (int)KeyType.Gold;
-        if(keyRing.CurrentKeyAmounts[keyIndex] > 0)
+        if(keyRing[KeyTypeToUnlock] > 0)
         {
-          keyRing.CurrentKeyAmounts[keyIndex]--;
+          keyRing[KeyTypeToUnlock]--;
 
           Trigger.Body.OnCollision -= OnCollisionWithTrigger;
           Global.Game.World.RemoveBody(Trigger.Body);
