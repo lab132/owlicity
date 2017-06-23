@@ -57,6 +57,7 @@
     <Compile Include="src\GameObjects\BackgroundScreen.cs" />
     <Compile Include="src\GameObjects\CameraObject.cs" />
     <Compile Include="src\GameObjects\DeathConfetti.cs" />
+    <Compile Include="src\GameObjects\Flora.cs" />
     <Compile Include="src\GameObjects\Gate.cs" />
     <Compile Include="src\GameObjects\Owliver.cs" />
     <Compile Include="src\Components\ParticleEmitterComponent.cs" />

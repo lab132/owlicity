@@ -92,38 +92,19 @@ namespace Owlicity
         }
         break;
 
-        case KnownGameObject.Tree_Fir:
-        case KnownGameObject.Tree_FirAlt:
-        case KnownGameObject.Tree_Conifer:
-        case KnownGameObject.Tree_ConiferAlt:
-        case KnownGameObject.Tree_Oak:
-        case KnownGameObject.Tree_Orange:
-        case KnownGameObject.Bush:
+        case KnownGameObject.Flora_Fir:
+        case KnownGameObject.Flora_FirAlt:
+        case KnownGameObject.Flora_Conifer:
+        case KnownGameObject.Flora_ConiferAlt:
+        case KnownGameObject.Flora_Oak:
+        case KnownGameObject.Flora_Orange:
+        case KnownGameObject.Flora_Bush:
         {
-          List<SpriteAnimationType> animTypes = new List<SpriteAnimationType>();
-          switch(type)
+          FloraType floraType = (FloraType)(type - KnownGameObject.Flora_Fir);
+          go = new Flora()
           {
-            case KnownGameObject.Tree_Fir: animTypes.Add(SpriteAnimationType.Fir_Idle); break;
-            case KnownGameObject.Tree_FirAlt: animTypes.Add(SpriteAnimationType.FirAlt_Idle); go.Layer = GameLayer.CloseToTheScreen; break;
-            case KnownGameObject.Tree_Conifer: animTypes.Add(SpriteAnimationType.Conifer_Idle); break;
-            case KnownGameObject.Tree_ConiferAlt: animTypes.Add(SpriteAnimationType.ConiferAlt_Idle); go.Layer = GameLayer.CloseToTheScreen; break;
-            case KnownGameObject.Tree_Oak: animTypes.Add(SpriteAnimationType.Oak_Idle); break;
-            case KnownGameObject.Tree_Orange: animTypes.Add(SpriteAnimationType.Orange_Idle); break;
-            case KnownGameObject.Bush: animTypes.Add(SpriteAnimationType.Bush_Idle); break;
-
-            default: throw new InvalidProgramException();
-          }
-
-          var sa = new SpriteAnimationComponent(go)
-          {
-            AnimationTypes = animTypes,
-            DepthReference = null, // Don't determine depth automatically
+            TreeType = floraType,
           };
-          sa.BeforePostInitialize += () =>
-          {
-            sa.RenderDepth = Global.Game.CalcDepth(sa.GetWorldSpatialData(), go.Layer);
-          };
-          sa.AttachTo(go);
         }
         break;
 
@@ -325,22 +306,22 @@ namespace Owlicity
 
         case KnownGameObject.Random_FirTree:
         {
-          KnownGameObject choice = _random.Choose(KnownGameObject.Tree_Fir, KnownGameObject.Tree_Conifer);
-          go = CreateKnown(choice);
+          FloraType floraType = _random.Choose(FloraType.Fir, FloraType.Conifer);
+          go = new Flora() { TreeType = floraType, };
         }
         break;
 
         case KnownGameObject.Random_FirTreeAlt:
         {
-          KnownGameObject choice = _random.Choose(KnownGameObject.Tree_FirAlt, KnownGameObject.Tree_ConiferAlt);
-          go = CreateKnown(choice);
+          FloraType floraType = _random.Choose(FloraType.FirAlt, FloraType.ConiferAlt);
+          go = new Flora() { TreeType = floraType, };
         }
         break;
 
         case KnownGameObject.Random_OakTree:
         {
-          KnownGameObject choice = _random.Choose(KnownGameObject.Tree_Oak, KnownGameObject.Tree_Orange);
-          go = CreateKnown(choice);
+          FloraType floraType = _random.Choose(FloraType.Oak, FloraType.Orange);
+          go = new Flora() { TreeType = floraType, };
         }
         break;
 

@@ -29,13 +29,16 @@ namespace Owlicity
     // Static stuff
     BackgroundScreen,
     Gate,
-    Tree_Fir,
-    Tree_FirAlt, // is "upside down"
-    Tree_Conifer,
-    Tree_ConiferAlt, // is "upside down"
-    Tree_Oak,
-    Tree_Orange,
-    Bush,
+
+    // Flora
+    // Note(manu): Keep the flora stuff together please.
+    Flora_Fir,
+    Flora_FirAlt, // is "upside down"
+    Flora_Conifer,
+    Flora_ConiferAlt, // is "upside down"
+    Flora_Oak,
+    Flora_Orange,
+    Flora_Bush,
 
     // Pickups
     Bonbon_Gold,

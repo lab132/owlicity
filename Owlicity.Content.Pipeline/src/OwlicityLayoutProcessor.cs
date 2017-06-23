@@ -33,7 +33,7 @@ namespace Owlicity.Content.Pipeline
       { new Color(255,   0,   0), KnownGameObject.Random_FirTree },
       { new Color(  0,   0, 255), KnownGameObject.Random_OakTree },
       { new Color(255,   0, 255), KnownGameObject.Random_FirTreeAlt },
-      { new Color(255, 255,   0), KnownGameObject.Bush },
+      { new Color(255, 255,   0), KnownGameObject.Flora_Bush },
     };
 
     struct JobInfo
@@ -165,7 +165,7 @@ namespace Owlicity.Content.Pipeline
         case 0xFF0000FF: return KnownGameObject.Random_FirTree;
         case 0x0000FFFF: return KnownGameObject.Random_OakTree;
         case 0xFF00FFFF: return KnownGameObject.Random_FirTreeAlt;
-        case 0xFFFF00FF: return KnownGameObject.Bush;
+        case 0xFFFF00FF: return KnownGameObject.Flora_Bush;
       }
 
       return KnownGameObject.Unknown;
