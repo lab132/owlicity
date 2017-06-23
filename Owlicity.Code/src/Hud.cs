@@ -6,7 +6,7 @@ namespace Owlicity
   // i.e. there is no need to convert to meters!
   public class OwlHud
   {
-    public Owliver Owliver;
+    public Owliver Owliver => Global.Game.Owliver;
 
     public SpatialData HealthIconAnchor = new SpatialData();
     public SpriteAnimationInstance HealthIconAnimation;
@@ -43,8 +43,6 @@ namespace Owlicity
       HealthIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.OwlHealthIcon);
 
       MoneyBagIconAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Bonbon_Gold);
-
-      Owliver = Global.Game.Owliver;
 
       CrossAnimation = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Cross);
 

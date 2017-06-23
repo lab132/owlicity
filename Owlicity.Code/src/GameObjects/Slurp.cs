@@ -88,7 +88,7 @@ namespace Owlicity
 
     public override void Initialize()
     {
-      Homing.Target = Global.Game.Owliver;
+      Homing.Target = Global.Game.Owliver.Center;
       
       {
         SpatialData s = this.GetWorldSpatialData();

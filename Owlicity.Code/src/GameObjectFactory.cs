@@ -111,113 +111,21 @@ namespace Owlicity
         case KnownGameObject.Bonbon_Gold:
         case KnownGameObject.Bonbon_Red:
         {
-          SpriteAnimationType animType;
-          switch(type)
+          BonbonType bonbonType = (BonbonType)(type - KnownGameObject.Bonbon_Gold);
+          go = new BonbonPickup()
           {
-            case KnownGameObject.Bonbon_Gold: animType = SpriteAnimationType.Bonbon_Gold; break;
-            case KnownGameObject.Bonbon_Red: animType = SpriteAnimationType.Bonbon_Red; break;
-            default: throw new InvalidProgramException();
-          }
-
-          var bc = new BodyComponent(go)
-          {
-            InitMode = BodyComponentInitMode.Manual,
+            BonbonType = bonbonType,
           };
-
-          bc.BeforeInitialize += () =>
-          {
-            SpatialData s = bc.GetWorldSpatialData();
-            bc.Body = BodyFactory.CreateCircle(
-              world: Global.Game.World,
-              radius: 0.2f,
-              density: 0.5f * Global.OwliverDensity,
-              position: s.Position,
-              userData: bc);
-            bc.Body.IsSensor = true;
-            bc.Body.CollidesWith = Global.OwliverCollisionCategory;
-          };
-
-          go.RootComponent = bc;
-
-          var sac = new SpriteAnimationComponent(go)
-          {
-            AnimationTypes = new List<SpriteAnimationType>
-            {
-              animType,
-            }
-          };
-          sac.AttachTo(bc);
-
-          var mbc = new MoneyBagComponent(go)
-          {
-            InitialAmount = 10,
-          };
-
-          var puc = new PickupComponent(go);
-
-          var hoc = new HomingComponent(go)
-          {
-            TargetRange = 1.0f,
-            Speed = 3.0f,
-
-            DebugDrawingEnabled = true,
-          };
-          hoc.BeforeInitialize += () =>
-          {
-            hoc.Target = Global.Game.Owliver;
-          };
-          hoc.AttachTo(bc);
         }
         break;
 
         case KnownGameObject.Key_Gold:
         {
-          var bc = new BodyComponent(go)
+          KeyType keyType = (KeyType)(type - KnownGameObject.Key_Gold);
+          go = new KeyPickup()
           {
-            InitMode = BodyComponentInitMode.Manual,
+            KeyType = keyType,
           };
-
-          bc.BeforeInitialize += () =>
-          {
-            SpatialData s = bc.GetWorldSpatialData();
-            bc.Body = BodyFactory.CreateCircle(
-              world: Global.Game.World,
-              radius: 0.2f,
-              density: 2 * Global.OwliverDensity,
-              position: s.Position,
-              userData: bc);
-            bc.Body.IsSensor = true;
-            bc.Body.CollidesWith = Global.OwliverCollisionCategory;
-          };
-
-          go.RootComponent = bc;
-
-          var sac = new SpriteAnimationComponent(go)
-          {
-            AnimationTypes = new List<SpriteAnimationType>
-            {
-              SpriteAnimationType.Key_Gold,
-            }
-          };
-          sac.AttachTo(bc);
-
-          var krc = new KeyRingComponent(go);
-          krc.InitialKeyAmounts[(int)KeyType.Gold] = 1;
-
-          var puc = new PickupComponent(go);
-
-          var hoc = new HomingComponent(go)
-          {
-            TargetRange = 1.0f,
-            Speed = 3.0f,
-
-            DebugDrawingEnabled = true,
-          };
-          hoc.BeforeInitialize += () =>
-          {
-            hoc.Target = Global.Game.Owliver;
-          };
-          hoc.AttachTo(bc);
         }
         break;
 

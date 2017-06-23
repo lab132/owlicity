@@ -76,6 +76,7 @@ namespace Owlicity
     public HealthComponent Health;
     public MoneyBagComponent MoneyBag;
     public KeyRingComponent KeyRing;
+    public SpatialComponent Center;
 
     public OwliverState CurrentState;
     public Action<OwliverState, OwliverState> OnStateChanged;
@@ -168,6 +169,10 @@ namespace Owlicity
         InitMode = BodyComponentInitMode.Manual,
       };
       RootComponent = BodyComponent;
+
+      Center = new SpatialComponent(this);
+      Center.Spatial.Position.Y -= Conversion.ToMeters(80) * Global.OwliverScale.Y;
+      Center.AttachTo(RootComponent);
 
       Movement = new MovementComponent(this)
       {
@@ -507,6 +512,11 @@ namespace Owlicity
         Global.Game.DebugDrawCommands.Add(view =>
         {
           view.DrawAABB(ref weaponAABB, color);
+        });
+
+        Global.Game.DebugDrawCommands.Add(view =>
+        {
+          view.DrawPoint(Center.GetWorldSpatialData().Position, Conversion.ToMeters(5.0f), Color.DarkViolet);
         });
       }
     }

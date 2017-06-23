@@ -40,10 +40,13 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\BonbonType.cs" />
     <Compile Include="src\Camera.cs" />
     <Compile Include="src\Components\AutoDestructComponent.cs" />
     <Compile Include="src\Components\BlinkingSequenceComponent.cs" />
     <Compile Include="src\Components\BodyComponent.cs" />
+    <Compile Include="src\GameObjects\KeyPickup.cs" />
+    <Compile Include="src\KeyType.cs" />
     <Compile Include="src\Components\SpringArmComponent.cs" />
     <Compile Include="src\Components\HealthDisplayComponent.cs" />
     <Compile Include="src\Components\MoneyBagComponent.cs" />
@@ -55,6 +58,7 @@
     <Compile Include="src\ComponentBase.cs" />
     <Compile Include="src\GameObjectFactory.cs" />
     <Compile Include="src\GameObjects\BackgroundScreen.cs" />
+    <Compile Include="src\GameObjects\BonbonPickup.cs" />
     <Compile Include="src\GameObjects\CameraObject.cs" />
     <Compile Include="src\GameObjects\DeathConfetti.cs" />
     <Compile Include="src\GameObjects\Flora.cs" />
