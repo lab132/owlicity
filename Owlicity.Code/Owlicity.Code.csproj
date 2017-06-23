@@ -65,6 +65,7 @@
     <Compile Include="src\Components\SpriteAnimationComponent.cs" />
     <Compile Include="src\Components\SpriteComponent.cs" />
     <Compile Include="src\Components\SquashComponent.cs" />
+    <Compile Include="src\GameObjects\Projectile.cs" />
     <Compile Include="src\GameObjects\Tankton.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Game.cs" />

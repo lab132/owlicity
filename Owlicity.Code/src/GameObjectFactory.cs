@@ -76,55 +76,7 @@ namespace Owlicity
 
         case KnownGameObject.Projectile:
         {
-          var bc = new BodyComponent(go)
-          {
-            InitMode = BodyComponentInitMode.Manual,
-          };
-          bc.BeforePostInitialize += () =>
-          {
-            SpatialData s = go.GetWorldSpatialData();
-            bc.Body = BodyFactory.CreateCapsule(
-              world: Global.Game.World,
-              endRadius: Conversion.ToMeters(9),
-              height: Conversion.ToMeters(50),
-              userData: bc,
-              position: s.Position,
-              rotation: s.Rotation.Radians + new Angle { Degrees = 90.0f + new Random().NextBilateralFloat() * 2 }.Radians,
-              density: 10 * Global.OwliverDensity,
-              bodyType: BodyType.Dynamic);
-            bc.Body.CollisionCategories = Global.OwliverWeaponCollisionCategory;
-            bc.Body.CollidesWith = ~(Global.OwliverCollisionCategory | Global.OwliverWeaponCollisionCategory);
-            bc.Body.IsBullet = true;
-            bc.Body.OnCollision += (fixtureA, fixtureB, contact) =>
-            {
-              Global.HandleDefaultHit(fixtureB.Body, bc.Body.Position, 1, 0.1f);
-
-              Global.Game.RemoveGameObject(go);
-
-              DeathConfetti confetti = new DeathConfetti();
-              confetti.Spatial.CopyFrom(go.Spatial);
-              confetti.AutoDestruct.DestructionDelay = TimeSpan.FromSeconds(0.25f);
-
-              confetti.ParticleEmitter.Emitter.MaxNumParticles = 16;
-              Vector2 g = -2.5f * bc.Body.LinearVelocity;
-              confetti.ParticleEmitter.Emitter.Gravity = g;
-
-              Global.Game.AddGameObject(confetti);
-            };
-          };
-          go.RootComponent = bc;
-
-          var sac = new SpriteAnimationComponent(go)
-          {
-            AnimationTypes = new List<SpriteAnimationType>
-            {
-              SpriteAnimationType.Bonbon_Red,
-            },
-          };
-          sac.Spatial.Rotation.Degrees -= 45.0f;
-          sac.AttachTo(bc);
-
-          var adc = new AutoDestructComponent(go);
+          go = new Projectile();
         }
         break;
 

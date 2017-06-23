@@ -7,6 +7,7 @@ using VelcroPhysics.Dynamics;
 using VelcroPhysics.Shared;
 using VelcroPhysics.Collision.ContactSystem;
 using VelcroPhysics.Factories;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Owlicity
 {
@@ -459,10 +460,11 @@ namespace Owlicity
         if(throwProjectiles)
         {
           float sign = CurrentState.FacingDirection == OwliverFacingDirection.Left ? -1.0f : 1.0f;
-          GameObject projectile = GameObjectFactory.CreateKnown(KnownGameObject.Projectile);
+
+          Projectile projectile = new Projectile();
           projectile.Spatial.CopyFrom(new SpatialData { Position = WeaponAABB.Center });
           projectile.Spatial.Position.X += sign * 0.1f;
-          projectile.GetComponent<AutoDestructComponent>().DestructionDelay = TimeSpan.FromSeconds(2.0f);
+          projectile.AutoDestruct.DestructionDelay = TimeSpan.FromSeconds(2.0f);
 
           Vector2 velocity = sign * new Vector2(8.0f, 0.0f);
 
