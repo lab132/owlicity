@@ -10,7 +10,7 @@ namespace Owlicity
   {
     public Point GridPosition;
     public Vector2 WorldPosition;
-    private GameObject _screenGameObject;
+    private BackgroundScreen _screenGameObject;
     private List<GameObject> _decorationObjects = new List<GameObject>();
 
     public void LoadContent(Level level)
@@ -23,16 +23,11 @@ namespace Owlicity
       // Screen game object
       //
       {
-        var go = GameObjectFactory.CreateKnown(KnownGameObject.BackgroundScreen);
-        go.Spatial.Position += WorldPosition;
+        _screenGameObject = new BackgroundScreen();
+        _screenGameObject.Spatial.Position += WorldPosition;
+        _screenGameObject.ShapeContentName = collisionContentName;
+        _screenGameObject.Sprite.SpriteContentName = groundTextureName;
 
-        var bc = go.Components.OfType<BodyComponent>().Single();
-        bc.ShapeContentName = collisionContentName;
-
-        var sc = go.Components.OfType<SpriteComponent>().Single();
-        sc.SpriteContentName = groundTextureName;
-
-        _screenGameObject = go;
         Global.Game.AddGameObject(_screenGameObject);
       }
 

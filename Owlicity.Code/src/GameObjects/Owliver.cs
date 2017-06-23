@@ -67,6 +67,7 @@ namespace Owlicity
     public SpriteAnimationComponent Animation;
     public float HitDuration = 0.25f;
 
+    public BodyComponent BodyComponent;
     public Body MyBody;
 
     public HashSet<ShopItemComponent> ConnectedShopItems = new HashSet<ShopItemComponent>();
@@ -162,44 +163,11 @@ namespace Owlicity
 
     public Owliver()
     {
-      var bodyComponent = new BodyComponent(this)
+      BodyComponent = new BodyComponent(this)
       {
         InitMode = BodyComponentInitMode.Manual,
       };
-      bodyComponent.BeforeInitialize += () =>
-      {
-        SpatialData s = this.GetWorldSpatialData();
-        bodyComponent.Body = new Body(
-          world: Global.Game.World,
-          position: s.Position,
-          rotation: s.Rotation.Radians,
-          bodyType: BodyType.Dynamic,
-          userdata: bodyComponent);
-
-        float radius = Conversion.ToMeters(60) * Global.OwliverScale.X;
-        float density = Global.OwliverDensity;
-        FixtureFactory.AttachCircle(
-          radius: radius,
-          density: density,
-          body: bodyComponent.Body,
-          offset: Conversion.ToMeters(0, -60) * Global.OwliverScale,
-          userData: bodyComponent);
-        FixtureFactory.AttachCircle(
-          radius: radius,
-          density: density,
-          body: bodyComponent.Body,
-          offset: Conversion.ToMeters(0, -130) * Global.OwliverScale,
-          userData: bodyComponent);
-
-        bodyComponent.Body.FixedRotation = true;
-        bodyComponent.Body.CollisionCategories = Global.OwliverCollisionCategory;
-        bodyComponent.Body.CollidesWith = Global.LevelCollisionCategory | Global.EnemyCollisionCategory;
-        bodyComponent.Body.SleepingAllowed = false;
-        bodyComponent.Body.LinearDamping = 15.0f;
-
-        MyBody = bodyComponent.Body;
-      };
-      RootComponent = bodyComponent;
+      RootComponent = BodyComponent;
 
       Movement = new MovementComponent(this)
       {
@@ -210,31 +178,28 @@ namespace Owlicity
       Animation = new SpriteAnimationComponent(this)
       {
         AnimationTypes = new List<SpriteAnimationType>
-            {
-              SpriteAnimationType.Owliver_Idle_Stick_Left,
-              SpriteAnimationType.Owliver_Idle_Stick_Right,
-              SpriteAnimationType.Owliver_Walk_Stick_Left,
-              SpriteAnimationType.Owliver_Walk_Stick_Right,
-              SpriteAnimationType.Owliver_Attack_Stick_Left,
-              SpriteAnimationType.Owliver_Attack_Stick_Right,
-              SpriteAnimationType.Owliver_Idle_FishingRod_Left,
-              SpriteAnimationType.Owliver_Idle_FishingRod_Right,
-              SpriteAnimationType.Owliver_Walk_FishingRod_Left,
-              SpriteAnimationType.Owliver_Walk_FishingRod_Right,
-              SpriteAnimationType.Owliver_Attack_FishingRod_Left,
-              SpriteAnimationType.Owliver_Attack_FishingRod_Right,
-            },
+        {
+          SpriteAnimationType.Owliver_Idle_Stick_Left,
+          SpriteAnimationType.Owliver_Idle_Stick_Right,
+          SpriteAnimationType.Owliver_Walk_Stick_Left,
+          SpriteAnimationType.Owliver_Walk_Stick_Right,
+          SpriteAnimationType.Owliver_Attack_Stick_Left,
+          SpriteAnimationType.Owliver_Attack_Stick_Right,
+          SpriteAnimationType.Owliver_Idle_FishingRod_Left,
+          SpriteAnimationType.Owliver_Idle_FishingRod_Right,
+          SpriteAnimationType.Owliver_Walk_FishingRod_Left,
+          SpriteAnimationType.Owliver_Walk_FishingRod_Right,
+          SpriteAnimationType.Owliver_Attack_FishingRod_Left,
+          SpriteAnimationType.Owliver_Attack_FishingRod_Right,
+        },
       };
-      Animation.AttachTo(bodyComponent);
+      Animation.AttachTo(BodyComponent);
 
       Health = new HealthComponent(this)
       {
         MaxHealth = 5,
       };
-      Health.OnHit += (damage) =>
-      {
-        Health.MakeInvincible(HitDuration);
-      };
+      Health.OnHit += OnHit;
 
       GameObjectFactory.CreateOnHitSquasher(this, Health).SetDefaultCurves(HitDuration);
 
@@ -255,11 +220,11 @@ namespace Owlicity
       return result;
     }
 
-    private void OnCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
+    private void OnCollision(Fixture myFixture, Fixture theirFixture, Contact contact)
     {
-      Debug.Assert(fixtureA.Body == MyBody);
+      Debug.Assert(myFixture.Body == MyBody);
 
-      GameObject go = ((ComponentBase)fixtureB.Body.UserData).Owner;
+      GameObject go = ((ComponentBase)theirFixture.Body.UserData).Owner;
 
       if (MoneyBag != null)
       {
@@ -304,6 +269,11 @@ namespace Owlicity
       }
     }
 
+    private void OnHit(int damage)
+    {
+      Health.MakeInvincible(HitDuration);
+    }
+
     private void OnAnimationLoopFinished(SpriteAnimationType animType, SpriteAnimationPlaybackState oldPlaybackState, SpriteAnimationPlaybackState newPlaybackState)
     {
       bool isAttackAnimation = _attackAnimations.Contains(animType);
@@ -320,12 +290,45 @@ namespace Owlicity
 
     public override void Initialize()
     {
-      base.Initialize();
+      SpatialData s = this.GetWorldSpatialData();
+      MyBody = new Body(
+        world: Global.Game.World,
+        position: s.Position,
+        rotation: s.Rotation.Radians,
+        bodyType: BodyType.Dynamic,
+        userdata: BodyComponent);
 
-      Animation.OnAnimationPlaybackStateChanged += OnAnimationLoopFinished;
+      float radius = Conversion.ToMeters(60) * Global.OwliverScale.X;
+      float density = Global.OwliverDensity;
+      Fixture lowerFixture = FixtureFactory.AttachCircle(
+        radius: radius,
+        density: density,
+        body: MyBody,
+        offset: Conversion.ToMeters(0, -60) * Global.OwliverScale,
+        userData: BodyComponent);
+      lowerFixture.CollidesWith = Global.LevelCollisionCategory | Global.EnemyCollisionCategory;
+
+      Fixture upperFixture = FixtureFactory.AttachCircle(
+        radius: radius,
+        density: density,
+        body: MyBody,
+        offset: Conversion.ToMeters(0, -130) * Global.OwliverScale,
+        userData: BodyComponent);
+      upperFixture.CollidesWith = Global.EnemyCollisionCategory;
+
+      MyBody.CollisionCategories = Global.OwliverCollisionCategory;
+      MyBody.FixedRotation = true;
+      MyBody.SleepingAllowed = false;
+      MyBody.LinearDamping = 15.0f;
 
       MyBody.OnCollision += OnCollision;
       MyBody.OnSeparation += OnSeparation;
+
+      BodyComponent.Body = MyBody;
+
+      Animation.OnAnimationPlaybackStateChanged += OnAnimationLoopFinished;
+
+      base.Initialize();
     }
 
     public override void Update(float deltaSeconds)

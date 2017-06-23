@@ -55,6 +55,7 @@
     <Compile Include="src\Components\MovementComponent.cs" />
     <Compile Include="src\ComponentBase.cs" />
     <Compile Include="src\GameObjectFactory.cs" />
+    <Compile Include="src\GameObjects\BackgroundScreen.cs" />
     <Compile Include="src\GameObjects\CameraObject.cs" />
     <Compile Include="src\GameObjects\DeathConfetti.cs" />
     <Compile Include="src\GameObjects\Owliver.cs" />

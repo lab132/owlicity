@@ -82,25 +82,7 @@ namespace Owlicity
 
         case KnownGameObject.BackgroundScreen:
         {
-          go.Layer = GameLayer.Background;
-
-          var bc = new BodyComponent(go)
-          {
-            InitMode = BodyComponentInitMode.FromContent,
-            BodyType = BodyType.Static,
-          };
-          bc.BeforePostInitialize += () =>
-          {
-            bc.Body.CollisionCategories = Global.LevelCollisionCategory;
-          };
-          go.RootComponent = bc;
-
-          var sc = new SpriteComponent(go)
-          {
-            DepthReference = null, // Don't determine depth automatically
-            RenderDepth = 1.0f,
-          };
-          sc.AttachTo(bc);
+          go = new BackgroundScreen();
         }
         break;
 

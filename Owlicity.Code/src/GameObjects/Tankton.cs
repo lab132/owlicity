@@ -99,6 +99,11 @@ namespace Owlicity
         segments: 0);
       body.FixedRotation = true;
       body.LinearDamping = 20.0f;
+      body.CollisionCategories = Global.EnemyCollisionCategory;
+      body.CollidesWith = Global.EnemyCollisionCategory |
+                          Global.LevelCollisionCategory |
+                          Global.OwliverCollisionCategory |
+                          Global.OwliverWeaponCollisionCategory;
 
       BodyComponent.Body = body;
 

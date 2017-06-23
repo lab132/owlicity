@@ -118,6 +118,11 @@ namespace Owlicity
         body.LinearDamping = 5.0f;
 
         body.OnCollision += OnCollision;
+        body.CollisionCategories = Global.EnemyCollisionCategory;
+        body.CollidesWith = Global.EnemyCollisionCategory |
+                            Global.LevelCollisionCategory |
+                            Global.OwliverCollisionCategory |
+                            Global.OwliverWeaponCollisionCategory;
 
         BodyComponent.Body = body;
       }
