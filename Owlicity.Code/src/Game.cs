@@ -259,7 +259,7 @@ namespace Owlicity
       }
 
       {
-        var testGate = GameObjectFactory.CreateKnown(KnownGameObject.Gate);
+        var testGate = new Gate();
         testGate.Spatial.Position += Conversion.ToMeters(2300, 1100);
         AddGameObject(testGate);
       }

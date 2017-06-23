@@ -45,7 +45,6 @@
     <Compile Include="src\Components\BlinkingSequenceComponent.cs" />
     <Compile Include="src\Components\BodyComponent.cs" />
     <Compile Include="src\Components\SpringArmComponent.cs" />
-    <Compile Include="src\Components\GateComponent.cs" />
     <Compile Include="src\Components\HealthDisplayComponent.cs" />
     <Compile Include="src\Components\MoneyBagComponent.cs" />
     <Compile Include="src\Components\EnemyComponent.cs" />
@@ -58,6 +57,7 @@
     <Compile Include="src\GameObjects\BackgroundScreen.cs" />
     <Compile Include="src\GameObjects\CameraObject.cs" />
     <Compile Include="src\GameObjects\DeathConfetti.cs" />
+    <Compile Include="src\GameObjects\Gate.cs" />
     <Compile Include="src\GameObjects\Owliver.cs" />
     <Compile Include="src\Components\ParticleEmitterComponent.cs" />
     <Compile Include="src\Components\PickupComponent.cs" />
