@@ -49,23 +49,20 @@ namespace Owlicity
       Body body = BodyFactory.CreateBody(
         world: Global.Game.World,
         position: spatial.Position,
-        rotation: spatial.Rotation.Radians,
-        userData: BodyComponent);
+        rotation: spatial.Rotation.Radians);
 
       FixtureFactory.AttachRectangle(
         body: body,
         offset: Conversion.ToMeters(0, -50),
         width: Conversion.ToMeters(330),
         height: Conversion.ToMeters(100),
-        density: Global.OwliverDensity,
-        userData: BodyComponent);
+        density: Global.OwliverDensity);
       FixtureFactory.AttachRectangle(
         body: body,
         offset: Conversion.ToMeters(0, -160),
         width: Conversion.ToMeters(280),
         height: Conversion.ToMeters(150),
-        density: Global.OwliverDensity,
-        userData: BodyComponent);
+        density: Global.OwliverDensity);
 
       BodyComponent.Body = body;
 

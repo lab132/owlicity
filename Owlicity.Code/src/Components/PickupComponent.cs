@@ -21,7 +21,7 @@ namespace Owlicity
     {
       base.Initialize();
 
-      Debug.Assert(BodyComponent != null);
+      Debug.Assert(BodyComponent?.Body != null);
       BodyComponent.Body.OnCollision += OnCollision;
     }
 

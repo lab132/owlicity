@@ -90,7 +90,6 @@ namespace Owlicity
         position: s.Position,
         rotation: s.Rotation.Radians,
         bodyType: BodyType.Dynamic,
-        userData: BodyComponent,
         width: dim.X,
         height: dim.Y,
         xRadius: 0.5f,
@@ -99,11 +98,7 @@ namespace Owlicity
         segments: 0);
       body.FixedRotation = true;
       body.LinearDamping = 20.0f;
-      body.CollisionCategories = Global.EnemyCollisionCategory;
-      body.CollidesWith = Global.EnemyCollisionCategory |
-                          Global.LevelCollisionCategory |
-                          Global.OwliverCollisionCategory |
-                          Global.OwliverWeaponCollisionCategory;
+      body.CollisionCategories = CollisionCategory.Enemy;
 
       BodyComponent.Body = body;
 

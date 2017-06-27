@@ -33,7 +33,7 @@ namespace Owlicity
       {
         AnimationTypes = new List<SpriteAnimationType>(),
       };
-      Animation.AttachTo(BodyComponent);
+      Animation.AttachTo(RootComponent);
 
       MoneyBag = new MoneyBagComponent(this)
       {
@@ -48,7 +48,7 @@ namespace Owlicity
 
         DebugDrawingEnabled = true,
       };
-      Homing.AttachTo(BodyComponent);
+      Homing.AttachTo(RootComponent);
 
       Pickup = new PickupComponent(this)
       {
@@ -63,10 +63,9 @@ namespace Owlicity
         world: Global.Game.World,
         radius: 0.2f,
         density: 0.5f * Global.OwliverDensity,
-        position: s.Position,
-        userData: BodyComponent);
+        position: s.Position);
       BodyComponent.Body.IsSensor = true;
-      BodyComponent.Body.CollidesWith = Global.OwliverCollisionCategory;
+      BodyComponent.Body.CollidesWith = CollisionCategory.Friendly;
 
       SpriteAnimationType animType = SpriteAnimationType.Bonbon_Gold + (int)BonbonType;
       Animation.AnimationTypes.Add(animType);

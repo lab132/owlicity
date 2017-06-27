@@ -89,8 +89,7 @@ namespace Owlicity
           density: density,
           position: s.Position + new Vector2(outerLeft + innerLeft + 0.5f * inner, 0.0f),
           rotation: s.Rotation.Radians,
-          bodyType: BodyType.Static,
-          userData: InnerBodyComponent);
+          bodyType: BodyType.Static);
       }
 
       //
@@ -103,8 +102,7 @@ namespace Owlicity
           world: Global.Game.World,
           position: s.Position,
           rotation: s.Rotation.Radians,
-          bodyType: BodyType.Static,
-          userData: OuterBodyComponent);
+          bodyType: BodyType.Static);
 
         Vector2 offsetRight = Conversion.ToMeters(300, 0);
         FixtureFactory.AttachRectangle(
@@ -112,15 +110,13 @@ namespace Owlicity
           width: outerLeft,
           height: barrierHeight,
           offset: new Vector2(0.5f * outerLeft, 0.0f),
-          density: density,
-          userData: OuterBodyComponent);
+          density: density);
         FixtureFactory.AttachRectangle(
           body: OuterBodyComponent.Body,
           width: outerRight,
           height: barrierHeight,
           offset: new Vector2(width - 0.5f * outerRight, 0.0f),
-          density: density,
-          userData: OuterBodyComponent);
+          density: density);
       }
 
       //
@@ -144,10 +140,9 @@ namespace Owlicity
           density: 0,
           position: s.Position,
           rotation: s.Rotation.Radians,
-          bodyType: BodyType.Static,
-          userData: Trigger);
+          bodyType: BodyType.Static);
         Trigger.Body.IsSensor = true;
-        Trigger.Body.CollidesWith = Global.OwliverCollisionCategory;
+        Trigger.Body.CollidesWith = CollisionCategory.Friendly;
         Trigger.Body.OnCollision += OnCollisionWithTrigger;
       }
 

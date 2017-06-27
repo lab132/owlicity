@@ -281,6 +281,12 @@ namespace Owlicity
         testRod.Spatial.Position += Conversion.ToMeters(128.0f, -80.0f);
         AddGameObject(testRod);
       }
+
+      {
+        var testSinger = new Singer();
+        testSinger.Spatial.Position += Conversion.ToMeters(1600, 300);
+        AddGameObject(testSinger);
+      }
 #endif
 
       {

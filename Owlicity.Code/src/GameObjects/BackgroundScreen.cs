@@ -47,9 +47,8 @@ namespace Owlicity
       List<Vertices> listOfVertices = Global.Game.Content.Load<List<Vertices>>(ShapeContentName);
       foreach(Vertices vertices in listOfVertices)
       {
-        FixtureFactory.AttachLoopShape(vertices, body, userData: BodyComponent);
+        FixtureFactory.AttachLoopShape(vertices, body);
       }
-      body.CollisionCategories = Global.LevelCollisionCategory;
       BodyComponent.Body = body;
 
       base.Initialize();

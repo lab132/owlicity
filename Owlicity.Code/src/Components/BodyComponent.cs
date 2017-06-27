@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using VelcroPhysics.Dynamics;
 using VelcroPhysics.Factories;
 using VelcroPhysics.Shared;
@@ -14,16 +16,10 @@ namespace Owlicity
 
   public class BodyComponent : SpatialComponent
   {
-    //
-    // Init data
-    //
     public BodyComponentInitMode InitMode;
     public BodyType BodyType;
     public string ShapeContentName;
 
-    //
-    // Runtime data
-    //
     public Body Body;
 
     public BodyComponent(GameObject owner) : base(owner)
@@ -38,7 +34,7 @@ namespace Owlicity
       {
         case BodyComponentInitMode.Manual:
         {
-          // TODO(manu): ??
+          Debug.Assert(Body != null);
         }
         break;
 
@@ -58,6 +54,12 @@ namespace Owlicity
         }
         break;
       }
+
+      Body.UserData = this;
+      foreach(Fixture fixture in Body.FixtureList)
+      {
+        fixture.UserData = this;
+      }
     }
 
     public override void Destroy()
@@ -76,6 +78,7 @@ namespace Owlicity
 
       if(Body != null)
       {
+        // Overwrite our transform with the physics transform.
         this.SetWorldPositionAndRotation(Body.Position, new Angle { Radians = Body.Rotation });
 
         if(DebugDrawingEnabled)

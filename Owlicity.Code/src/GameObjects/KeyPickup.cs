@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VelcroPhysics.Dynamics;
 using VelcroPhysics.Factories;
 
 namespace Owlicity
@@ -29,7 +30,7 @@ namespace Owlicity
       {
         AnimationTypes = new List<SpriteAnimationType>(),
       };
-      Animation.AttachTo(BodyComponent);
+      Animation.AttachTo(RootComponent);
 
       KeyRing = new KeyRingComponent(this);
 
@@ -46,7 +47,7 @@ namespace Owlicity
 
         DebugDrawingEnabled = true,
       };
-      Homing.AttachTo(BodyComponent);
+      Homing.AttachTo(RootComponent);
     }
 
     public override void Initialize()
@@ -54,12 +55,12 @@ namespace Owlicity
       SpatialData s = BodyComponent.GetWorldSpatialData();
       BodyComponent.Body = BodyFactory.CreateCircle(
         world: Global.Game.World,
+        bodyType: BodyType.Static,
         radius: 0.2f,
         density: 2 * Global.OwliverDensity,
-        position: s.Position,
-        userData: BodyComponent);
+        position: s.Position);
       BodyComponent.Body.IsSensor = true;
-      BodyComponent.Body.CollidesWith = Global.OwliverCollisionCategory;
+      BodyComponent.Body.CollidesWith = CollisionCategory.Friendly;
 
       SpriteAnimationType animType = SpriteAnimationType.Key_Gold + (int)KeyType;
       Animation.AnimationTypes.Add(animType);

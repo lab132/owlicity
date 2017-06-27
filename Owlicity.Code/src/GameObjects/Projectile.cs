@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VelcroPhysics.Collision.Filtering;
 using VelcroPhysics.Dynamics;
 using VelcroPhysics.Factories;
 
@@ -15,11 +16,16 @@ namespace Owlicity
     public BodyComponent BodyComponent;
     public SpriteAnimationComponent Animation;
     public AutoDestructComponent AutoDestruct;
+    
+    public Category CollisionCategories = VelcroPhysics.Settings.DefaultFixtureCollisionCategories;
+    public Category CollidesWith = VelcroPhysics.Settings.DefaultFixtureCollidesWith;
 
     public int Damage = 1;
     public float ForceOnImpact = 0.1f;
-    public float TimeToLive = 0.25f;
-    public int NumParticlesToSpawn = 16;
+    public float ConfettiTimeToLive = 0.25f;
+    public int ConfettiCountOnImpact = 16;
+
+    public float MaxSpeed;
 
     public Projectile()
     {
@@ -49,13 +55,12 @@ namespace Owlicity
         world: Global.Game.World,
         endRadius: Conversion.ToMeters(9),
         height: Conversion.ToMeters(50),
-        userData: BodyComponent,
         position: s.Position,
         rotation: s.Rotation.Radians + new Angle { Degrees = 90.0f + new Random().NextBilateralFloat() * 2 }.Radians,
-        density: 10 * Global.OwliverDensity,
+        density: 1000 * Global.OwliverDensity,
         bodyType: BodyType.Dynamic);
-      body.CollisionCategories = Global.OwliverWeaponCollisionCategory;
-      body.CollidesWith = ~(Global.OwliverCollisionCategory | Global.OwliverWeaponCollisionCategory);
+      body.CollisionCategories = CollisionCategories;
+      body.CollidesWith = CollidesWith;
       body.IsBullet = true;
       body.OnCollision += OnCollision;
       BodyComponent.Body = body;
@@ -69,17 +74,39 @@ namespace Owlicity
       Body theirBody = theirFixture.Body;
       Debug.Assert(ourBody == BodyComponent.Body);
 
-      Global.HandleDefaultHit(theirBody, ourBody.Position, Damage, ForceOnImpact);
+      //Global.HandleDefaultHit(theirBody, ourBody.Position, Damage, ForceOnImpact);
+      Global.HandleDefaultHit(theirBody, ourBody.Position, Damage, 0);
 
       DeathConfetti confetti = new DeathConfetti();
       confetti.Spatial.CopyFrom(this.Spatial);
-      confetti.AutoDestruct.DestructionDelay = TimeSpan.FromSeconds(TimeToLive);
+      confetti.AutoDestruct.DestructionDelay = TimeSpan.FromSeconds(ConfettiTimeToLive);
       confetti.ParticleEmitter.Emitter.MaxNumParticles = 16;
       Vector2 g = -2.5f * BodyComponent.Body.LinearVelocity;
       confetti.ParticleEmitter.Emitter.Gravity = g;
       Global.Game.AddGameObject(confetti);
 
       Global.Game.RemoveGameObject(this);
+    }
+
+    public override void Update(float deltaSeconds)
+    {
+      if(MaxSpeed > 0)
+      {
+        float maxSpeedSquared = MaxSpeed * MaxSpeed;
+        Vector2 velocity = BodyComponent.Body.LinearVelocity;
+        if(velocity.LengthSquared() > maxSpeedSquared)
+        {
+          velocity = velocity.GetClampedTo(MaxSpeed);
+          BodyComponent.Body.LinearVelocity = velocity;
+        }
+      }
+
+      base.Update(deltaSeconds);
+    }
+
+    public override void PrePhysicsUpdate(float deltaSeconds)
+    {
+      base.PrePhysicsUpdate(deltaSeconds);
     }
   }
 }

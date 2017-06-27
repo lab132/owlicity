@@ -82,17 +82,15 @@ namespace Owlicity
         world: Global.Game.World,
         position: s.Position,
         rotation: s.Rotation.Radians,
-        bodyType: BodyType.Static,
-        userData: BodyComponent);
+        bodyType: BodyType.Static);
       FixtureFactory.AttachRectangle(
         body: BodyComponent.Body,
         width: Conversion.ToMeters(100),
         height: Conversion.ToMeters(100),
         offset: Conversion.ToMeters(0, 100),
-        density: Global.OwliverDensity,
-        userData: BodyComponent);
+        density: Global.OwliverDensity);
       BodyComponent.Body.IsSensor = true;
-      BodyComponent.Body.CollidesWith = Global.OwliverCollisionCategory;
+      BodyComponent.Body.CollidesWith = CollisionCategory.Friendly;
 
       switch(ItemType)
       {

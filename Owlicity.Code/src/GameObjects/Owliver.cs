@@ -8,6 +8,7 @@ using VelcroPhysics.Shared;
 using VelcroPhysics.Collision.ContactSystem;
 using VelcroPhysics.Factories;
 using Microsoft.Xna.Framework.Graphics;
+using VelcroPhysics.Collision.Filtering;
 
 namespace Owlicity
 {
@@ -178,7 +179,7 @@ namespace Owlicity
       {
         BodyComponent = BodyComponent,
         ManualInputProcessing = true,
-        MaxMovementSpeed = 2.5f,
+        MaxMovementSpeed = 3.5f,
       };
 
       Animation = new SpriteAnimationComponent(this)
@@ -310,19 +311,16 @@ namespace Owlicity
         radius: radius,
         density: density,
         body: MyBody,
-        offset: Conversion.ToMeters(0, -60) * Global.OwliverScale,
-        userData: BodyComponent);
-      lowerFixture.CollidesWith = Global.LevelCollisionCategory | Global.EnemyCollisionCategory;
+        offset: Conversion.ToMeters(0, -60) * Global.OwliverScale);
 
       Fixture upperFixture = FixtureFactory.AttachCircle(
         radius: radius,
         density: density,
         body: MyBody,
-        offset: Conversion.ToMeters(0, -130) * Global.OwliverScale,
-        userData: BodyComponent);
-      upperFixture.CollidesWith = Global.EnemyCollisionCategory;
+        offset: Conversion.ToMeters(0, -130) * Global.OwliverScale);
+      upperFixture.CollidesWith = CollisionCategory.EnemyWeapon;
 
-      MyBody.CollisionCategories = Global.OwliverCollisionCategory;
+      MyBody.CollisionCategories = CollisionCategory.Friendly;
       MyBody.FixedRotation = true;
       MyBody.SleepingAllowed = false;
       MyBody.LinearDamping = 15.0f;
@@ -463,9 +461,9 @@ namespace Owlicity
         int damage = Damage;
         float force = 0.1f * damage;
         List<Fixture> fixtures = Global.Game.World.QueryAABB(ref weaponAABB);
-        foreach(Body hitBody in fixtures.Where(f => f.CollidesWith.HasFlag(Global.OwliverWeaponCollisionCategory))
-                                      .Select(f => f.Body)
-                                      .Distinct())
+        foreach(Body hitBody in fixtures.Where(f => f.CollisionCategories.HasFlag(CollisionCategory.Enemy))
+                                        .Select(f => f.Body)
+                                        .Distinct())
         {
           Global.HandleDefaultHit(hitBody, MyBody.Position, damage, force);
         }
@@ -474,13 +472,19 @@ namespace Owlicity
         if(throwProjectiles)
         {
           float sign = CurrentState.FacingDirection == OwliverFacingDirection.Left ? -1.0f : 1.0f;
+          float speed = 8.0f;
 
-          Projectile projectile = new Projectile();
+          Projectile projectile = new Projectile()
+          {
+            MaxSpeed = speed,
+            CollisionCategories = CollisionCategory.FriendlyWeapon,
+            CollidesWith = CollisionCategory.World | CollisionCategory.AnyEnemy,
+          };
           projectile.Spatial.CopyFrom(new SpatialData { Position = WeaponAABB.Center });
           projectile.Spatial.Position.X += sign * 0.1f;
           projectile.AutoDestruct.DestructionDelay = TimeSpan.FromSeconds(2.0f);
 
-          Vector2 velocity = sign * new Vector2(8.0f, 0.0f);
+          Vector2 velocity = sign * new Vector2(speed, 0.0f);
 
 #if false
           var hoc = new HomingComponent(projectile)
@@ -493,12 +497,11 @@ namespace Owlicity
           hoc.AttachTo(projectile);
 #endif
 
-          var bc = projectile.GetComponent<BodyComponent>();
-          bc.BeforePostInitialize += () =>
+          projectile.BodyComponent.BeforePostInitialize += () =>
           {
-            bc.Body.CollidesWith = ~(Global.OwliverCollisionCategory | Global.OwliverWeaponCollisionCategory);
-            Vector2 impulse = bc.Body.Mass * velocity;
-            bc.Body.ApplyLinearImpulse(ref impulse);
+            Body body = projectile.BodyComponent.Body;
+            Vector2 impulse = body.Mass * velocity;
+            body.ApplyLinearImpulse(ref impulse);
           };
           Global.Game.AddGameObject(projectile);
         }

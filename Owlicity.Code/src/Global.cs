@@ -11,19 +11,21 @@ namespace Owlicity
   {
     public static OwlGame Game { get; set; }
     
+    //
+    // Scale
+    //
     public static readonly Vector2 OwliverScale = new Vector2(0.5f);
     public static readonly Vector2 BonbonScale = new Vector2(0.6f);
     public static readonly Vector2 SlurpScale = new Vector2(0.5f);
+    public static readonly Vector2 SingerScale = new Vector2(0.5f);
     public static readonly Vector2 TanktonScale = new Vector2(0.5f);
 
     public static readonly float OwliverDensity = 0.01f;
 
-    public const Category LevelCollisionCategory = Category.Cat1;
-    public const Category OwliverCollisionCategory = Category.Cat2;
-    public const Category OwliverWeaponCollisionCategory = Category.Cat3;
-    public const Category EnemyCollisionCategory = Category.Cat4;
-    public const Category PickupCollisionCategory = Category.Cat5;
 
+    //
+    // Confetti
+    //
     public static readonly Color[] ConfettiRed = new[] { new Color(0xa3, 0x3b, 0x41), new Color(0xda, 0x67, 0x77), };
     public static readonly Color[] ConfettiPurple = new[] { new Color(0x73, 0x4c, 0x87) };
     public static readonly Color[] ConfettiBlue = new[] { new Color(0x41, 0x6d, 0x9c), new Color(0x7a, 0xaa, 0xdd), };

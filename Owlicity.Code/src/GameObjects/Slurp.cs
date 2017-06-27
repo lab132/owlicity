@@ -106,24 +106,18 @@ namespace Owlicity
           radius: radius,
           density: density,
           body: body,
-          offset: Conversion.ToMeters(0, -25) * Global.SlurpScale,
-          userData: BodyComponent);
+          offset: Conversion.ToMeters(0, -25) * Global.SlurpScale);
         FixtureFactory.AttachCircle(
           radius: radius,
           density: density,
           body: body,
-          offset: Conversion.ToMeters(0, 25) * Global.SlurpScale,
-          userData: BodyComponent);
+          offset: Conversion.ToMeters(0, 25) * Global.SlurpScale);
 
         body.FixedRotation = true;
         body.LinearDamping = 5.0f;
 
         body.OnCollision += OnCollision;
-        body.CollisionCategories = Global.EnemyCollisionCategory;
-        body.CollidesWith = Global.EnemyCollisionCategory |
-                            Global.LevelCollisionCategory |
-                            Global.OwliverCollisionCategory |
-                            Global.OwliverWeaponCollisionCategory;
+        body.CollisionCategories = CollisionCategory.Enemy;
 
         BodyComponent.Body = body;
       }
