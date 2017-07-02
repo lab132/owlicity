@@ -44,11 +44,10 @@ namespace Owlicity
     {
       base.Update(deltaSeconds);
 
-      ISpatial target = TargetSensor.CurrentMainTarget;
+      Body target = TargetSensor.CurrentMainTarget;
       if(target != null)
       {
-        SpatialData targetSpatial = target.GetWorldSpatialData();
-        Vector2 deltaPosition = targetSpatial.Position - this.GetWorldSpatialData().Position;
+        Vector2 deltaPosition = target.Position - this.GetWorldSpatialData().Position;
         deltaPosition.GetDirectionAndLength(out Vector2 targetDir, out float targetDistance);
 
         Body bodyToMove = BodyToMove;

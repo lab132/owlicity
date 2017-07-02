@@ -103,13 +103,13 @@ namespace Owlicity
         }
       }
 
-      if(CanLaunchProjectile && TargetSensor.CurrentMainTarget != null)
+      Body target = TargetSensor.CurrentMainTarget;
+      if(CanLaunchProjectile && target != null)
       {
-        Vector2 targetPosition = TargetSensor.CurrentMainTarget.GetWorldSpatialData().Position;
         if(CurrentProjectile == null)
         {
           Vector2 myPosition = this.GetWorldSpatialData().Position;
-          (targetPosition - myPosition).GetDirectionAndLength(out Vector2 targetDir, out float targetDistance);
+          (target.Position - myPosition).GetDirectionAndLength(out Vector2 targetDir, out float targetDistance);
 
           const float speed = 1.8f;
           Projectile projectile = new Projectile
@@ -148,7 +148,7 @@ namespace Owlicity
 
         Global.Game.DebugDrawCommands.Add(view =>
         {
-          view.DrawCircle(targetPosition, 1.0f, Color.Red);
+          view.DrawCircle(target.Position, 1.0f, Color.Red);
         });
       }
       base.Update(deltaSeconds);

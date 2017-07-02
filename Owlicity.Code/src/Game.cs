@@ -284,8 +284,18 @@ namespace Owlicity
 
       {
         var testSinger = new Singer();
-        testSinger.Spatial.Position += Conversion.ToMeters(1600, 300);
+        testSinger.Spatial.Position += Conversion.ToMeters(2600, 300);
         AddGameObject(testSinger);
+      }
+
+      {
+        var testTrap = new SpikeTrap()
+        {
+          Orientation = SpikeTrapOrientation.Vertical,
+          SensorReach = 4.0f,
+        };
+        testTrap.Spatial.Position += Conversion.ToMeters(1600, 500);
+        AddGameObject(testTrap);
       }
 #endif
 

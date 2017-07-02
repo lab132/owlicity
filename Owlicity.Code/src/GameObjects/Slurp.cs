@@ -15,7 +15,7 @@ namespace Owlicity
   {
     public TimeSpan HitDuration = TimeSpan.FromSeconds(0.25f);
     public int Damage = 1;
-    public float ForceOnImpact = 0.05f;
+    public float ForceOnImpact = 0.1f;
 
     public BodyComponent BodyComponent;
     public SpriteAnimationComponent Animation;
@@ -114,11 +114,11 @@ namespace Owlicity
       };
     }
 
-    private void OnCollision(Fixture fixtureA, Fixture fixtureB, Contact contact)
+    private void OnCollision(Fixture ourFixture, Fixture theirFixture, Contact contact)
     {
-      Debug.Assert(((BodyComponent)fixtureA.UserData).Owner == this);
+      Debug.Assert(ourFixture.GetGameObject() == this);
 
-      Body hitBody = fixtureB.Body;
+      Body hitBody = theirFixture.Body;
       Global.HandleDefaultHit(hitBody, MyBody.Position, Damage, ForceOnImpact);
     }
 
@@ -131,7 +131,7 @@ namespace Owlicity
       {
         // Change the facing direction to the target.
         Vector2 myPosition = this.GetWorldSpatialData().Position;
-        Vector2 targetPosition = Homing.TargetSensor.CurrentMainTarget.GetWorldSpatialData().Position;
+        Vector2 targetPosition = Homing.TargetSensor.CurrentMainTarget.Position;
         if(targetPosition.X < myPosition.X)
         {
           Animation.ChangeActiveAnimation(SpriteAnimationType.Slurp_Idle_Left);

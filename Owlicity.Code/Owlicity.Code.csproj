@@ -48,9 +48,11 @@
     <Compile Include="src\Components\BodyComponent.cs" />
     <Compile Include="src\Components\PickupComponent.cs" />
     <Compile Include="src\Components\TargetSensorComponent.cs" />
+    <Compile Include="src\Extensions.cs" />
     <Compile Include="src\GameObjects\KeyPickup.cs" />
     <Compile Include="src\GameObjects\ShopItem.cs" />
     <Compile Include="src\GameObjects\Singer.cs" />
+    <Compile Include="src\GameObjects\SpikeTrap.cs" />
     <Compile Include="src\KeyType.cs" />
     <Compile Include="src\Components\SpringArmComponent.cs" />
     <Compile Include="src\Components\HealthDisplayComponent.cs" />

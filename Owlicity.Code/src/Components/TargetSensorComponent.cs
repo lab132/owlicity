@@ -8,6 +8,7 @@ using VelcroPhysics.Collision.ContactSystem;
 using VelcroPhysics.Collision.Filtering;
 using VelcroPhysics.Dynamics;
 using VelcroPhysics.Factories;
+using VelcroPhysics.Shared;
 
 namespace Owlicity
 {
@@ -16,6 +17,7 @@ namespace Owlicity
     Unknown,
 
     Circle,
+    Rectangle,
   }
 
   public class TargetSensorComponent : BodyComponent
@@ -25,8 +27,10 @@ namespace Owlicity
 
     public float CircleSensorRadius;
 
-    public List<ISpatial> CurrentTargetList = new List<ISpatial>();
-    public ISpatial CurrentMainTarget => CurrentTargetList.FirstOrDefault();
+    public AABB RectangleSensorLocalAABB;
+
+    public List<Body> CurrentTargetList = new List<Body>();
+    public Body CurrentMainTarget => CurrentTargetList.FirstOrDefault();
 
 
     public TargetSensorComponent(GameObject owner)
@@ -48,10 +52,22 @@ namespace Owlicity
           Debug.Assert(CircleSensorRadius > 0.0f);
           Body = BodyFactory.CreateCircle(
             world: Global.Game.World,
-            radius: CircleSensorRadius,
-            density: 0,
+            bodyType: BodyType.Static,
             position: s.Position,
-            bodyType: BodyType.Static);
+            radius: CircleSensorRadius,
+            density: 0);
+        }
+        break;
+
+        case TargetSensorType.Rectangle:
+        {
+          Body = BodyFactory.CreateRectangle(
+            world: Global.Game.World,
+            bodyType: BodyType.Static,
+            position: RectangleSensorLocalAABB.Center,
+            width: RectangleSensorLocalAABB.Width,
+            height: RectangleSensorLocalAABB.Height,
+            density: 0);
         }
         break;
 
@@ -76,14 +92,14 @@ namespace Owlicity
 
     private void OnCollision(Fixture ourFixture, Fixture theirFixture, Contact contact)
     {
-      ISpatial target = ((BodyComponent)theirFixture.UserData).Owner;
+      Body target = theirFixture.Body;
       if(!CurrentTargetList.Contains(target))
         CurrentTargetList.Add(target);
     }
 
     private void OnSeparation(Fixture ourFixture, Fixture theirFixture, Contact contact)
     {
-      ISpatial target = ((BodyComponent)theirFixture.UserData).Owner;
+      Body target = theirFixture.Body;
       bool wasRemoved = CurrentTargetList.Remove(target);
       Debug.Assert(wasRemoved);
     }
