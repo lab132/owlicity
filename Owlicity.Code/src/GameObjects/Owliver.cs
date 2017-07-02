@@ -77,7 +77,6 @@ namespace Owlicity
     public HealthComponent Health;
     public MoneyBagComponent MoneyBag;
     public KeyRingComponent KeyRing;
-    public SpatialComponent Center;
 
     public OwliverState CurrentState;
     public Action<OwliverState, OwliverState> OnStateChanged;
@@ -170,10 +169,6 @@ namespace Owlicity
         InitMode = BodyComponentInitMode.Manual,
       };
       RootComponent = BodyComponent;
-
-      Center = new SpatialComponent(this);
-      Center.Spatial.Position.Y -= Conversion.ToMeters(80) * Global.OwliverScale.Y;
-      Center.AttachTo(RootComponent);
 
       Movement = new MovementComponent(this)
       {
@@ -310,14 +305,13 @@ namespace Owlicity
       Fixture lowerFixture = FixtureFactory.AttachCircle(
         radius: radius,
         density: density,
-        body: MyBody,
-        offset: Conversion.ToMeters(0, -60) * Global.OwliverScale);
+        body: MyBody);
 
       Fixture upperFixture = FixtureFactory.AttachCircle(
         radius: radius,
         density: density,
         body: MyBody,
-        offset: Conversion.ToMeters(0, -130) * Global.OwliverScale);
+        offset: Conversion.ToMeters(0, -70) * Global.OwliverScale);
       upperFixture.CollidesWith = CollisionCategory.EnemyWeapon;
 
       MyBody.CollisionCategories = CollisionCategory.Friendly | CollisionCategory.Owliver;
@@ -521,11 +515,6 @@ namespace Owlicity
         Global.Game.DebugDrawCommands.Add(view =>
         {
           view.DrawAABB(ref weaponAABB, color);
-        });
-
-        Global.Game.DebugDrawCommands.Add(view =>
-        {
-          view.DrawPoint(Center.GetWorldSpatialData().Position, Conversion.ToMeters(5.0f), Color.DarkViolet);
         });
       }
     }

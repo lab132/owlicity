@@ -386,7 +386,7 @@ namespace Owlicity
 
       if(result == null)
       {
-        const float owliverHotspotY = 230.0f;
+        const float owliverHotspotY = 170.0f;
 
         SpriteAnimationConfig config = SpriteAnimationConfig.Default;
 

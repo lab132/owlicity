@@ -198,7 +198,7 @@ namespace Owlicity
         Owliver.Spatial.Position += Conversion.ToMeters(450, 600);
         AddGameObject(Owliver);
 
-        CurrentLevel.CullingCenter = Owliver.Center;
+        CurrentLevel.CullingCenter = Owliver;
       }
 
       CurrentLevel.LoadContent();
@@ -215,7 +215,7 @@ namespace Owlicity
 
         ActiveCamera.SpringArm.BeforeInitialize += () =>
         {
-          ActiveCamera.SpringArm.Target = Owliver.Center;
+          ActiveCamera.SpringArm.Target = Owliver;
         };
 
         AddGameObject(ActiveCamera);
@@ -372,7 +372,7 @@ namespace Owlicity
 
         if(ActiveCamera.SpringArm.Target == null)
         {
-          ActiveCamera.SpringArm.Target = Owliver.Center;
+          ActiveCamera.SpringArm.Target = Owliver;
         }
         else
         {
@@ -382,7 +382,7 @@ namespace Owlicity
 
       if(Input.DebugInput.ResetCameraPosition)
       {
-        ActiveCamera.Spatial.Position = Owliver.Center.GetWorldSpatialData().Position;
+        ActiveCamera.Spatial.Position = Owliver.GetWorldSpatialData().Position;
       }
 #endif
 

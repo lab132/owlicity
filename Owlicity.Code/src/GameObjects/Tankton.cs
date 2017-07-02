@@ -109,7 +109,7 @@ namespace Owlicity
     {
       base.Update(deltaSeconds);
 
-      Vector2 deltaToOwliver = Global.Game.Owliver.Center.GetWorldSpatialData().Position - this.GetWorldSpatialData().Position;
+      Vector2 deltaToOwliver = Global.Game.Owliver.GetWorldSpatialData().Position - this.GetWorldSpatialData().Position;
       if(deltaToOwliver.X < 0)
       {
         Animation.ChangeActiveAnimation(SpriteAnimationType.Tankton_Idle_Left);
