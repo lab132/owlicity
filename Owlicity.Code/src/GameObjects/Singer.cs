@@ -15,8 +15,11 @@ namespace Owlicity
     public BodyComponent BodyComponent;
     public TargetSensorComponent TargetSensor;
     public SpriteAnimationComponent Animation;
+    public HealthComponent Health;
+    public HealthDisplayComponent HealthDisplay;
 
-    public float Reach = 3.0f;
+    public TimeSpan HitDuration = TimeSpan.FromSeconds(0.25f);
+    public float SensorReach = 3.0f;
 
     public Projectile CurrentProjectile;
     public TimeSpan ProjectileLaunchCooldown = TimeSpan.FromSeconds(0.5f);
@@ -38,7 +41,7 @@ namespace Owlicity
       TargetSensor = new TargetSensorComponent(this)
       {
         SensorType = TargetSensorType.Circle,
-        CircleSensorRadius = Reach,
+        CircleSensorRadius = SensorReach,
         TargetCollisionCategories = CollisionCategory.Friendly,
       };
       TargetSensor.AttachTo(RootComponent);
@@ -52,6 +55,18 @@ namespace Owlicity
         },
       };
       Animation.AttachTo(RootComponent);
+
+      Health = GameObjectFactory.CreateDefaultHealth(this,
+        maxHealth: 3,
+        hitDuration: HitDuration,
+        deathParticleTimeToLive: TimeSpan.FromSeconds(1));
+
+      HealthDisplay = new HealthDisplayComponent(this)
+      {
+        Health = Health,
+        HealthIcon = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Cross),
+      };
+      HealthDisplay.AttachTo(Animation);
     }
 
     public override void Initialize()
@@ -112,8 +127,8 @@ namespace Owlicity
             projectile.BodyComponent.Body.LinearVelocity = targetDir * speed;
           };
 
-          Global.CreateDefaultHomingCircle(projectile, projectile.BodyComponent,
-            sensorRadius: 2.0f,
+          GameObjectFactory.CreateDefaultHomingCircle(projectile, projectile.BodyComponent,
+            sensorRadius: 1.1f * SensorReach,
             homingType: HomingType.ConstantAcceleration,
             homingSpeed: 0.05f * speed);
 

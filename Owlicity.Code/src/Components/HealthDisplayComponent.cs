@@ -48,11 +48,7 @@ namespace Owlicity
       // TODO(manu): Does the AABB of this component count? It's just a display after all...
       //Spatial.LocalAABB = Conversion.ToMeters(HealthIcon.CalcAABB());
 
-      if(Health == null)
-      {
-        Health = Owner.GetComponent<HealthComponent>();
-        Debug.Assert(Health != null);
-      }
+      Debug.Assert(Health != null);
 
       switch(InitialDisplayOrigin)
       {

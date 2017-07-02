@@ -14,8 +14,8 @@ namespace Owlicity
     //
     public int MaxHealth = 1;
     public int InitialHealth = -1; // Will be MaxHealth if < 0.
-    public float InitialInvincibilityDuration;
-    public float DefaultInvincibilityDuration;
+    public TimeSpan InitialInvincibilityDuration;
+    public TimeSpan DefaultInvincibilityDuration;
 
     //
     // Runtime data.
@@ -27,12 +27,12 @@ namespace Owlicity
     public bool IsDead => !IsAlive;
 
     // Is zero when not invincible.
-    public float CurrentInvincibilityDuration { get; private set; }
+    public TimeSpan CurrentInvincibilityDuration { get; private set; }
 
     // between 0 and CurrentInvincibilityDuration.
-    public float CurrentInvincibilityTime { get; private set; }
+    public TimeSpan CurrentInvincibilityTime { get; private set; }
 
-    public bool IsInvincible => CurrentInvincibilityDuration > 0.0f;
+    public bool IsInvincible => CurrentInvincibilityDuration.Ticks > 0;
 
     // Only invoked when not dead.
     public Action<int> OnHit;
@@ -75,18 +75,18 @@ namespace Owlicity
     public Action OnInvincibilityGained;
     public Action OnInvincibilityLost;
 
-    public void MakeInvincible(float durationInSeconds)
+    public void MakeInvincible(TimeSpan duration)
     {
-      Debug.Assert(durationInSeconds > 0, "Invalid invincibility duration.");
+      Debug.Assert(duration.Ticks > 0, "Invalid invincibility duration.");
 
-      CurrentInvincibilityDuration = durationInSeconds;
-      CurrentInvincibilityTime = 0.0f;
+      CurrentInvincibilityDuration = duration;
+      CurrentInvincibilityTime = TimeSpan.Zero;
       OnInvincibilityGained?.Invoke();
     }
 
     public void StopInvincibility()
     {
-      CurrentInvincibilityDuration = 0.0f;
+      CurrentInvincibilityDuration = TimeSpan.Zero;
       OnInvincibilityLost?.Invoke();
     }
 
@@ -106,7 +106,7 @@ namespace Owlicity
 
       CurrentHealth = InitialHealth;
 
-      if(InitialInvincibilityDuration > 0)
+      if(InitialInvincibilityDuration.Ticks > 0)
       {
         MakeInvincible(InitialInvincibilityDuration);
       }
@@ -118,7 +118,7 @@ namespace Owlicity
 
       if(IsInvincible)
       {
-        CurrentInvincibilityTime += deltaSeconds;
+        CurrentInvincibilityTime += TimeSpan.FromSeconds(deltaSeconds);
         if(CurrentInvincibilityTime >= CurrentInvincibilityDuration)
         {
           StopInvincibility();

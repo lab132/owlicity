@@ -45,6 +45,59 @@ namespace Owlicity
       return result;
     }
 
+    public static HomingComponent CreateDefaultHomingCircle(
+      GameObject owner,
+      BodyComponent bodyComponentToMove,
+      float sensorRadius,
+      HomingType homingType,
+      float homingSpeed)
+    {
+      var tsc = new TargetSensorComponent(owner)
+      {
+        TargetCollisionCategories = CollisionCategory.Owliver,
+        SensorType = TargetSensorType.Circle,
+        CircleSensorRadius = sensorRadius,
+      };
+      tsc.AttachTo(bodyComponentToMove);
+
+      var hoc = new HomingComponent(owner)
+      {
+        BodyComponentToMove = bodyComponentToMove,
+        TargetSensor = tsc,
+        Speed = homingSpeed,
+        HomingType = homingType,
+
+        DebugDrawingEnabled = true,
+      };
+      hoc.AttachTo(bodyComponentToMove);
+
+      return hoc;
+    }
+
+    public static HealthComponent CreateDefaultHealth(GameObject owner,
+      int maxHealth,
+      TimeSpan hitDuration,
+      TimeSpan deathParticleTimeToLive)
+    {
+      var hc = new HealthComponent(owner) { MaxHealth = maxHealth };
+      hc.OnHit += (damage) =>
+      {
+        hc.MakeInvincible(hitDuration);
+      };
+
+      hc.OnDeath += (damage) =>
+      {
+        DeathConfetti confetti = new DeathConfetti();
+        confetti.Spatial.CopyFrom(owner.Spatial);
+        confetti.AutoDestruct.DestructionDelay = deathParticleTimeToLive;
+        Global.Game.AddGameObject(confetti);
+
+        Global.Game.RemoveGameObject(owner);
+      };
+
+      return hc;
+    }
+
     public static GameObject CreateKnown(KnownGameObject type)
     {
       GameObject go = new GameObject();

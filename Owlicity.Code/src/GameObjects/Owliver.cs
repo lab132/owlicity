@@ -66,7 +66,7 @@ namespace Owlicity
   public class Owliver : GameObject
   {
     public SpriteAnimationComponent Animation;
-    public float HitDuration = 0.25f;
+    public TimeSpan HitDuration = TimeSpan.FromSeconds(0.25f);
 
     public BodyComponent BodyComponent;
     public Body MyBody;
@@ -99,7 +99,7 @@ namespace Owlicity
 
         AABB local;
         {
-          Vector2 offset = Conversion.ToMeters(20, -120);
+          Vector2 offset = Conversion.ToMeters(20, -60);
           switch(CurrentState.WeaponType)
           {
             case OwliverWeaponType.Stick:

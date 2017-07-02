@@ -40,7 +40,7 @@ namespace Owlicity
         InitialAmount = 10,
       };
 
-      Homing = Global.CreateDefaultHomingCircle(this, BodyComponent,
+      Homing = GameObjectFactory.CreateDefaultHomingCircle(this, BodyComponent,
         sensorRadius: 1.0f,
         homingType: HomingType.ConstantSpeed,
         homingSpeed: 3.0f);

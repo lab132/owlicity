@@ -24,20 +24,21 @@ namespace Owlicity
     {
     }
 
-    public void SetDefaultCurves(float duration, Vector2? initialScale = null, Vector2? extremeScale = null)
+    public void SetDefaultCurves(TimeSpan duration, Vector2? initialScale = null, Vector2? extremeScale = null)
     {
+      float s = (float)duration.TotalSeconds;
       Vector2 init = initialScale ?? Vector2.One;
       Vector2 extreme = extremeScale ?? new Vector2(1.5f, 0.75f);
 
       SquashCurveX = new Curve();
-      SquashCurveX.Keys.Add(new CurveKey(0.0f * duration, init.X));
-      SquashCurveX.Keys.Add(new CurveKey(0.5f * duration, extreme.X));
-      SquashCurveX.Keys.Add(new CurveKey(1.0f * duration, init.X));
+      SquashCurveX.Keys.Add(new CurveKey(0.0f * s, init.X));
+      SquashCurveX.Keys.Add(new CurveKey(0.5f * s, extreme.X));
+      SquashCurveX.Keys.Add(new CurveKey(1.0f * s, init.X));
 
       SquashCurveY = new Curve();
-      SquashCurveY.Keys.Add(new CurveKey(0.0f * duration, init.Y));
-      SquashCurveY.Keys.Add(new CurveKey(0.5f * duration, extreme.Y));
-      SquashCurveY.Keys.Add(new CurveKey(1.0f * duration, init.Y));
+      SquashCurveY.Keys.Add(new CurveKey(0.0f * s, init.Y));
+      SquashCurveY.Keys.Add(new CurveKey(0.5f * s, extreme.Y));
+      SquashCurveY.Keys.Add(new CurveKey(1.0f * s, init.Y));
     }
 
     public void StartSequence()

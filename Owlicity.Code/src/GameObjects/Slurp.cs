@@ -13,7 +13,7 @@ namespace Owlicity
 {
   public class Slurp : GameObject
   {
-    public float HitDuration = 0.25f;
+    public TimeSpan HitDuration = TimeSpan.FromSeconds(0.25f);
     public int Damage = 1;
     public float ForceOnImpact = 0.05f;
 
@@ -44,14 +44,14 @@ namespace Owlicity
       };
       Animation.AttachTo(BodyComponent);
 
-      Health = new HealthComponent(this)
-      {
-        MaxHealth = 3,
-      };
-      Health.OnHit += OnHit;
-      Health.OnDeath += OnDeath;
+      Health = GameObjectFactory.CreateDefaultHealth(this,
+        maxHealth: 3,
+        hitDuration: HitDuration,
+        deathParticleTimeToLive: TimeSpan.FromSeconds(1));
+
       HealthDisplay = new HealthDisplayComponent(this)
       {
+        Health = Health,
         InitialDisplayOrigin = HealthDisplayComponent.DisplayOrigin.Bottom,
         HealthIcon = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Cross),
       };
@@ -61,25 +61,10 @@ namespace Owlicity
 
       GameObjectFactory.CreateOnHitBlinkingSequence(this, Health, Animation).SetDefaultCurves(HitDuration);
 
-      Homing = Global.CreateDefaultHomingCircle(this, BodyComponent,
+      Homing = GameObjectFactory.CreateDefaultHomingCircle(this, BodyComponent,
         sensorRadius: 3.0f,
         homingType: HomingType.ConstantSpeed,
         homingSpeed: 0.5f);
-    }
-
-    public void OnHit(int damage)
-    {
-      Health.MakeInvincible(HitDuration);
-    }
-
-    public void OnDeath(int damage)
-    {
-      DeathConfetti confetti = new DeathConfetti();
-      confetti.Spatial.CopyFrom(this.Spatial);
-      confetti.AutoDestruct.DestructionDelay = TimeSpan.FromSeconds(1.0f);
-      Global.Game.AddGameObject(confetti);
-
-      Global.Game.RemoveGameObject(this);
     }
 
     public override void Initialize()

@@ -191,36 +191,4 @@ namespace Owlicity
     }
 #endif
   }
-
-  public static partial class Global
-  {
-    public static HomingComponent CreateDefaultHomingCircle(
-      GameObject owner,
-      BodyComponent bodyComponentToMove,
-      float sensorRadius,
-      HomingType homingType,
-      float homingSpeed)
-    {
-      var tsc = new TargetSensorComponent(owner)
-      {
-        TargetCollisionCategories = CollisionCategory.Owliver,
-        SensorType = TargetSensorType.Circle,
-        CircleSensorRadius = sensorRadius,
-      };
-      tsc.AttachTo(bodyComponentToMove);
-
-      var hoc = new HomingComponent(owner)
-      {
-        BodyComponentToMove = bodyComponentToMove,
-        TargetSensor = tsc,
-        Speed = homingSpeed,
-        HomingType = homingType,
-
-        DebugDrawingEnabled = true,
-      };
-      hoc.AttachTo(bodyComponentToMove);
-
-      return hoc;
-    }
-  }
 }

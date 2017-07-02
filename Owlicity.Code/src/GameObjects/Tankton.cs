@@ -17,7 +17,7 @@ namespace Owlicity
     public HealthComponent Health;
     public HealthDisplayComponent HealthDisplay;
 
-    public float HitDuration = 0.25f;
+    public TimeSpan HitDuration = TimeSpan.FromSeconds(0.25f);
 
 
     public Tankton()
@@ -48,6 +48,7 @@ namespace Owlicity
 
       HealthDisplay = new HealthDisplayComponent(this)
       {
+        Health = Health,
         HealthIcon = SpriteAnimationFactory.CreateAnimationInstance(SpriteAnimationType.Cross),
         InitialDisplayOrigin = HealthDisplayComponent.DisplayOrigin.Bottom,
         NumIconsPerRow = 5,
@@ -73,9 +74,8 @@ namespace Owlicity
       DeathConfetti confetti = new DeathConfetti();
       confetti.Spatial.CopyFrom(this.Spatial);
       confetti.AutoDestruct.DestructionDelay = TimeSpan.FromSeconds(5.0f);
-      confetti.ParticleEmitter = confetti.GetComponent<ParticleEmitterComponent>();
       confetti.ParticleEmitter.Emitter.MaxNumParticles = 4096;
-        // TODO(manu): Somehow, this doesn't work...
+      // TODO(manu): Somehow, this doesn't work...
       confetti.ParticleEmitter.Emitter.MaxParticleSpeed = 200.0f;
 
       Global.Game.AddGameObject(confetti);

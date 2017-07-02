@@ -30,7 +30,7 @@ namespace Owlicity
     {
     }
 
-    public void SetDefaultCurves(float duration, Color? on = null, Color? off = null, int numSamples = 3)
+    public void SetDefaultCurves(TimeSpan duration, Color? on = null, Color? off = null, int numSamples = 3)
     {
       Debug.Assert(numSamples > 1);
 
@@ -39,12 +39,12 @@ namespace Owlicity
       ColorTrackB = new Curve();
       ColorTrackA = new Curve();
 
-      float durationBetweenSamples = duration / numSamples;
+      float secondsBetweenSamples = (float)duration.TotalSeconds / numSamples;
       Color color0 = on ?? Color.White;
       Color color1 = off ?? Color.Red;
       for(int sampleIndex = 0; sampleIndex < numSamples; sampleIndex++)
       {
-        float position = sampleIndex * durationBetweenSamples;
+        float position = sampleIndex * secondsBetweenSamples;
         float lerp = sampleIndex / numSamples;
         Vector4 value = Color.Lerp(color0, color1, lerp).ToVector4();
         ColorTrackR.Keys.Add(new CurveKey(position, value.X));
