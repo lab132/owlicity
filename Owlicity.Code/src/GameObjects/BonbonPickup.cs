@@ -40,15 +40,10 @@ namespace Owlicity
         InitialAmount = 10,
       };
 
-      Homing = new HomingComponent(this)
-      {
-        BodyComponent = BodyComponent,
-        TargetRange = 1.0f,
-        Speed = 3.0f,
-
-        DebugDrawingEnabled = true,
-      };
-      Homing.AttachTo(RootComponent);
+      Homing = Global.CreateDefaultHomingCircle(this, BodyComponent,
+        sensorRadius: 1.0f,
+        homingType: HomingType.ConstantSpeed,
+        homingSpeed: 3.0f);
 
       Pickup = new PickupComponent(this)
       {
@@ -69,8 +64,6 @@ namespace Owlicity
 
       SpriteAnimationType animType = SpriteAnimationType.Bonbon_Gold + (int)BonbonType;
       Animation.AnimationTypes.Add(animType);
-
-      Homing.Target = Global.Game.Owliver.Center;
 
       base.Initialize();
     }

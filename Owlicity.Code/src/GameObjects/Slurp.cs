@@ -61,15 +61,10 @@ namespace Owlicity
 
       GameObjectFactory.CreateOnHitBlinkingSequence(this, Health, Animation).SetDefaultCurves(HitDuration);
 
-      Homing = new HomingComponent(this)
-      {
-        BodyComponent = BodyComponent,
-        TargetRange = 3.0f,
-        Speed = 0.5f,
-
-        DebugDrawingEnabled = true,
-      };
-      Homing.AttachTo(BodyComponent);
+      Homing = Global.CreateDefaultHomingCircle(this, BodyComponent,
+        sensorRadius: 3.0f,
+        homingType: HomingType.ConstantSpeed,
+        homingSpeed: 0.5f);
     }
 
     public void OnHit(int damage)
@@ -89,8 +84,6 @@ namespace Owlicity
 
     public override void Initialize()
     {
-      Homing.Target = Global.Game.Owliver.Center;
-      
       {
         SpatialData s = this.GetWorldSpatialData();
         Body body = new Body(
@@ -124,20 +117,15 @@ namespace Owlicity
 
       base.Initialize();
 
-      // TODO(manu): This could be its own component (it's a recurring thing).
       // Disable chasing when we are invincible.
-      ISpatial previousTarget = null;
       Health.OnInvincibilityGained += () =>
       {
-        Debug.Assert(previousTarget == null);
-        previousTarget = Homing.Target;
-        Homing.Target = null;
+        Homing.TargetSensor.Body.Enabled = false;
       };
 
       Health.OnInvincibilityLost += () =>
       {
-        Homing.Target = previousTarget;
-        previousTarget = null;
+        Homing.TargetSensor.Body.Enabled = true;
       };
     }
 
@@ -158,7 +146,7 @@ namespace Owlicity
       {
         // Change the facing direction to the target.
         Vector2 myPosition = this.GetWorldSpatialData().Position;
-        Vector2 targetPosition = Homing.Target.GetWorldSpatialData().Position;
+        Vector2 targetPosition = Homing.TargetSensor.CurrentMainTarget.GetWorldSpatialData().Position;
         if(targetPosition.X < myPosition.X)
         {
           Animation.ChangeActiveAnimation(SpriteAnimationType.Slurp_Idle_Left);

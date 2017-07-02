@@ -39,15 +39,10 @@ namespace Owlicity
         BodyComponent = BodyComponent,
       };
 
-      Homing = new HomingComponent(this)
-      {
-        BodyComponent = BodyComponent,
-        TargetRange = 1.0f,
-        Speed = 3.0f,
-
-        DebugDrawingEnabled = true,
-      };
-      Homing.AttachTo(RootComponent);
+      Homing = Global.CreateDefaultHomingCircle(this, BodyComponent,
+        sensorRadius: 1.0f,
+        homingType: HomingType.ConstantSpeed,
+        homingSpeed: 3.0f);
     }
 
     public override void Initialize()
@@ -66,8 +61,6 @@ namespace Owlicity
       Animation.AnimationTypes.Add(animType);
 
       KeyRing[KeyType] = 1;
-
-      Homing.Target = Global.Game.Owliver.Center;
 
       base.Initialize();
     }

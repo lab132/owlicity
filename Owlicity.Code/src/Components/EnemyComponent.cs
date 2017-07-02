@@ -36,8 +36,10 @@ namespace Owlicity
 
     public EnemyComponent(GameObject owner) : base(owner)
     {
+      throw new NotImplementedException();
     }
 
+#if false
     public override void Initialize()
     {
       base.Initialize();
@@ -75,18 +77,20 @@ namespace Owlicity
       if(Chaser != null)
       {
         // Disable chasing when we are invincible.
-        ISpatial previousTarget = null;
+        //ISpatial previousTarget = null;
         Health.OnInvincibilityGained += () =>
         {
-          Debug.Assert(previousTarget == null);
-          previousTarget = Chaser.Target;
-          Chaser.Target = null;
+          //Debug.Assert(previousTarget == null);
+          //previousTarget = Chaser.Target;
+          Chaser.TargetSensor.Enabled = false;
+          //Chaser.Target = null;
         };
 
         Health.OnInvincibilityLost += () =>
         {
-          Chaser.Target = previousTarget;
-          previousTarget = null;
+          Chaser.TargetSensor.Enabled = true;
+          //Chaser.Target = previousTarget;
+          //previousTarget = null;
         };
       }
     }
@@ -118,5 +122,6 @@ namespace Owlicity
         }
       }
     }
+#endif
   }
 }

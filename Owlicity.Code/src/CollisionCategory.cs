@@ -12,11 +12,13 @@ namespace Owlicity
     public const Category World = Category.Cat1;
 
     public const Category Friendly = Category.Cat10;
-    public const Category FriendlyWeapon = Category.Cat11;
-    public const Category AnyFriendly = Friendly | FriendlyWeapon;
+    public const Category Owliver = Category.Cat11;
+    public const Category Quadric = Category.Cat12;
+    public const Category FriendlyWeapon = Category.Cat15;
+    public const Category AnyFriendly = Friendly | Owliver | Quadric | FriendlyWeapon;
 
     public const Category Enemy = Category.Cat20;
-    public const Category EnemyWeapon = Category.Cat21;
+    public const Category EnemyWeapon = Category.Cat25;
     public const Category AnyEnemy = Enemy | EnemyWeapon;
   }
 }

@@ -13,13 +13,19 @@ namespace Owlicity
   public class Singer : GameObject
   {
     public BodyComponent BodyComponent;
-    public BodyComponent Trigger;
+    public TargetSensorComponent TargetSensor;
     public SpriteAnimationComponent Animation;
 
     public float Reach = 3.0f;
 
-    public GameObject CurrentTarget;
     public Projectile CurrentProjectile;
+    public TimeSpan ProjectileLaunchCooldown = TimeSpan.FromSeconds(0.5f);
+    public TimeSpan ProjectileTimeToLive = TimeSpan.FromSeconds(5);
+
+    private float CurrentProjectileLaunchCooldown;
+
+    public bool CanLaunchProjectile => CurrentProjectile == null && CurrentProjectileLaunchCooldown == 0.0f;
+
 
     public Singer()
     {
@@ -29,11 +35,13 @@ namespace Owlicity
       };
       RootComponent = BodyComponent;
 
-      Trigger = new BodyComponent(this)
+      TargetSensor = new TargetSensorComponent(this)
       {
-        InitMode = BodyComponentInitMode.Manual,
+        SensorType = TargetSensorType.Circle,
+        CircleSensorRadius = Reach,
+        TargetCollisionCategories = CollisionCategory.Friendly,
       };
-      Trigger.AttachTo(RootComponent);
+      TargetSensor.AttachTo(RootComponent);
 
       Animation = new SpriteAnimationComponent(this)
       {
@@ -66,88 +74,61 @@ namespace Owlicity
         BodyComponent.Body = body;
       }
 
-      {
-        SpatialData s = Trigger.GetWorldSpatialData();
-        Body body = BodyFactory.CreateCircle(
-          world: Global.Game.World,
-          bodyType: BodyType.Static,
-          position: s.Position,
-          radius: Reach,
-          density: 0);
-        body.IsSensor = true;
-        body.CollidesWith = CollisionCategory.Friendly;
-        body.OnCollision += OnCollisionWithTrigger;
-        body.OnSeparation += OnSeparationWithTrigger;
-
-        Trigger.Body = body;
-      }
-
       base.Initialize();
-    }
-
-    private void OnCollisionWithTrigger(Fixture myFixture, Fixture theirFixture, Contact contact)
-    {
-      GameObject target = ((BodyComponent)theirFixture.UserData).Owner;
-      if(CurrentTarget == null)
-      {
-        CurrentTarget = target;
-      }
-    }
-
-    private void OnSeparationWithTrigger(Fixture myFixture, Fixture theirFixture, Contact contact)
-    {
-      GameObject target = ((BodyComponent)theirFixture.UserData).Owner;
-      if(CurrentTarget == target)
-      {
-        CurrentTarget = null;
-      }
     }
 
     public override void Update(float deltaSeconds)
     {
-      Vector2 myPosition = this.GetWorldSpatialData().Position;
-      Trigger.Body.Position = myPosition;
-
-      if(CurrentTarget != null)
+      if(CurrentProjectile == null && CurrentProjectileLaunchCooldown > 0)
       {
-        Vector2 targetPosition = CurrentTarget.GetWorldSpatialData().Position;
-        (targetPosition - myPosition).GetDirectionAndLength(out Vector2 targetDir, out float targetDistance);
+        CurrentProjectileLaunchCooldown -= deltaSeconds;
+        if(CurrentProjectileLaunchCooldown < 0)
+        {
+          CurrentProjectileLaunchCooldown = 0.0f;
+        }
+      }
 
+      if(CanLaunchProjectile && TargetSensor.CurrentMainTarget != null)
+      {
+        Vector2 targetPosition = TargetSensor.CurrentMainTarget.GetWorldSpatialData().Position;
         if(CurrentProjectile == null)
         {
-          float speed = 5.0f;
-          CurrentProjectile = new Projectile
+          Vector2 myPosition = this.GetWorldSpatialData().Position;
+          (targetPosition - myPosition).GetDirectionAndLength(out Vector2 targetDir, out float targetDistance);
+
+          const float speed = 1.8f;
+          Projectile projectile = new Projectile
           {
             MaxSpeed = speed,
             CollisionCategories = CollisionCategory.EnemyWeapon,
             CollidesWith = CollisionCategory.World | CollisionCategory.AnyFriendly,
           };
-          CurrentProjectile.Animation.AnimationTypes = new List<SpriteAnimationType> { SpriteAnimationType.Bonbon_Gold };
-          CurrentProjectile.Spatial.Position = myPosition + targetDir * 0.5f;
+          projectile.Animation.AnimationTypes = new List<SpriteAnimationType> { SpriteAnimationType.Bonbon_Gold };
+          float relativeSpawnOffset = 0.5f; // meters
+          projectile.Spatial.Position = myPosition + targetDir * relativeSpawnOffset;
 
-          CurrentProjectile.BodyComponent.BeforePostInitialize += () =>
+          projectile.BodyComponent.BeforePostInitialize += () =>
           {
-            CurrentProjectile.BodyComponent.Body.LinearVelocity = targetDir * speed;
+            projectile.BodyComponent.Body.LinearVelocity = targetDir * speed;
           };
 
-          var hoc = new HomingComponent(CurrentProjectile)
-          {
-            BodyComponent = CurrentProjectile.BodyComponent,
-            Target = CurrentTarget,
-            TargetRange = 1.0f,
-            Speed = 0.25f * speed,
+          Global.CreateDefaultHomingCircle(projectile, projectile.BodyComponent,
+            sensorRadius: 2.0f,
+            homingType: HomingType.ConstantAcceleration,
+            homingSpeed: 0.05f * speed);
 
-            DebugDrawingEnabled = true,
-          };
-          hoc.AttachTo(CurrentProjectile);
+          projectile.AutoDestruct.DestructionDelay = ProjectileTimeToLive;
 
-          CurrentProjectile.AutoDestruct.DestructionDelay = TimeSpan.FromSeconds(1);
-          CurrentProjectile.AutoDestruct.BeforeDestroy += () =>
+
+          CurrentProjectile = projectile;
+          projectile.AutoDestruct.BeforeDestroy += () =>
           {
             CurrentProjectile = null;
           };
 
-          Global.Game.AddGameObject(CurrentProjectile);
+          CurrentProjectileLaunchCooldown = (float)ProjectileLaunchCooldown.TotalSeconds;
+
+          Global.Game.AddGameObject(projectile);
         }
 
         Global.Game.DebugDrawCommands.Add(view =>

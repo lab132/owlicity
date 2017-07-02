@@ -386,6 +386,8 @@ namespace Owlicity
 
       if(result == null)
       {
+        const float owliverHotspotY = 230.0f;
+
         SpriteAnimationConfig config = SpriteAnimationConfig.Default;
 
         switch(animType)
@@ -394,7 +396,7 @@ namespace Owlicity
           {
             config.TileSheetName = "owliver_idle_front_left_spritesheet";
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(125, 230);
+            config.Hotspot = new Vector2(125, owliverHotspotY);
           }
           break;
 
@@ -403,7 +405,7 @@ namespace Owlicity
             config.TileSheetName = "owliver_idle_front_left_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(129, 230);
+            config.Hotspot = new Vector2(129, owliverHotspotY);
           }
           break;
 
@@ -411,7 +413,7 @@ namespace Owlicity
           {
             config.TileSheetName = "owliver_walk_front_left_spritesheet";
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(125, 230);
+            config.Hotspot = new Vector2(125, owliverHotspotY);
           }
           break;
 
@@ -420,7 +422,7 @@ namespace Owlicity
             config.TileSheetName = "owliver_walk_front_left_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(129, 230);
+            config.Hotspot = new Vector2(129, owliverHotspotY);
           }
           break;
 
@@ -428,7 +430,7 @@ namespace Owlicity
           {
             config.TileSheetName = "owliver_attack_spritesheet";
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(169, 230);
+            config.Hotspot = new Vector2(169, owliverHotspotY);
             config.TileCount = 5;
             config.PingPong = false;
             config.NumLoopsToPlay = 1;
@@ -440,7 +442,7 @@ namespace Owlicity
             config.TileSheetName = "owliver_attack_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(86, 230);
+            config.Hotspot = new Vector2(86, owliverHotspotY);
             config.TileCount = 5;
             config.PingPong = false;
             config.NumLoopsToPlay = 1;
@@ -451,7 +453,7 @@ namespace Owlicity
           {
             config.TileSheetName = "owliver_idle_fishingrod_spritesheet";
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(125, 230);
+            config.Hotspot = new Vector2(125, owliverHotspotY);
           }
           break;
 
@@ -460,7 +462,7 @@ namespace Owlicity
             config.TileSheetName = "owliver_idle_fishingrod_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(129, 230);
+            config.Hotspot = new Vector2(129, owliverHotspotY);
           }
           break;
 
@@ -468,7 +470,7 @@ namespace Owlicity
           {
             config.TileSheetName = "owliver_walk_fishingrod_spritesheet";
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(125, 230);
+            config.Hotspot = new Vector2(125, owliverHotspotY);
           }
           break;
 
@@ -477,7 +479,7 @@ namespace Owlicity
             config.TileSheetName = "owliver_walk_fishingrod_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(129, 230);
+            config.Hotspot = new Vector2(129, owliverHotspotY);
           }
           break;
 
@@ -485,7 +487,7 @@ namespace Owlicity
           {
             config.TileSheetName = "owliver_attack_fishingrod_spritesheet";
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(169, 230);
+            config.Hotspot = new Vector2(169, owliverHotspotY);
             config.TileCount = 5;
             config.PingPong = false;
             config.NumLoopsToPlay = 1;
@@ -497,7 +499,7 @@ namespace Owlicity
             config.TileSheetName = "owliver_attack_fishingrod_spritesheet";
             config.SpriteEffects = SpriteEffects.FlipHorizontally;
             config.Scale = Global.OwliverScale;
-            config.Hotspot = new Vector2(86, 230);
+            config.Hotspot = new Vector2(86, owliverHotspotY);
             config.TileCount = 5;
             config.PingPong = false;
             config.NumLoopsToPlay = 1;

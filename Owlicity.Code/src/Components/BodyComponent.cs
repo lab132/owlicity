@@ -55,6 +55,7 @@ namespace Owlicity
         break;
       }
 
+      Debug.Assert(Body != null);
       Body.UserData = this;
       foreach(Fixture fixture in Body.FixtureList)
       {

@@ -320,7 +320,7 @@ namespace Owlicity
         offset: Conversion.ToMeters(0, -130) * Global.OwliverScale);
       upperFixture.CollidesWith = CollisionCategory.EnemyWeapon;
 
-      MyBody.CollisionCategories = CollisionCategory.Friendly;
+      MyBody.CollisionCategories = CollisionCategory.Friendly | CollisionCategory.Owliver;
       MyBody.FixedRotation = true;
       MyBody.SleepingAllowed = false;
       MyBody.LinearDamping = 15.0f;
